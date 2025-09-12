@@ -1,0 +1,22 @@
+case_id: "{{CASE_ID}}"
+case_title: "Short, descriptive title of the verification case"
+objective: |
+What are we verifying? (e.g., 1D linear front ROS vs. analytical solution)
+assumptions:
+- Dry fuels, no spotting, steady uniform wind
+- 2D Cartesian mesh, constant cell size
+- Periodic lateral boundary conditions (if applicable)
+expected_results: |
+State the expected values/curves and why (analytical derivation or literature)
+acceptance_criteria:
+ros_rmse_pct: 5 # example: ≤ 5% RMSE vs theory
+hrr_bias_pct: 10 # example: ≤ 10% bias allowed
+elmfire:
+bin: "${ELMFIRE_BIN:-/path/to/elmfire}"
+config: "elmf_config.inp"
+runtime_limit_s: 7200
+postprocess:
+figures:
+- "ROS_profile.png"
+- "HRRPUA_time_series.png"
+generate_pdf: true
