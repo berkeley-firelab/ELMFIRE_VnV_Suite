@@ -1,29 +1,12 @@
 \documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{graphicx}
-\usepackage{siunitx}
-\usepackage{booktabs}
-\usepackage{hyperref}
-\usepackage{amsmath, amssymb}
-\usepackage{enumitem}
-\usepackage{cleveref}
 
-% ==== Case metadata (edit as needed) ====
-\newcommand{\CaseID}{mc\_toa\_uniform\_mask}
-\newcommand{\CaseTitle}{Monte Carlo Time-of-Arrival (ToA) under Uniform Ignition Masks}
-\newcommand{\CaseOwner}{Yiren Qin}
-\newcommand{\CaseVersion}{v0.1}
-\newcommand{\CaseDate}{\today}
-
-\title{ELMFIRE Verification Case\\\CaseTitle}
-\author{\CaseOwner}
-\date{\CaseDate\ (\CaseVersion)}
 
 \begin{document}
 \maketitle
 
+
 \section*{Case Summary}
-\textbf{Case ID:} \CaseID \\
+\textbf{Case ID:} \CaseID\\
 \textbf{Objective:} Justify the Monte Carlo (MC) method used by ELMFIRE for ignition sampling by deriving the expected time-of-arrival (ToA) statistics at a target pixel when ignition is drawn uniformly from a specified mask (square or circle). We compare the empirical ToA distribution from ensembles to the mask-implied expectation, and quantify how many ensembles are needed for convergence.
 
 \section{Assumptions}
@@ -35,6 +18,7 @@
   \item Coordinates are meters; the ToA along a ray from source to target uses the directional ROS returned by the ellipse kinematics.
   \item Ignition location $X$ is uniformly distributed on the mask region $\Omega$ (square or circle).
 \end{itemize}
+
 
 \section{Simulation Setup}
 \subsection{Parameter Table}
@@ -68,7 +52,16 @@ For a source $\mathbf{x}\in\Omega$, we compute a direction angle $\theta=\mathrm
 \end{equation}
 The MATLAB driver (provided) evaluates $T(\mathbf{x})$ for all grid points inside the mask (uniform discrete sampling) and produces histograms and sample moments (mean/min/max).
 
-\section{Expected Statistics and Reasoning}
+
+\subsection{Input Data}
+Describe input rasters, constants, initial conditions.
+
+
+\subsection{Numerical Controls}
+Mesh resolution, Time step(CFL), level-set solver options, etc.
+
+
+\section{Expected Results and Reasoning}
 Let $X\sim\mathrm{Unif}(\Omega)$ be the ignition location and $T = T(X)$ the induced ToA random variable. The \emph{mask-implied} expected value and CDF are
 \begin{align}
   \mathbb{E}[T] &= \frac{1}{|\Omega|}\int_{\Omega}\! \frac{d(\mathbf{x})}{\tilde v(\mathbf{x})}\, d\mathbf{x}, 
@@ -141,5 +134,9 @@ After running $N$-member ELMFIRE ensembles with random ignition draws on the sam
   \item Command(s): \texttt{./run\_case.sh}; environment: \texttt{<modules/conda env>}.
   \item Logs available under \texttt{cases/\CaseID/logs/}.
 \end{itemize}
+
+
+\section{Discussion}
+
 
 \end{document}

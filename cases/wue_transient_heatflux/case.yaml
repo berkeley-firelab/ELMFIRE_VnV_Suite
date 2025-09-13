@@ -1,0 +1,12 @@
+case_id: "wue_transient_heatflux"
+case_title: "Transient heatflux verification with WU-E model"
+
+elmfire:
+bin: "${ELMFIRE_BIN:-elmfire_debug_2025.07_hf}"
+config: "elmfire.data.in"
+path_to_gdal: "${PATH_TO_GDAL:-/path/to/gd}"
+
+postprocess:
+figures:
+- "ROS_profile.png"
+- "HRRPUA_time_series.png"

@@ -1,0 +1,11 @@
+case_id: "ignition_mask_bp_convergence"
+case_title: "Monte Carlo Time-of-Arrival (ToA) under Uniform Ignition Masks"
+
+elmfire:
+bin: "${ELMFIRE_BIN:elmfire_debug_2025.07_hf}"
+config: "elmfire.data.in"
+
+postprocess:
+figures:
+- "ROS_profile.png"
+- "HRRPUA_time_series.png"

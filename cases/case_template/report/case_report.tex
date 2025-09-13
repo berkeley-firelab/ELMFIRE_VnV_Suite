@@ -20,7 +20,7 @@ List assumptions concisely:
 
 
 \section{Simulation Setup}
-Key parameters and configuration choices. Cite the specific ELMFIRE config and any pre/post processing steps.
+Key parameters and configuration choices (in elmfire.data.in). Cite the specific ELMFIRE config and any pre/post processing steps.
 
 
 \subsection{Input Data}
@@ -28,7 +28,7 @@ Describe input rasters, constants, initial conditions.
 
 
 \subsection{Numerical Controls}
-Time step, CFL, output cadence, etc.
+Mesh resolution, Time step(CFL), level-set solver options, etc.
 
 
 \section{Expected Results and Reasoning}
@@ -40,7 +40,7 @@ Define quantitative pass/fail criteria (e.g., RMSE\,\(\leq\)\,\SI{5}{\percent}).
 
 
 \section{Results}
-\input{figures.tex} % Auto‑generated figures
+Discussion with figures generated in the folder `figures'. 
 
 
 \subsection{Key Metrics}
@@ -48,11 +48,6 @@ Summarize metric values (auto‑insert from JSON if desired in a later extension
 
 
 \section{Discussion}
-Discuss deviations, sensitivities, and next steps.
-
-
-\section*{Reproducibility}
-Commit hash, command line, environment info. Attach logs if needed.
 
 
 \end{document}

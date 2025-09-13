@@ -12,6 +12,7 @@ YAML="$CASE_DIR/case.yaml"
 ELMFIRE_BIN=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'bin:' 'NF>1{gsub(/[ \"]/, "", $2); print $2}')
 ELMFIRE_CFG=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'config:' 'NF>1{gsub(/[ \"]/, "", $2); print $2}')
 RUNTIME_LIMIT=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'runtime_limit_s:' 'NF>1{gsub(/[ \"]/, "", $2); print $2}')
+PATH_TO_GDAL=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'path_to_gdal:' 'NF>1{gsub(/[ \"]/, "", $2); print $2}')
 
 mkdir -p "$CASE_DIR/output" "$CASE_DIR/figures" "$CASE_DIR/logs" 
 mkdir -p "$CASE_DIR/logs/scratch"
@@ -34,6 +35,11 @@ fi
 if [[ $ELAPSED -gt ${RUNTIME_LIMIT:-999999} ]]; then
 echo "[WARN] Runtime exceeded limit ($ELAPSED s > ${RUNTIME_LIMIT}s)" >&2
 fi
+
+
+# (Optional) move/copy model outputs into ./output
+# Example: mv *.csv "$CASE_DIR/output/" || true
+
 
 # --- Postprocess & Figures ---
 python3 "$CASE_DIR/scripts/postprocess.py" --case-dir "$CASE_DIR"

@@ -1,69 +1,17 @@
 \documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{graphicx}
-\usepackage{siunitx}
-\usepackage{booktabs}
-\usepackage{hyperref}
-\usepackage{amsmath, amssymb}
-\usepackage{enumitem}
-\usepackage{cleveref}
 
-% ==== Case metadata (edit as needed) ====
-\newcommand{\CaseID}{wue\_heatflux\_ellipse\_transient}
-\newcommand{\CaseTitle}{WU--E Heat-Flux Model with Wind-Aligned Ellipse and Transient HRR}
-\newcommand{\CaseOwner}{Yiren Qin}
-\newcommand{\CaseVersion}{v0.1}
-\newcommand{\CaseDate}{\today}
-
-\title{ELMFIRE Verification Case\\\CaseTitle}
-\author{\CaseOwner}
-\date{\CaseDate\ (\CaseVersion)}
 
 \begin{document}
 \maketitle
 
+
 \section*{Case Summary}
-\textbf{Case ID:} \CaseID \\
+\textbf{Case ID:} \CaseID\\
 \textbf{Objective:} Verify the WU--E (urban structure) heat-flux prototype that couples a wind-aligned anisotropic fire ellipse (Hamada-style regression) with a piecewise transient design-fire curve for HRRPUA. We check that (i) geometric transformations, (ii) ellipse reach/coverage, (iii) per-cell HRR normalization, and (iv) heat-flux partitions (direct flame contact vs.\ radiation) reproduce expected behavior and conserve energy consistently.
 
-\section{Assumptions}
-\begin{itemize}[nosep]
-  \item Urban array represented on a uniform analysis grid of square cells of size $\Delta$ (m).
-  \item Structures have a non-burnable fraction $\mathrm{NONBURNABLE\_FRAC}$; the remainder contributes to heat release/flux.
-  \item HRRPUA follows a piecewise transient curve with early growth, plateau, and decay; negative segments are clipped to zero.
-  \item Wind-aligned ellipse is derived from 20-ft wind inputs $(\mathrm{WD}_{20ft}, \mathrm{WS}_{20ft})$ and geometric parameters $(A,D)$ with a proportionality $W_p$.
-  \item Radiation is applied outside the ellipse up to a cutoff radius $R_{\mathrm{rad}}$; convective/design-fire contact (DFC) acts within the ellipse footprint.
-  \item Units: distances in meters; heat flux in kW/m$^2$.
-\end{itemize}
-
-\section{Simulation Setup}
-\subsection{Parameter Table (defaults)}
-\begin{center}
-\small
-\begin{tabular}{lcl}
-\toprule
-Properties & Symbols & Values \\
-\hline
-Absorptivity & $\alpha$ & 0.89 \\
-Radiation cutoff (m) & $R_{\mathrm{rad}}$ & 100 \\
-Analysis cell size (m) & $\Delta$ & 20 \\
-Wind direction (deg, from) & $\mathrm{WD}_{20ft}$ & 0 \\
-Wind speed (mph) & $\mathrm{WS}_{20ft}$ & 40 \\
-Footprint dim.\ (m) & $A$ & 10 \\
-Separation (m) & $D$ & 10 \\
-Wind proportionality & $W_p$ & 1 \\
-Non-burnable fraction & $\mathrm{NONBURNABLE\_FRAC}$ & 0 \\
-Early, dev., decay times (s) & $(t_{\mathrm{early}}, t_{\mathrm{dev}}, t_{\mathrm{decay}})$ & (300, 3900, 4200) \\
-Peak HRRPUA (kW/m$^2$) & $\mathrm{HRRPUA_{peak}}$ & 400 \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\subsection{Grid and Indices}
-Cells are indexed by $i,j\in\{-5,\dots,5\}$ with centers $(x,y)=(i\,\Delta,\; j\,\Delta)$ relative to the burning structure at $(0,0)$.
-
-\section{Method}
-\subsection{Coordinate Transformations}
+\section{Methods}
+\subsections{Theory}
+\subsection*{Coordinate Transformations}
 Geometric angle from source to target cell:
 \begin{equation}
   \theta=\arctan\!\big(j,\; i\big)\quad (\mathrm{rad}).
@@ -78,7 +26,7 @@ Relative angle for ellipse formulas:
   R=\sqrt{(i\,\Delta)^2+(j\,\Delta)^2}.
 \end{equation}
 
-\subsection{Wind-Aligned Ellipse (Hamada-Style)}
+\subsection*{Wind-Aligned Ellipse (Hamada-Style)}
 Convert wind speed to m/s:
 \begin{equation}
   V=0.447\,\mathrm{WS}_{20ft}.
@@ -113,7 +61,7 @@ State vector:
 \mathbf{E}=\big[a,\, b,\, \varepsilon,\, D_\downarrow\big]^{\mathsf T}.
 \]
 
-\subsection{Ellipse Reach and Coverage}
+\subsection*{Ellipse Reach and Coverage}
 Maximum reach (scalar):
 \begin{equation}
   R_{\max}=0.3\,D_\downarrow\,\frac{a-\varepsilon}{b^2}.
@@ -134,14 +82,14 @@ Radiation annulus outside DFC, bounded by cutoff:
   F_{\mathrm{rad}}&=\Delta_{\mathrm{rad}}\bigl(1-C_{\mathrm{DFC}}\bigr). 
 \end{align}
 
-\subsection{Per-Cell HRR Normalization}
+\subsection*{Per-Cell HRR Normalization}
 To conserve total HRRPUA over the ellipse footprint, use the adjuster
 \begin{equation}
   C_\mathrm{HRR}=\frac{\Delta^2}{\pi \, (b/a)\, a\, b}
   = \frac{\Delta^2}{\pi b^2}.
 \end{equation}
 
-\subsection{Transient HRRPUA}
+\subsection*{Transient HRRPUA}
 For burning time $\tau$ and parameters $(t_{\mathrm{early}}, t_{\mathrm{dev}}, t_{\mathrm{decay}}, \mathrm{HRRPUA_{peak}})$:
 \begin{equation}
 \mathrm{HRRPUA}(\tau)=
@@ -154,7 +102,7 @@ For burning time $\tau$ and parameters $(t_{\mathrm{early}}, t_{\mathrm{dev}}, t
 \qquad \mathrm{HRRPUA}(\tau)\leftarrow \max\{0,\mathrm{HRRPUA}(\tau)\}.
 \end{equation}
 
-\subsection{Per-Cell Heat Fluxes}
+\subsection*{Per-Cell Heat Fluxes}
 Let $C_{\mathrm{burn}}=1-\mathrm{NONBURNABLE\_FRAC}$. Then
 \begin{align}
   q''_{\mathrm{DFC}} &= C_{\mathrm{burn}}\,C_{\mathrm{DFC}}\,\mathrm{HRRPUA}(\tau)\,C_\mathrm{HRR},\\
@@ -165,7 +113,7 @@ Let $C_{\mathrm{burn}}=1-\mathrm{NONBURNABLE\_FRAC}$. Then
   \end{cases}
 \end{align}
 
-\subsection{Algorithm (Per Time Step)}
+\subsection*{Algorithm (Per Time Step)}
 \begin{enumerate}[nosep,label=\arabic*.]
   \item Set $\tau=t-t_0$ and compute $\mathrm{HRRPUA}(\tau)$.
   \item From $(\mathrm{WS}_{20ft},A,D,W_p)$ compute $\mathbf{E}=[a,b,\varepsilon,D_\downarrow]$.
@@ -176,6 +124,50 @@ Let $C_{\mathrm{burn}}=1-\mathrm{NONBURNABLE\_FRAC}$. Then
     \item Evaluate $q''_{\mathrm{DFC}}$ and $q''_{\mathrm{rad}}$.
   \end{enumerate}
 \end{enumerate}
+
+\subsection{Assumptions}
+\begin{itemize}[nosep]
+  \item Urban array represented on a uniform analysis grid of square cells of size $\Delta$ (m).
+  \item Structures have a non-burnable fraction $\mathrm{NONBURNABLE\_FRAC}$; the remainder contributes to heat release/flux.
+  \item HRRPUA follows a piecewise transient curve with early growth, plateau, and decay; negative segments are clipped to zero.
+  \item Wind-aligned ellipse is derived from 20-ft wind inputs $(\mathrm{WD}_{20ft}, \mathrm{WS}_{20ft})$ and geometric parameters $(A,D)$ with a proportionality $W_p$.
+  \item Radiation is applied outside the ellipse up to a cutoff radius $R_{\mathrm{rad}}$; convective/design-fire contact (DFC) acts within the ellipse footprint.
+  \item Units: distances in meters; heat flux in kW/m$^2$.
+\end{itemize}
+
+\subsection{Simulation Setup}
+\subsection*{Parameter Table (defaults)}
+\begin{center}
+\small
+\begin{tabular}{lcl}
+\toprule
+Properties & Symbols & Values \\
+\hline
+Absorptivity & $\alpha$ & 0.89 \\
+Radiation cutoff (m) & $R_{\mathrm{rad}}$ & 100 \\
+Analysis cell size (m) & $\Delta$ & 20 \\
+Wind direction (deg, from) & $\mathrm{WD}_{20ft}$ & 0 \\
+Wind speed (mph) & $\mathrm{WS}_{20ft}$ & 40 \\
+Footprint dim.\ (m) & $A$ & 10 \\
+Separation (m) & $D$ & 10 \\
+Wind proportionality & $W_p$ & 1 \\
+Non-burnable fraction & $\mathrm{NONBURNABLE\_FRAC}$ & 0 \\
+Early, dev., decay times (s) & $(t_{\mathrm{early}}, t_{\mathrm{dev}}, t_{\mathrm{decay}})$ & (300, 3900, 4200) \\
+Peak HRRPUA (kW/m$^2$) & $\mathrm{HRRPUA_{peak}}$ & 400 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Grid and Indices}
+Cells are indexed by $i,j\in\{-5,\dots,5\}$ with centers $(x,y)=(i\,\Delta,\; j\,\Delta)$ relative to the burning structure at $(0,0)$.
+
+\subsection{Input Data}
+Describe input rasters, constants, initial conditions.
+
+
+\subsection{Numerical Controls}
+Mesh resolution, Time step(CFL), level-set solver options, etc.
+
 
 \section{Expected Results and Reasoning}
 \begin{itemize}[nosep]
@@ -221,5 +213,6 @@ This section includes diagnostic figures:
   \item Command(s): \texttt{./run\_case.sh}; environment: \texttt{<modules/conda env>}.
   \item Logs under \texttt{cases/\CaseID/logs/}; figures in \texttt{cases/\CaseID/figures/}.
 \end{itemize}
+
 
 \end{document}

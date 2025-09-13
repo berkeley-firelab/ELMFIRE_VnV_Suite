@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euo pipefail # Ensure the script won’t continue in a half-broken state.
 ROOT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." &>/dev/null && pwd)
 TEMPLATE="$ROOT_DIR/cases/case_template"
 CASES_DIR="$ROOT_DIR/cases"
@@ -23,11 +23,17 @@ rsync -a --exclude "figures" --exclude "output" --exclude "logs" "$TEMPLATE/" "$
 
 
 # Token replacement
-sed -i.bak -e "s/{{CASE_ID}}/$CASE_ID/g" "$DEST/case.yaml" "$DEST/report/case_macros.tex" "$DEST/README.md"
+sed -i.bak -e "s/{{CASE_ID}}/$CASE_ID/g" "$DEST/case.yaml" "$DEST/report/case_macros.tex" 
 rm -f "$DEST"/*.bak "$DEST"/report/*.bak || true
 
 
 echo "[OK] Created case at $DEST"
 
 
-echo "Next steps:\n cd $DEST\n # Edit case.yaml, elmf_config.inp, report/case_macros.tex\n ./run_case.sh"
+echo "Next steps:"
+echo "- cd $DEST, and edit the following:"
+echo "case.yaml: Case Metadata"
+echo "report/case_macros.tex: Case report Metadata"
+echo "report/case_report.tex: Detailed report"
+echo "scripts/postprocess.py: Case-specific Postprocessing pipeline"
+echo "- ./run_case.sh"
