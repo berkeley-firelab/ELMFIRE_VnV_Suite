@@ -36,11 +36,6 @@ if [[ $ELAPSED -gt ${RUNTIME_LIMIT:-999999} ]]; then
 echo "[WARN] Runtime exceeded limit ($ELAPSED s > ${RUNTIME_LIMIT}s)" >&2
 fi
 
-
-# (Optional) move/copy model outputs into ./output
-# Example: mv *.csv "$CASE_DIR/output/" || true
-
-
 # --- Postprocess & Figures ---
 python3 "$CASE_DIR/scripts/postprocess.py" --case-dir "$CASE_DIR"
 

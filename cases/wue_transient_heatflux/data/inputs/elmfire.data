@@ -1,5 +1,5 @@
 &INPUTS
-FUELS_AND_TOPOGRAPHY_DIRECTORY = './data/inputs'
+FUELS_AND_TOPOGRAPHY_DIRECTORY = './inputs'
 ASP_FILENAME                   = 'asp'
 CBD_FILENAME                   = 'cbd'
 CBH_FILENAME                   = 'cbh'
@@ -11,7 +11,7 @@ SLP_FILENAME                   = 'slp'
 ADJ_FILENAME                   = 'adj'
 PHI_FILENAME                   = 'new_phi'
 DT_METEOROLOGY                 = 3600.0
-WEATHER_DIRECTORY              = './data/inputs'
+WEATHER_DIRECTORY              = './inputs'
 WS_FILENAME                    = 'ws'
 WD_FILENAME                    = 'wd'
 M1_FILENAME                    = 'm1'
@@ -89,9 +89,9 @@ USE_CONSTANT_BLDG_SPREAD_MODEL_PARAMS = .TRUE.
 /
 
 &MISCELLANEOUS
-MISCELLANEOUS_INPUTS_DIRECTORY = './data/misc'
+MISCELLANEOUS_INPUTS_DIRECTORY = './misc'
 FUEL_MODEL_FILE                = 'fuel_models.csv'
 BUILDING_FUEL_MODEL_FILE       = 'building_fuel_models.csv'
 PATH_TO_GDAL                   ='/global/home/users/yirenqin712/.conda/envs/elmfire/bin/'
-SCRATCH                        = './data/scratch'
+SCRATCH                        = './scratch'
 /
