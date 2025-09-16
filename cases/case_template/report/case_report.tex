@@ -1,53 +1,15 @@
 \documentclass[11pt]{article}
+% --- Packages every case needs ---
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{subfiles}
 
+% --- Any helper macros you like ---
+\newcommand{\atanII}[2]{\operatorname{atan2}\!\left(#1,#2\right)} % safer atan2
 
 \begin{document}
-\maketitle
-
-
-\section*{Case Summary}
-\textbf{Case ID:} \CaseID\\
-\textbf{Objective:} Brief objective, linking to theory/expected outcomes.
-
-
-\section{Assumptions}
-List assumptions concisely:
-\begin{itemize}[nosep]
-\item Homogeneous fuel; no spotting; steady uniform wind.
-\item 2D structured grid, constant \(\Delta x = \Delta y\).
-\item Boundary conditions: specify.
-\end{itemize}
-
-
-\section{Simulation Setup}
-Key parameters and configuration choices (in elmfire.data.in). Cite the specific ELMFIRE config and any pre/post processing steps.
-
-
-\subsection{Input Data}
-Describe input rasters, constants, initial conditions.
-
-
-\subsection{Numerical Controls}
-Mesh resolution, Time step(CFL), level-set solver options, etc.
-
-
-\section{Expected Results and Reasoning}
-Derive the expected behavior (analytical solution or literature correlations). Include equations and parameter substitutions.
-
-
-\section{Acceptance Criteria}
-Define quantitative pass/fail criteria (e.g., RMSE\,\(\leq\)\,\SI{5}{\percent}).
-
-
-\section{Results}
-Discussion with figures generated in the folder `figures'. 
-
-
-\subsection{Key Metrics}
-Summarize metric values (auto‑insert from JSON if desired in a later extension) and state Pass/Fail.
-
-
-\section{Discussion}
-
-
+\subfile{case_body.tex}
 \end{document}

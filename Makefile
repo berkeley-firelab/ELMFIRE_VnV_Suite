@@ -1,4 +1,4 @@
-.PHONY: new run build-all main clean
+-.PHONY: new run build-all main clean
 
 
 new:

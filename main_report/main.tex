@@ -4,6 +4,13 @@
 \usepackage{pdfpages}
 \usepackage{titlesec}
 \usepackage{tocloft}
+\usepackage{subfiles}
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+
 \setlength{\cftbeforesecskip}{6pt}
 
 
@@ -14,12 +21,16 @@
 
 \begin{document}
 \maketitle
+
+\newpage
 \tableofcontents
+
+\newpage
 \input{preface.tex}
 
 % Auto‑generated list of case PDFs:
-% \input{case_reports/VE_1.tex}
-% \input{case_reports/VE_2.tex}
+\newpage
+\input{cases.tex}
 
 
 \end{document}

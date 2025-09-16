@@ -1,0 +1,52 @@
+% Load per-case macros and prerequisites
+\input{case_macros.tex}
+
+\documentclass[../report/case_report.tex]{subfiles}
+\begin{document}
+
+\subsection*{Case Summary}
+\textbf{Case ID:} \CaseID\\
+\textbf{Objective:} Brief objective, linking to theory/expected outcomes.
+
+
+\subsection{Assumptions}
+List assumptions concisely:
+\begin{itemize}[nosep]
+\item Homogeneous fuel; no spotting; steady uniform wind.
+\item 2D structured grid, constant \(\Delta x = \Delta y\).
+\item Boundary conditions: specify.
+\end{itemize}
+
+
+\subsection{Simulation Setup}
+Key parameters and configuration choices (in elmfire.data.in). Cite the specific ELMFIRE config and any pre/post processing steps.
+
+
+\subsubsection{Input Data}
+Describe input rasters, constants, initial conditions.
+
+
+\subsubsection{Numerical Controls}
+Mesh resolution, Time step(CFL), level-set solver options, etc.
+
+
+\subsection{Expected Results and Reasoning}
+Derive the expected behavior (analytical solution or literature correlations). Include equations and parameter substitutions.
+
+
+\subsection{Acceptance Criteria}
+Define quantitative pass/fail criteria (e.g., RMSE\,\(\leq\)\,\SI{5}{\percent}).
+
+
+\subsection{Results}
+Discussion with figures generated in the folder `figures'. 
+
+
+\subsubsection{Key Metrics}
+Summarize metric values (auto‑insert from JSON if desired in a later extension) and state Pass/Fail.
+
+
+\subsection{Discussion}
+
+
+\end{document}

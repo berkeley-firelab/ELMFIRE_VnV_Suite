@@ -1,1 +1,11 @@
 .DS_Store
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+.aux
+*.stderr
+*.stdout
+*.synctex.gz
+*.out
+*.toc

@@ -1,142 +1,16 @@
+% --- Any helper macros you like ---
+\newcommand{\atanII}[2]{\operatorname{atan2}\!\left(#1,#2\right)} % safer atan2
+
 \documentclass[11pt]{article}
 
+% --- Packages every case needs ---
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{subfiles}
 
 \begin{document}
-\maketitle
-
-
-\section*{Case Summary}
-\textbf{Case ID:} \CaseID\\
-\textbf{Objective:} Justify the Monte Carlo (MC) method used by ELMFIRE for ignition sampling by deriving the expected time-of-arrival (ToA) statistics at a target pixel when ignition is drawn uniformly from a specified mask (square or circle). We compare the empirical ToA distribution from ensembles to the mask-implied expectation, and quantify how many ensembles are needed for convergence.
-
-\section{Assumptions}
-\begin{itemize}[nosep]
-  \item Flat terrain: slope $=0$, aspect arbitrary but unused for $SLP=0$.
-  \item Homogeneous fuel: \texttt{IFBFM = 102}, fixed moisture: $M_1=0.03$, $M_{10}=0.04$, $M_{100}=0.05$, $M_\mathrm{lh}=0.30$, $M_\mathrm{lw}=0.60$.
-  \item Steady wind: direction $\mathrm{WD20}=180^\circ$ (blowing to the north), speed $\mathrm{WS20}=15$ mph; canopy terms set to zero ($CC=CH=0$).
-  \item No spotting/suppression; acceleration factor $=1$; length/width cap $\mathrm{LOW}_{\max}=8$.
-  \item Coordinates are meters; the ToA along a ray from source to target uses the directional ROS returned by the ellipse kinematics.
-  \item Ignition location $X$ is uniformly distributed on the mask region $\Omega$ (square or circle).
-\end{itemize}
-
-
-\section{Simulation Setup}
-\subsection{Parameter Table}
-\begin{center}
-\small
-\begin{tabular}{lcl}
-\toprule
-Fuel model & IFBFM & 102 \\
-\hline
-Dead fuel moisture & $M_1, M_{10}, M_{100}$ & 0.03, 0.04, 0.05 \\
-Live fuel moisture & $M_\mathrm{lh}, M_\mathrm{lw}$ & 0.30, 0.60 \\
-Wind (20-ft) & $(\mathrm{WD20}, \mathrm{WS20})$ & $(180^\circ, 15~\mathrm{mph})$ \\
-Slope / Aspect & $(SLP, ASP)$ & $(0^\circ, 0^\circ)$ \\
-Adj. factors & $(ADJ, \mathrm{ACCEL})$ & $(1, 1)$ \\
-Ellipse cap & $\mathrm{LOW}_{\max}$ & 8 \\
-Target (m) & $\mathbf{y}$ & $(50, 200)$ \\
-Square mask (m) & $\Omega_\square$ & $[0, 100]\times[0, 100]$ \\
-Circle mask (m) & $\Omega_\circ$ & center $(50,50)$, radius $R=20$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\subsection{Method (MATLAB Reference)}
-For a source $\mathbf{x}\in\Omega$, we compute a direction angle $\theta=\mathrm{atan2}(y_y-x_y, y_x-x_x)$, set the fireline normal to $(\cos\theta,\sin\theta)$, update ellipse kinematics via \texttt{UX\_AND\_UY\_ELLIPTICAL}, and obtain the directional rate of spread (ROS) magnitude $v(\mathbf{x})$ (ft/min). The straight-line source-to-target distance is $d(\mathbf{x})=\lVert \mathbf{y}-\mathbf{x}\rVert$. Time of arrival is
-\begin{equation}
-  T(\mathbf{x})=
-  \begin{cases}
-    \dfrac{d(\mathbf{x})}{\,v(\mathbf{x})\cdot \frac{0.3048}{60}\,}, & \text{if coordinates in meters} \\
-    \dfrac{d(\mathbf{x})}{\,v(\mathbf{x})\,}, & \text{if coordinates in feet}.
-  \end{cases}
-\end{equation}
-The MATLAB driver (provided) evaluates $T(\mathbf{x})$ for all grid points inside the mask (uniform discrete sampling) and produces histograms and sample moments (mean/min/max).
-
-
-\subsection{Input Data}
-Describe input rasters, constants, initial conditions.
-
-
-\subsection{Numerical Controls}
-Mesh resolution, Time step(CFL), level-set solver options, etc.
-
-
-\section{Expected Results and Reasoning}
-Let $X\sim\mathrm{Unif}(\Omega)$ be the ignition location and $T = T(X)$ the induced ToA random variable. The \emph{mask-implied} expected value and CDF are
-\begin{align}
-  \mathbb{E}[T] &= \frac{1}{|\Omega|}\int_{\Omega}\! \frac{d(\mathbf{x})}{\tilde v(\mathbf{x})}\, d\mathbf{x}, 
-  \quad \tilde v(\mathbf{x}) = v(\mathbf{x})\cdot \frac{0.3048}{60} \;\; (\mathrm{m/min}),\\
-  F_T(t) &= \mathbb{P}\!\left(\frac{d(\mathbf{x})}{\tilde v(\mathbf{x})}\le t\right)
-          = \frac{1}{|\Omega|}\int_{\{\mathbf{x}\in\Omega: d(\mathbf{x})\le t\,\tilde v(\mathbf{x})\}} d\mathbf{x}.
-\end{align}
-In special cases:
-\begin{itemize}[nosep]
-  \item If $v(\mathbf{x})\equiv v_0$ (isotropic ROS), then $T(\mathbf{x}) = d(\mathbf{x})/v_0$ and the ToA distribution is the distance distribution over $\Omega$ scaled by $1/v_0$.
-  \item With an anisotropic ellipse (wind-aligned), $v(\mathbf{x})$ varies only through the direction from $\mathbf{x}$ to $\mathbf{y}$; the expectation remains an area integral, efficiently approximated by uniform quadrature on the same grid the script uses.
-\end{itemize}
-Thus, the MATLAB “all-points-in-mask” evaluation \emph{is} a numerical quadrature for $\mathbb{E}[T]$ and the full $F_T$, which we treat as the \emph{expected} mask-implied reference.
-
-\section{Verification Plan with ELMFIRE Ensembles}
-ELMFIRE ensembles will use identical physics and environmental settings, but ignition locations will be drawn randomly from $\Omega$ with equal probability. For an ensemble size $N$, define the empirical CDF $\hat F_T^{(N)}$ and moments (mean $\hat\mu_N$, variance $\hat\sigma_N^2$). Convergence is assessed against the mask-implied reference $(F_T, \mu, \sigma^2)$ via:
-\begin{enumerate}[nosep]
-  \item \textbf{Mean Relative Error (MRE):} $\mathrm{MRE} = |\hat\mu_N - \mu|/\mu$.
-  \item \textbf{RMSE of histogram/bin means} over a fixed partition of $t$.
-  \item \textbf{Kolmogorov–Smirnov (KS) distance:} $D_N = \sup_t |\hat F_T^{(N)}(t)-F_T(t)|$.
-\end{enumerate}
-A practical sample-size target for the mean uses the CLT:
-\begin{equation}
-  N \;\gtrsim\; \left(\frac{z_{1-\alpha/2}\,\sigma}{\varepsilon\,\mu}\right)^2,
-\end{equation}
-where $\varepsilon$ is the desired relative error tolerance and $z_{1-\alpha/2}$ the normal quantile. We estimate $\sigma$ from either the mask quadrature or pilot ensembles.
-
-\section{Acceptance Criteria}
-\begin{itemize}[nosep]
-  \item \textbf{Mean:} $\mathrm{MRE} \le \SI{5}{\percent}$.
-  \item \textbf{Distribution:} KS distance $D_N \le 0.05$ (typical); and visual agreement of PDF/CDF.
-  \item \textbf{Stability:} Increasing $N$ by a factor of two changes $\hat\mu_N$ by $\le \SI{2}{\percent}$ and $D_N$ by $\le 0.01$.
-\end{itemize}
-
-\section{Results (Mask-Implied Reference)}
-This section presents the direct evaluation from the MATLAB loop over all source points inside the mask:
-\begin{itemize}[nosep]
-  \item Histogram/PDF of ToA for the \emph{square} mask (uniform over $[0,100]^2$).
-  \item Histogram/PDF of ToA for the \emph{circle} mask (center $(50,50)$, $R=20$).
-  \item Empirical CDFs and summary moments (mean/min/max) for each mask.
-\end{itemize}
-
-% Auto-generated figures from your post-processing:
-% Suggested filenames (update to your pipeline as needed):
-%   figures/ToA_hist_square.png
-%   figures/ToA_hist_circle.png
-%   figures/ToA_cdf_square.png
-%   figures/ToA_cdf_circle.png
-% \input{figures.tex}
-
-\section{Results (ELMFIRE Ensembles)}
-After running $N$-member ELMFIRE ensembles with random ignition draws on the same mask(s):
-\begin{enumerate}[nosep]
-  \item Compare ensemble histograms/CDFs vs. mask-implied reference.
-  \item Report $\hat\mu_N$, $\hat\sigma_N$, MRE, RMSE (bins), and KS $D_N$.
-  \item Increase $N$ until criteria in \S\;5 are satisfied; record the smallest $N$ meeting tolerance.
-\end{enumerate}
-
-\section{Discussion}
-\begin{itemize}[nosep]
-  \item Interpret any persistent bias (e.g., due to anisotropic ellipse interacting with mask geometry).
-  \item Note sensitivity to wind speed, fuel model, and target placement.
-  \item Document computational cost vs.\ accuracy trade-offs for ensemble sizing.
-\end{itemize}
-
-\section*{Reproducibility}
-\begin{itemize}[nosep]
-  \item MATLAB script commit: \texttt{<hash>} (code in repo appendix or link).
-  \item ELMFIRE build: \texttt{<compiler/flags>}, binary: \texttt{<path>}.
-  \item Command(s): \texttt{./run\_case.sh}; environment: \texttt{<modules/conda env>}.
-  \item Logs available under \texttt{cases/\CaseID/logs/}.
-\end{itemize}
-
-
-\section{Discussion}
-
-
+\subfile{case_body.tex}
 \end{document}
