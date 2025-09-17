@@ -92,6 +92,6 @@ USE_CONSTANT_BLDG_SPREAD_MODEL_PARAMS = .TRUE.
 MISCELLANEOUS_INPUTS_DIRECTORY = './data/misc'
 FUEL_MODEL_FILE                = 'fuel_models.csv'
 BUILDING_FUEL_MODEL_FILE       = 'building_fuel_models.csv'
-PATH_TO_GDAL                   ='/global/home/users/yirenqin712/.conda/envs/elmfire/bin/'
-SCRATCH                        = './data/scratch'
+PATH_TO_GDAL                   ='/home/yirenq/applications/anaconda3/bin'
+SCRATCH                        = './logs/scratch'
 /
