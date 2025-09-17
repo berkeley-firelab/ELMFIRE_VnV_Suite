@@ -36,7 +36,7 @@ echo "[WARN] Runtime exceeded limit ($ELAPSED s > ${RUNTIME_LIMIT}s)" >&2
 fi
 
 # --- Postprocess & Figures ---
-python3 "$CASE_DIR/scripts/postprocess.py" --case-dir "$CASE_DIR"
+python3 "$CASE_DIR/scripts/postprocess.py"
 
 
 # --- Build case report PDF ---

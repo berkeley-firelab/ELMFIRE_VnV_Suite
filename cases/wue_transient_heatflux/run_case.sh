@@ -14,31 +14,37 @@ ELMFIRE_CFG=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'config:' 'NF>1
 RUNTIME_LIMIT=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'runtime_limit_s:' 'NF>1{gsub(/[ \"]/, "", $2); print $2}')
 PATH_TO_GDAL=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'path_to_gdal:' 'NF>1{gsub(/[ \"]/, "", $2); print $2}')
 
-mkdir -p "$CASE_DIR/output" "$CASE_DIR/figures" "$CASE_DIR/logs" 
+mkdir -p "$CASE_DIR/outputs" "$CASE_DIR/figures" "$CASE_DIR/logs" 
 mkdir -p "$CASE_DIR/logs/scratch"
 
 # --- Run ELMFIRE ---
-# echo "[INFO] Running ELMFIRE..."
-# SECS_START=$(date +%s)
-# set +e
-# "$ELMFIRE_BIN" "$CASE_DIR/$ELMFIRE_CFG" > "$CASE_DIR/logs/elmfire.stdout" 2> "$CASE_DIR/logs/elmfire.stderr"
-# RC=$?
-# set -e
-# SECS_END=$(date +%s)
-# ELAPSED=$((SECS_END-SECS_START))
+echo "[INFO] Running ELMFIRE..."
+SECS_START=$(date +%s)
+set +e
+"$ELMFIRE_BIN" "$CASE_DIR/$ELMFIRE_CFG" > "$CASE_DIR/logs/elmfire.stdout" 2> "$CASE_DIR/logs/elmfire.stderr"
+RC=$?
+set -e
+SECS_END=$(date +%s)
+ELAPSED=$((SECS_END-SECS_START))
 
 
-# if [[ $RC -ne 0 ]]; then
-# echo "[ERROR] ELMFIRE failed (exit $RC). See logs/elmfire.stderr" >&2
-# exit $RC
-# fi
-# if [[ $ELAPSED -gt ${RUNTIME_LIMIT:-999999} ]]; then
-# echo "[WARN] Runtime exceeded limit ($ELAPSED s > ${RUNTIME_LIMIT}s)" >&2
-# fi
+if [[ $RC -ne 0 ]]; then
+echo "[ERROR] ELMFIRE failed (exit $RC). See logs/elmfire.stderr" >&2
+exit $RC
+fi
+if [[ $ELAPSED -gt ${RUNTIME_LIMIT:-999999} ]]; then
+echo "[WARN] Runtime exceeded limit ($ELAPSED s > ${RUNTIME_LIMIT}s)" >&2
+fi
 
 # --- Postprocess & Figures ---
-# python3 "$CASE_DIR/scripts/postprocess.py" --case-dir "$CASE_DIR"
+python3 "$CASE_DIR/scripts/postprocess.py"
 
+# --- Generate LaTeX macros from metrics.json ---
+METRICS_JSON="$CASE_DIR/outputs/metrics.json"
+MACROS_TEX="$CASE_DIR/report/metrics_macros.tex"
+
+echo "[INFO] Creating $MACROS_TEX from $METRICS_JSON"
+python3 "$CASE_DIR/scripts/metrics_to_macro.py"
 
 # --- Build case report PDF ---
 ( cd "$CASE_DIR/report" && latexmk -pdf -silent case_report.tex )

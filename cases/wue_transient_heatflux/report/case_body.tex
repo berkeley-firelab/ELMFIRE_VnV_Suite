@@ -1,5 +1,6 @@
 % Load per-case macros and prerequisites
 \input{case_macros.tex}
+\IfFileExists{metrics_macros.tex}{\input{metrics_macros.tex}}{}
 
 \documentclass[../report/case_report.tex]{subfiles}
 \begin{document}
@@ -178,26 +179,76 @@ Mesh resolution, Time step(CFL), level-set solver options, etc.
 
 \subsection{Acceptance Criteria}
 \begin{itemize}[nosep]
-  \item \textbf{Shape metrics}: Measured $\{a,b,\varepsilon\}$ vs.\ regression predictions within \SI{2}{\percent}.
-  \item \textbf{Energy consistency}: $\big|\sum_{\text{cells}} q''_{\mathrm{DFC}} - \mathrm{HRRPUA}(\tau)\big|/\mathrm{HRRPUA}(\tau)\le \SI{5}{\percent}$ (plateau phase).
+  \item \textbf{Energy consistency}: $\sum_{\text{cells}} \big|Q_{simulation} - Q_{analytical}\big|/Q_{analytical}\le \SI{0.5}{\percent}$, $Q$ will be HRRPUA, transient DFC and radiative heat fluxes.
   \item \textbf{Partition sanity}: $q''_{\mathrm{rad}}\to 0$ as $R_{\mathrm{eff}}\to\infty$ and vanishes inside pure DFC cells when $F_{\mathrm{rad}}=0$.
   \item \textbf{Directional response}: Downwind flux peak $>\!$ side $>\!$ upwind for $V$ in moderate/high ranges.
 \end{itemize}
 
 \subsection{Results}
-This section includes diagnostic figures:
-\begin{itemize}[nosep]
-  \item Footprint maps of $C_{\mathrm{DFC}}$, $F_{\mathrm{rad}}$, and $q''$ at selected times.
-  \item Downwind/sidewind/upwind radial profiles of $q''_{\mathrm{DFC}}$ and $q''_{\mathrm{rad}}$.
-  \item Time histories of total $\sum q''_{\mathrm{DFC}}$ and $\sum q''_{\mathrm{rad}}$ vs.\ $\mathrm{HRRPUA}(\tau)$.
-\end{itemize}
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l r}
+    \toprule
+    Metric & Value \\
+    \midrule
+    HRR mean relative error & \Metric{error_hrr_mean_rel} \\
+    DFC mean relative error & \Metric{error_dfc_mean_rel} \\
+    RAD mean relative error & \Metric{error_rad_mean_rel} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Comparison errors (analytic vs simulation).}
+  \label{tab:wue_metrics}
+\end{table}
 
-% Auto-generated figures from your post-processing (examples):
-%   figures/coverage_dfc.png
-%   figures/coverage_rad.png
-%   figures/flux_profiles.png
-%   figures/time_histories.png
-% \input{figures.tex}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{../figures/hrr_history.pdf}
+  \caption{Transient HRR (analytic vs. simulation).}
+  \label{fig:hrr_history}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../figures/dfc_analytic_frames.pdf}
+  \caption{Analytic DFC heat flux at selected times.}
+  \label{fig:dfc_analytic_frames}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../figures/dfc_sim_frames.pdf}
+  \caption{Simulated DFC heat flux at selected times.}
+  \label{fig:dfc_sim_frames}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../figures/rad_analytic_frames.pdf}
+  \caption{Analytic radiative heat flux at selected times.}
+  \label{fig:rad_analytic_frames}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../figures/rad_sim_frames.pdf}
+  \caption{Simulated radiative heat flux at selected times.}
+  \label{fig:rad_sim_frames}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{../figures/rad_history_xy0_m30.pdf}
+  \caption{Radiative heat flux time history at $(x,y)=(0,-30)$ m.}
+  \label{fig:rad_history_xy0_m30}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{../figures/dfc_history_xy0_m20.pdf}
+  \caption{DFC heat flux time history at $(x,y)=(0,-20)$ m.}
+\label{fig:dfc_history_xy0_m20}
+\end{figure}
+
 
 \subsection{Discussion}
 \begin{itemize}[nosep]

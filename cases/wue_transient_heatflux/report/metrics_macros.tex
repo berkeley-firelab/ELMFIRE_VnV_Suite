@@ -1,0 +1,26 @@
+% Auto-generated metrics_macros.tex
+\makeatletter
+\newcommand{\DefineMetric}[2]{\expandafter\def\csname metric@#1\endcsname{#2}}
+\newcommand{\Metric}[1]{%
+  \ifcsname metric@#1\endcsname
+    \csname metric@#1\endcsname
+  \else
+    \textbf{??}%
+  \fi}
+\newcommand{\MetricOr}[2]{%
+  \ifcsname metric@#1\endcsname
+    \csname metric@#1\endcsname
+  \else
+    #2%
+  \fi}
+\newcommand{\IfMetricTF}[3]{%
+  \ifcsname metric@#1\endcsname
+    #2%
+  \else
+    #3%
+  \fi}
+\makeatother
+
+\DefineMetric{error_hrr_mean_rel}{0.000314}
+\DefineMetric{error_dfc_mean_rel}{1.8e-05}
+\DefineMetric{error_rad_mean_rel}{0.000288}
