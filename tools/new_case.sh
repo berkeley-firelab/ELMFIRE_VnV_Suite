@@ -6,11 +6,20 @@ CASES_DIR="$ROOT_DIR/cases"
 
 
 if [[ $# -lt 1 ]]; then
-echo "Usage: $0 <case_id>" >&2
+echo "Usage: $0 <case_path>" >&2
 exit 1
 fi
-CASE_ID="$1"
-DEST="$CASES_DIR/$CASE_ID"
+RAW_PATH="$1"
+RAW_PATH="${RAW_PATH%/}"
+if [[ -z "$RAW_PATH" ]]; then
+  echo "[ERROR] Case path cannot be empty" >&2
+  exit 1
+fi
+
+CASE_PATH="$RAW_PATH"
+CASE_NAME="$(basename "$CASE_PATH")"
+DEST="$CASES_DIR/$CASE_PATH"
+PARENT_DIR="$(dirname "$DEST")"
 
 
 if [[ -e "$DEST" ]]; then
@@ -19,11 +28,12 @@ exit 2
 fi
 
 
+mkdir -p "$PARENT_DIR"
 rsync -a --exclude "figures" --exclude "output" --exclude "logs" "$TEMPLATE/" "$DEST/"
 
 
 # Token replacement
-sed -i.bak -e "s/{{CASE_ID}}/$CASE_ID/g" "$DEST/case.yaml" "$DEST/report/case_macros.tex" 
+sed -i.bak -e "s/{{CASE_ID}}/$CASE_NAME/g" "$DEST/case.yaml" "$DEST/report/case_macros.tex"
 rm -f "$DEST"/*.bak "$DEST"/report/*.bak || true
 
 

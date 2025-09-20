@@ -17,12 +17,18 @@ latex_escape() {
 }
 
 # Build all per-case PDFs (still useful for standalone viewing)
-shopt -s nullglob
-for CASE_TEX in "$CASES_DIR"/*/report/case_report.tex; do
-  CASE_DIR=$(dirname "$(dirname "$CASE_TEX")")
+mapfile -t CASE_TEX_FILES < <(
+  find "$CASES_DIR" -type f -path "*/report/case_report.tex" \
+    ! -path "$CASES_DIR/case_template/*" | sort
+)
+
+for CASE_TEX in "${CASE_TEX_FILES[@]}"; do
+  CASE_REPORT_DIR=$(dirname "$CASE_TEX")
+  CASE_DIR=$(dirname "$CASE_REPORT_DIR")
+  CASE_REL_PATH=${CASE_DIR#"$CASES_DIR/"}
   CASE_NAME=$(basename "$CASE_DIR")
-  [[ "$CASE_NAME" == "case_template" ]] && continue
-  ( cd "$(dirname "$CASE_TEX")" && latexmk -pdf -silent case_report.tex )
+
+  ( cd "$CASE_REPORT_DIR" && latexmk -pdf -silent case_report.tex )
   echo "[OK] Built $CASE_DIR/report/case_report.pdf"
 done
 
@@ -30,20 +36,21 @@ done
 OUT="$MAIN_DIR/cases.tex"
 : > "$OUT"
 
-for CASE_DIR in "$CASES_DIR"/*; do
-  [[ -d "$CASE_DIR" ]] || continue
+for CASE_TEX in "${CASE_TEX_FILES[@]}"; do
+  CASE_REPORT_DIR=$(dirname "$CASE_TEX")
+  CASE_DIR=$(dirname "$CASE_REPORT_DIR")
+  CASE_REL_PATH=${CASE_DIR#"$CASES_DIR/"}
   CASE_NAME=$(basename "$CASE_DIR")
-  [[ "$CASE_NAME" == "case_template" ]] && continue
+  CASE_NAME_TEX=$(latex_escape "$CASE_NAME")
 
   BODY="$CASE_DIR/report/case_body.tex"
   PDF="$CASE_DIR/report/case_report.pdf"
-  CASE_NAME_TEX=$(latex_escape "$CASE_NAME")
 
   if [[ -f "$BODY" ]]; then
     {
       echo "\\clearpage"
       echo "\\section{$CASE_NAME_TEX}"
-      echo "\\subfile{../cases/$CASE_NAME/report/case_body.tex}"
+      echo "\\subfile{../cases/$CASE_REL_PATH/report/case_body.tex}"
       echo ""
     } >> "$OUT"
     echo "[OK] Linked as subfile: $BODY"
@@ -52,13 +59,13 @@ for CASE_DIR in "$CASES_DIR"/*; do
     {
       echo "\\clearpage"
       echo "\\section{$CASE_NAME_TEX}"
-      echo "\\includepdf[pages=1,linktodoc=true,pagecommand={\\section*{$CASE_NAME_TEX}\\addcontentsline{toc}{section}{$CASE_NAME_TEX}\\thispagestyle{empty}}]{../cases/$CASE_NAME/report/case_report.pdf}"
-      echo "\\includepdf[pages=2-,linktodoc=true,pagecommand={\\thispagestyle{empty}}]{../cases/$CASE_NAME/report/case_report.pdf}"
+      echo "\\includepdf[pages=1,linktodoc=true,pagecommand={\\section*{$CASE_NAME_TEX}\\addcontentsline{toc}{section}{$CASE_NAME_TEX}\\thispagestyle{empty}}]{../cases/$CASE_REL_PATH/report/case_report.pdf}"
+      echo "\\includepdf[pages=2-,linktodoc=true,pagecommand={\\thispagestyle{empty}}]{../cases/$CASE_REL_PATH/report/case_report.pdf}"
       echo ""
     } >> "$OUT"
     echo "[OK] Fallback includepdf: $PDF"
   else
-    echo "[WARN] No case_body.tex or case_report.pdf for $CASE_NAME — skipping" >&2
+    echo "[WARN] No case_body.tex or case_report.pdf for $CASE_REL_PATH — skipping" >&2
   fi
 done
 
