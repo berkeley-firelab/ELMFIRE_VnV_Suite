@@ -1,11 +1,11 @@
 # ELMFIRE Verification and Validation Suite
 
-The ELMFIRE Verification and Validation (V&V) Suite captures small, self-contained
+The ELMFIRE Verification and Validation (V&V) Suite captures self-contained
 scenarios that exercise targeted portions of the ELMFIRE wildfire spread model.
 Each case includes the inputs required to reproduce the simulation, a scripted
 post-processing pipeline, and a LaTeX report that documents the expected
 behaviour, results, and pass/fail criteria. The repository also builds a master
-report that aggregates every individual case report.
+report (ELMFIRE Verification Guide) that aggregates every individual case report.
 
 ---
 
@@ -23,7 +23,7 @@ ELMFIRE_VnV_Suite/
 │   │   ├── outputs/        # Derived metrics (JSON, rasters, etc.)
 │   │   ├── logs/           # Runtime logs captured by run_case.sh
 │   │   └── report/         # LaTeX sources for the case report
-│   └── case_template/      # Boilerplate used by tools/new_case.sh
+│   └── case_template/      # Template used by tools/new_case.sh
 ├── common/                 # Shared resources (plot styling, latexmkrc)
 ├── main_report/            # Aggregated master report (main.tex → main.pdf)
 ├── tools/                  # Workflow helpers (create case, rebuild reports)
@@ -43,12 +43,10 @@ will be prepared:
   verify. Store it in a shared location and/or expose it through the
   `ELMFIRE_BIN` environment variable for convenience.
 - **GNU Make, Bash, Coreutils**: required for the helper scripts in `tools/` and
-  the per-case `run_case.sh` pipelines (standard on Linux/macOS).
+  the per-case `run_case.sh` pipelines (standard on Linux).
 - **Python ≥ 3.9** with `pip`.
-- **LaTeX toolchain**: `latexmk`, `pdflatex`, and common packages. On Ubuntu the
-  bundle `texlive-full` or `texlive-latex-extra latexmk` is sufficient.
-- **GDAL/RasterIO dependencies** (e.g. `gdal-bin`, `libgdal-dev`) if any case
-  reads GeoTIFF rasters. These are required by `rasterio` in some post-processing
+- **LaTeX**: for linux system (server/HPC), install LaTeX following the instrution at `https://www.tug.org/texlive/quickinstall.html`.
+- **GDAL/RasterIO dependencies** (e.g. `gdal-bin`, `libgdal-dev`) These are required by ELMFIRE and `rasterio` in some post-processing
   scripts.
 
 ### Python packages
@@ -74,17 +72,17 @@ correct packages and versions are available.
 
 1. **Clone the repository** and change into it:
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/berkeley-firelab/ELMFIRE_VnV_Suite.git
    cd ELMFIRE_VnV_Suite
    ```
 2. **Point to the ELMFIRE executable**. Either set `ELMFIRE_BIN` globally:
    ```bash
-   export ELMFIRE_BIN=/opt/elmfire/bin/elmfire_2025.07
+   export ELMFIRE_BIN=/opt/elmfire/bin/elmfire_2025.0717
    ```
    or edit `cases/<case>/case.yaml` to reference the absolute path under the
    `elmfire.bin` key. Using the environment variable keeps the YAML portable.
-3. **(Optional) Configure GDAL search paths** if your environment requires it.
-   A case can define `path_to_gdal` in `case.yaml` for use by `run_case.sh`.
+3. **Configure path to GDAL for all test cases** run `make configure PATH_TO_GDAL=/opt/my-gdal/bin` 
+   to update the PATH_TO_GDAL namelist for all test cases.
 4. **Activate the Python virtual environment** prepared in the previous section
    before running any scripts.
 
@@ -133,8 +131,8 @@ Inspect `logs/elmfire.stderr` if the simulation fails. Outputs are kept inside
    `{{CASE_ID}}` tokens in the YAML and report macros.
 
 2. **Edit case metadata**:
-   - `case.yaml` — update `case_title`, set `elmfire.bin` (or rely on
-     `ELMFIRE_BIN`), choose `elmfire.config`, and list any figures your
+   - `case.yaml` — update `case_title`, set path to the elmfire excutable (or rely on
+     `ELMFIRE_BIN`), choose `elmfire.data.in`, and list any figures your
      post-processing will create.
    - `report/case_macros.tex` — fill in `\CaseTitle`, `\CaseOwner`,
      `\CaseVersion`, and `\CaseDate` so the report documents the targeted
@@ -142,7 +140,7 @@ Inspect `logs/elmfire.stderr` if the simulation fails. Outputs are kept inside
 
 3. **Prepare the simulation inputs**:
    - Place the tailored `elmfire.data.in` and any required rasters or tables
-     inside the case directory (`data/` is provided for convenience).
+     (or scripts for generating the input data) inside the case directory (`data/` is provided for convenience).
    - Document important parameters in `report/case_body.tex` under the
      “Simulation Setup” and “Assumptions” subsections.
 
@@ -169,7 +167,7 @@ Inspect `logs/elmfire.stderr` if the simulation fails. Outputs are kept inside
 
 7. **Version-control the case** by adding new inputs, scripts, figures, metrics,
    and report sources to Git. Large raw rasters can be excluded if they are
-   reproducible elsewhere; otherwise coordinate storage with the team.
+   reproducible elsewhere (scripts should be provided); otherwise coordinate storage with the team.
 
 ---
 
@@ -217,5 +215,3 @@ for each affected case:
 - Prefer referencing the executable via `ELMFIRE_BIN` to avoid hard-coding
   machine-specific paths in `case.yaml`.
 
-Following the conventions above keeps the V&V suite consistent, reproducible,
-and ready for regression testing as ELMFIRE evolves.
