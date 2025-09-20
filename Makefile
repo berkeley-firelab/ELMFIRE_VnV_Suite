@@ -1,5 +1,5 @@
 .PHONY: new run build-all main clean configure
-ELMFIRE_CONFIGS := $(wildcard cases/*/elmfire.data.in)
+ELMFIRE_CONFIGS := $(shell find cases -type f -name 'elmfire.data.in')
 
 new:
 @./tools/new_case.sh $(CASE)
