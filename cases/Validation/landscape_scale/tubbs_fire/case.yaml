@@ -1,0 +1,11 @@
+case_id: "tubbs_fire"
+case_title: "2017 Tubbs Fire Reconstrcution"
+
+elmfire:
+bin: "elmfire_debug_2025.0717_hf"
+config: "elmfire.data.in"
+
+postprocess:
+figures:
+- "ROS_profile.png"
+- "HRRPUA_time_series.png"

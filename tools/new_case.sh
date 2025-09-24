@@ -29,7 +29,7 @@ fi
 
 
 mkdir -p "$PARENT_DIR"
-rsync -a --exclude "figures" --exclude "output" --exclude "logs" "$TEMPLATE/" "$DEST/"
+rsync -a --exclude "figures" --exclude "outputs" --exclude "logs" "$TEMPLATE/" "$DEST/"
 
 
 # Token replacement

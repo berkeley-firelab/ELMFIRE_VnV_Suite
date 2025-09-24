@@ -1,0 +1,16 @@
+% --- Any helper macros you like ---
+\newcommand{\atanII}[2]{\operatorname{atan2}\!\left(#1,#2\right)} % safer atan2
+
+\documentclass[11pt]{article}
+% --- Packages every case needs ---
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{subfiles}
+\usepackage[left=2cm, right=2cm, top=2cm, bottom=2cm]{geometry}
+
+\begin{document}
+\subfile{case_body.tex}
+\end{document}

@@ -1,0 +1,47 @@
+% Auto-generated metrics_macros.tex
+\makeatletter
+\newcommand{\DefineMetric}[2]{\expandafter\def\csname metric@#1\endcsname{#2}}
+\newcommand{\Metric}[1]{%
+  \ifcsname metric@#1\endcsname
+    \csname metric@#1\endcsname
+  \else
+    \textbf{??}%
+  \fi}
+\newcommand{\MetricOr}[2]{%
+  \ifcsname metric@#1\endcsname
+    \csname metric@#1\endcsname
+  \else
+    #2%
+  \fi}
+\newcommand{\IfMetricTF}[3]{%
+  \ifcsname metric@#1\endcsname
+    #2%
+  \else
+    #3%
+  \fi}
+\makeatother
+
+\DefineMetric{kappa_1}{0.320381}
+\DefineMetric{kappa_2}{0.484716}
+\DefineMetric{kappa_3}{0.46502}
+\DefineMetric{kappa_4}{0.456246}
+\DefineMetric{kappa_5}{0.43558}
+\DefineMetric{kappa_6}{0.416833}
+\DefineMetric{kappa_7}{0.405689}
+\DefineMetric{kappa_8}{0.402694}
+\DefineMetric{t_simu_1}{19793.1}
+\DefineMetric{t_simu_2}{43205.7}
+\DefineMetric{t_simu_3}{43205.7}
+\DefineMetric{t_simu_4}{43205.7}
+\DefineMetric{t_simu_5}{43205.7}
+\DefineMetric{t_simu_6}{43205.7}
+\DefineMetric{t_simu_7}{43205.7}
+\DefineMetric{t_simu_8}{43205.7}
+\DefineMetric{t_viirs_1}{19800}
+\DefineMetric{t_viirs_2}{60660}
+\DefineMetric{t_viirs_3}{105060}
+\DefineMetric{t_viirs_4}{145980}
+\DefineMetric{t_viirs_5}{196320}
+\DefineMetric{t_viirs_6}{231240}
+\DefineMetric{t_viirs_7}{281640}
+\DefineMetric{t_viirs_8}{316500}

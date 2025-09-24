@@ -5,7 +5,7 @@ set -euo pipefail
 # --- Configuration ---
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 CASE_DIR="$SCRIPT_DIR"
-ROOT_DIR=$(cd "$CASE_DIR/../../" && pwd)
+ROOT_DIR=$(cd "$CASE_DIR/../../../../" && pwd)
 
 
 YAML="$CASE_DIR/case.yaml"
