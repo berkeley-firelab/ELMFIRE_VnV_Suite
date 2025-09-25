@@ -1,0 +1,23 @@
+# ignore large outputs and caches
+**/output/
+**/outputs/
+**/scratch/
+**/logs/
+**/*.png
+**/*.jpg
+**/*.asc
+**/*.npy
+**/*.npz
+
+# venvs, notebooks, junk
+.venv/
+.env
+*.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# git
+.git
+.gitignore
+elmfire
+.DS_Store

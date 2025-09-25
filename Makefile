@@ -1,9 +1,5 @@
 .PHONY: new run run-all build-all main clean configure
 
-# Safe defaults, overrideable from environment
-ROOT_DIR ?= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-ELMFIRE_BIN ?= $(ROOT_DIR)/bin/elmfire
-
 # Find all ELMFIRE config files
 ELMFIRE_CONFIGS := $(shell find cases -type f -name 'elmfire.data.in')
 
