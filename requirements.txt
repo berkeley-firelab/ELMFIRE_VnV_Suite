@@ -1,0 +1,9 @@
+matplotlib
+numpy
+pandas
+rasterio
+geopandas
+shapely
+scikit-learn
+pyproj
+fiona

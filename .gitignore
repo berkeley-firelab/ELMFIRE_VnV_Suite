@@ -1,4 +1,5 @@
 .DS_Store
+.ipynb_checkpoints
 *.aux
 *.fdb_latexmk
 *.fls
@@ -10,3 +11,4 @@
 *.out
 *.toc
 __pycache__
+elmfire

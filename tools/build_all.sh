@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ROOT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." &>/dev/null && pwd)
 MAIN_DIR="$ROOT_DIR/main_report"
 CASES_DIR="$ROOT_DIR/cases"
 
@@ -44,7 +43,6 @@ for CASE_TEX in "${CASE_TEX_FILES[@]}"; do
   CASE_NAME_TEX=$(latex_escape "$CASE_NAME")
 
   BODY="$CASE_DIR/report/case_body.tex"
-  PDF="$CASE_DIR/report/case_report.pdf"
 
   if [[ -f "$BODY" ]]; then
     {
@@ -54,18 +52,8 @@ for CASE_TEX in "${CASE_TEX_FILES[@]}"; do
       echo ""
     } >> "$OUT"
     echo "[OK] Linked as subfile: $BODY"
-  elif [[ -f "$PDF" ]]; then
-    # Fallback: include the compiled PDF, hide master page numbers to avoid duplicates
-    {
-      echo "\\clearpage"
-      echo "\\section{$CASE_NAME_TEX}"
-      echo "\\includepdf[pages=1,linktodoc=true,pagecommand={\\section*{$CASE_NAME_TEX}\\addcontentsline{toc}{section}{$CASE_NAME_TEX}\\thispagestyle{empty}}]{../cases/$CASE_REL_PATH/report/case_report.pdf}"
-      echo "\\includepdf[pages=2-,linktodoc=true,pagecommand={\\thispagestyle{empty}}]{../cases/$CASE_REL_PATH/report/case_report.pdf}"
-      echo ""
-    } >> "$OUT"
-    echo "[OK] Fallback includepdf: $PDF"
   else
-    echo "[WARN] No case_body.tex or case_report.pdf for $CASE_REL_PATH — skipping" >&2
+    echo "[WARN] No case_body.tex for $CASE_REL_PATH — skipping" >&2
   fi
 done
 

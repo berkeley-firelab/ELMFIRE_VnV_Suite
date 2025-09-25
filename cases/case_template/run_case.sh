@@ -5,19 +5,16 @@ set -euo pipefail
 # --- Configuration ---
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 CASE_DIR="$SCRIPT_DIR"
-ROOT_DIR=$(cd "$CASE_DIR/../../../../" && pwd)
 
 
 YAML="$CASE_DIR/case.yaml"
-ELMFIRE_BIN=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'bin:' 'NF>1{gsub(/[ \"]/, "", $2); print $2}')
 ELMFIRE_CFG=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'config:' 'NF>1{gsub(/[ "]/,"",$2); print $2}')
 RUNTIME_LIMIT=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'runtime_limit_s:' 'NF>1{gsub(/[ "]/,"",$2); print $2}')
-PATH_TO_GDAL=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'path_to_gdal:' 'NF>1{gsub(/[ "]/,"",$2); print $2}')
 
 mkdir -p "$CASE_DIR/outputs" "$CASE_DIR/figures" "$CASE_DIR/logs" 
 mkdir -p "$CASE_DIR/logs/scratch"
 
-# --- Run ELMFIRE ---
+--- Run ELMFIRE ---
 echo "[INFO] Running ELMFIRE..."
 SECS_START=$(date +%s)
 set +e
@@ -39,21 +36,5 @@ fi
 # --- Postprocess & Figures ---
 python3 "$CASE_DIR/scripts/postprocess.py"
 
-# --- Generate LaTeX macros from metrics.json ---
-METRICS_JSON="$CASE_DIR/outputs/metrics.json"
-MACROS_TEX="$CASE_DIR/report/metrics_macros.tex"
-
-echo "[INFO] Creating $MACROS_TEX from $METRICS_JSON"
-python3 "$CASE_DIR/scripts/metrics_to_macro.py"
-
-# --- Build case report PDF ---
-( cd "$CASE_DIR/report" && latexmk -pdf -silent case_report.tex )
-
-
-# --- Update main report index ---
-echo "Updating main report..."
-sh "$ROOT_DIR/tools/refresh_main.sh"
-
-
-# --- Done ---
-echo "[OK] Built $CASE_DIR/report/case_report.pdf"
+--- Done ---
+echo "[OK] Done Running $CASE_DIR"
