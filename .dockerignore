@@ -1,13 +1,10 @@
+docs
+.github
+
 # ignore large outputs and caches
-**/output/
 **/outputs/
 **/scratch/
 **/logs/
-**/*.png
-**/*.jpg
-**/*.asc
-**/*.npy
-**/*.npz
 
 # venvs, notebooks, junk
 .venv/
@@ -19,5 +16,4 @@ __pycache__/
 # git
 .git
 .gitignore
-elmfire
 .DS_Store

@@ -14,7 +14,7 @@ RUNTIME_LIMIT=$(awk '/^elmfire:/,/^postprocess:/' "$YAML" | awk -F 'runtime_limi
 mkdir -p "$CASE_DIR/outputs" "$CASE_DIR/figures" "$CASE_DIR/logs" 
 mkdir -p "$CASE_DIR/logs/scratch"
 
---- Run ELMFIRE ---
+# --- Run ELMFIRE ---
 echo "[INFO] Running ELMFIRE..."
 SECS_START=$(date +%s)
 set +e
@@ -36,5 +36,5 @@ fi
 # --- Postprocess & Figures ---
 python3 "$CASE_DIR/scripts/postprocess.py"
 
---- Done ---
+# --- Done ---
 echo "[OK] Done Running $CASE_DIR"
