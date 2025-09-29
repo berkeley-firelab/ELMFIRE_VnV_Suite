@@ -2,6 +2,8 @@
 
 The ELMFIRE Verification and Validation (V&V) Suite captures self-contained
 scenarios that exercise targeted portions of the ELMFIRE wildfire spread model.
+Cases are grouped first by whether they target verification or validation, and
+then by their scale (for example `cases/Validation/landscape_scale/<case>/`).
 Each case includes the inputs required to reproduce the simulation, a scripted
 post-processing pipeline, and a LaTeX report that documents the expected
 behaviour, results, and pass/fail criteria. The repository also builds a master
@@ -13,19 +15,26 @@ report (ELMFIRE Verification Guide) that aggregates every individual case report
 
 ```text
 ELMFIRE_VnV_Suite/
-├── cases/                 # One directory per verification case (plus a template)
-│   ├── <case>/
-│   │   ├── case.yaml       # Metadata and runtime settings for run_case.sh
-│   │   ├── elmfire.data.in # Case-specific ELMFIRE configuration
-│   │   ├── data/           # Optional raw input rasters or tables
-│   │   ├── scripts/        # Post-processing utilities for this case
-│   │   ├── figures/        # Auto-generated plots (outputs)
-│   │   ├── outputs/        # Derived metrics (JSON, rasters, etc.)
-│   │   ├── logs/           # Runtime logs captured by run_case.sh
-│   │   └── report/         # LaTeX sources for the case report
+├── cases/                 # Category folders plus a reusable template
+│   ├── Validation/
+│   │   ├── landscape_scale/
+│   │   │   └── <case>/     # Landscape-scale validation studies
+│   │   └── structure_scale/
+│   │       └── <case>/     # Structure-scale validation studies
+│   ├── Verification/
+│   │   └── <case>/         # Verification cases grouped by theme
 │   └── case_template/      # Template used by tools/new_case.sh
+│       ├── case.yaml       # Metadata and runtime settings for run_case.sh
+│       ├── elmfire.data.in # Case-specific ELMFIRE configuration
+│       ├── data/           # Optional raw input rasters or tables
+│       ├── scripts/        # Post-processing utilities for this case
+│       ├── figures/        # Auto-generated plots (outputs)
+│       ├── outputs/        # Derived metrics (JSON, rasters, etc.)
+│       ├── logs/           # Runtime logs captured by run_case.sh
+│       └── report/         # LaTeX sources for the case report
 ├── common/                 # Shared resources (plot styling, latexmkrc)
 ├── main_report/            # Aggregated master report (main.tex → main.pdf)
+├── gcp_config/             # Dockerfile, Cloud Build + Batch templates for Google Cloud runs
 ├── tools/                  # Workflow helpers (create case, rebuild reports)
 └── Makefile                # Convenience targets that wrap the scripts
 ```
@@ -62,7 +71,7 @@ pip install numpy matplotlib rasterio
 ```
 
 Individual cases may require additional dependencies—inspect
-`cases/<case>/scripts/*.py` and install any extras (for example `scipy` or
+`cases/<category>/<case>/scripts/*.py` and install any extras (for example `scipy` or
 `pandas`). Keep the virtual environment activated while running cases so the
 correct packages and versions are available.
 
@@ -79,7 +88,7 @@ correct packages and versions are available.
    ```bash
    export ELMFIRE_BIN=/opt/elmfire/bin/elmfire_2025.0717
    ```
-   or edit `cases/<case>/case.yaml` to reference the absolute path under the
+   or edit `cases/<category>/<case>/case.yaml` to reference the absolute path under the
    `elmfire.bin` key. Using the environment variable keeps the YAML portable.
 3. **Configure path to GDAL for all test cases** run `make configure PATH_TO_GDAL=/opt/my-gdal/bin` 
    to update the PATH_TO_GDAL namelist for all test cases.
@@ -94,10 +103,10 @@ Each case ships with a `run_case.sh` orchestrator that executes the simulation,
 post-processes the results, and rebuilds the LaTeX report.
 
 ```bash
-# From the repository root:
-make run CASE=wue_transient_heatflux
+# From the repository root (specify the category + case ID):
+make run CASE=Verification/wue_transient_heatflux
 # or
-./cases/wue_transient_heatflux/run_case.sh
+./cases/Verification/wue_transient_heatflux/run_case.sh
 ```
 
 The script performs the following steps:
@@ -115,7 +124,37 @@ The script performs the following steps:
    the master report index via `tools/refresh_main.sh`.
 
 Inspect `logs/elmfire.stderr` if the simulation fails. Outputs are kept inside
-`cases/<case>/` so they can be version-controlled when appropriate.
+`cases/<category>/<case>/` so they can be version-controlled when appropriate.
+
+---
+
+## Running multiple cases automatically
+
+Use `tools/run_all.py` when you need to execute every case sequentially (or
+shard the workload across multiple workers). The helper script discovers all
+`run_case.sh` files under `cases/`, even when they live inside nested
+category folders, skips the template, and honors optional
+sharding environment variables so it can be reused on Slurm or in cloud
+batch jobs.
+
+```bash
+# Run every case sequentially on the local workstation
+python3 tools/run_all.py
+
+# Show the planned commands without executing them
+python3 tools/run_all.py --dry-run
+
+# Submit via Slurm using the shared header at common/slurm_head.txt
+python3 tools/run_all.py --slurm
+```
+
+Cloud environments set `CLOUD_RUN_TASK_*`, `BATCH_TASK_*`, or `TASK_COUNT`
+automatically. You can also override the shard layout explicitly:
+
+```bash
+# Run only shard 1/4 locally
+python3 tools/run_all.py --shard-index 1 --shard-count 4
+```
 
 ---
 
@@ -123,12 +162,14 @@ Inspect `logs/elmfire.stderr` if the simulation fails. Outputs are kept inside
 
 1. **Bootstrap from the template** using the helper script or Makefile target:
    ```bash
-   ./tools/new_case.sh my_new_case
+   ./tools/new_case.sh Verification/my_new_case
    # or
-   make new CASE=my_new_case
+   make new CASE=Verification/my_new_case
    ```
-   This copies `cases/case_template/` into `cases/my_new_case/` and expands the
-   `{{CASE_ID}}` tokens in the YAML and report macros.
+   Replace `Verification/` with the appropriate category (e.g.,
+   `Validation/landscape_scale/`). The helper copies `cases/case_template/`
+   into `cases/<category>/my_new_case/` and expands the `{{CASE_ID}}` tokens in
+   the YAML and report macros.
 
 2. **Edit case metadata**:
    - `case.yaml` — update `case_title`, set path to the elmfire excutable (or rely on
@@ -160,14 +201,71 @@ Inspect `logs/elmfire.stderr` if the simulation fails. Outputs are kept inside
 
 6. **Run the end-to-end pipeline**:
    ```bash
-   ./cases/my_new_case/run_case.sh
+   ./cases/Verification/my_new_case/run_case.sh
    ```
+   Swap in the category path you selected in step 1.
    Iterate on the configuration, post-processing, or report content until the
    outputs and PDF look correct.
 
 7. **Version-control the case** by adding new inputs, scripts, figures, metrics,
    and report sources to Git. Large raw rasters can be excluded if they are
    reproducible elsewhere (scripts should be provided); otherwise coordinate storage with the team.
+
+---
+
+## Running the suite in Google Cloud
+
+The `gcp_config/` folder contains everything required to build a container that
+packages the ELMFIRE source tree together with the V&V suite and to launch a
+Google Cloud Batch job that executes `tools/run_all.py` across all cases.
+
+### 1. Prepare infrastructure
+
+1. Create an Artifact Registry Docker repository (for example
+   `${REGION}-docker.pkg.dev/${PROJECT_ID}/elmfire-vnv-suite`).
+2. Provision a Google Cloud Storage bucket that will receive the generated
+   figures, metrics, and PDFs (e.g., `gs://elmfire_vnv_reports`). Grant the
+   Cloud Build and Batch service accounts permission to write to the bucket.
+3. Identify or create a service account that can submit Batch jobs and access
+   Artifact Registry and the results bucket. Update the `_JOB_SA` substitution in
+   `gcp_config/cloudbuild.yaml` accordingly.
+
+### 2. Build the ELMFIRE + V&V image
+
+The multi-stage Dockerfile at `gcp_config/Dockerfile` compiles ELMFIRE from
+source and installs the suite dependencies. Build it with Cloud Build so the
+image lands in Artifact Registry:
+
+```bash
+gcloud builds submit \
+  --config gcp_config/cloudbuild.yaml \
+  --substitutions _REGION=us-central1,_REPO=elmfire-vnv-suite,_IMAGE=elmfire-vnv,_JOB_NAME=elmfire-vnv,_RESULTS_BUCKET=gs://elmfire_vnv_reports,_JOB_SA=SERVICE_ACCOUNT_EMAIL,_TASK_COUNT=4,_PARALLELISM=4 \
+  .
+```
+
+The build step renders `gcp_config/infra/batch_job.json` with the provided
+substitutions and automatically submits a Cloud Batch job named
+`elmfire-vnv-<commit>` that executes `python3 tools/run_all.py`. Adjust the
+`_TASK_COUNT` and `_PARALLELISM` substitutions to control how many shards the
+suite is split into.
+
+### 3. Monitor and collect results
+
+Once submitted, track the Batch job from the Cloud Console:
+
+```
+https://console.cloud.google.com/batch/jobs/details/${REGION}/elmfire-vnv-<commit>?project=${PROJECT_ID}
+```
+
+Each task uploads a snapshot of the suite (including generated reports) to the
+`RESULTS_BUCKET`, using the commit SHA as a prefix. Download the artifacts with
+`gsutil rsync` or from the console. Logs for each task are forwarded to Cloud
+Logging for troubleshooting.
+
+If you prefer Cloud Run Jobs instead of Batch, a template is also provided at
+`gcp_config/infra/job.yaml`. Render it with `sed` (mirroring the Batch step in
+`cloudbuild.yaml`) and deploy it via `gcloud run jobs replace` followed by
+`gcloud run jobs execute`.
 
 ---
 
@@ -183,7 +281,7 @@ for each affected case:
 3. **Review acceptance criteria** in `report/case_body.tex` to confirm they still
    apply. Adjust tolerances if model changes warrant it and document the
    rationale in the “Discussion” section.
-4. **Re-run** `./cases/<case>/run_case.sh` to generate fresh outputs, metrics,
+4. **Re-run** `./cases/<category>/<case>/run_case.sh` to generate fresh outputs, metrics,
    and the updated PDF.
 5. **Inspect diffs** in `outputs/metrics.json`, plots under `figures/`, and the
    LaTeX report. Highlight notable changes in the Discussion section.
@@ -205,7 +303,7 @@ for each affected case:
 
 - Activate the Python environment and ensure the desired ELMFIRE binary is on
   hand before running any case scripts.
-- Use `make run CASE=<id>` for spot checks, `./tools/new_case.sh` to seed new
+- Use `make run CASE=<category>/<id>` for spot checks, `./tools/new_case.sh` to seed new
   cases, and `./tools/build_all.sh` to rebuild everything (case PDFs + master
   report).
 - Keep `outputs/metrics.json`, generated figures, and LaTeX sources under
