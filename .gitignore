@@ -62,3 +62,11 @@ rag_db
 *.toc
 !vnv_suite/**/misc
 !vnv_suite/**/inputs
+
+# Folders inside the unit test cases to ignore
+cases/Verification/unit_tests/*/data/
+cases/Verification/unit_tests/*/figures/
+cases/Verification/unit_tests/*/logs/
+cases/Verification/unit_tests/*/outputs/
+cases/Verification/unit_tests/*/report/
+cases/Verification/unit_tests/*/scratch/

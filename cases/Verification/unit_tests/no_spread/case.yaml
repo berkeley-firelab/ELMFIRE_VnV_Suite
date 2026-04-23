@@ -1,0 +1,11 @@
+case_id: "no_spread"
+case_title: "No rate of spread case, ROS = 0 m/s"
+
+elmfire:
+bin: "elmfire"
+config: "elmfire.data.in"
+
+postprocess:
+figures:
+- "ROS_profile.png"
+- "HRRPUA_time_series.png"
