@@ -1,5 +1,5 @@
-case_id: "no_spread"
-case_title: "No rate of spread case, ROS = 0 m/s"
+case_id: "constant_ros"
+case_title: "Constant rate of spread ROS = ? m/s"
 
 elmfire:
 bin: "elmfire"

@@ -100,6 +100,12 @@ def load_initial_phi_from_file(nx: int, ny: int) -> np.ndarray | None:
         return None
     return phi0
 
+def analytical_solution(x: np.ndarray, y: np.ndarray, t: np.ndarray, ros: float = 2.29, R0: float = 0.0) -> np.ndarray:
+    # For ROS = 0, the solution should be the initial condition for all time steps.
+    # This function is a placeholder in case we want to implement a more complex analytical solution in the future.
+    X, Y = np.meshgrid(x, y)
+    return np.sqrt(X**2 + Y**2) - R0 - ros * t[:, None, None]
+
 
 def build_initial_phi_from_ignition(config: dict, nx: int, ny: int) -> np.ndarray:
     cell_size = get_float(config, "COMPUTATIONAL_DOMAIN_CELLSIZE")
@@ -249,9 +255,17 @@ def field_stats(field: np.ndarray, *, nonnegative_only: bool = False) -> dict:
     }
 
 # NormOrder = int | float | Literal["fro", "nuc"] | None
-def analytical_solution_comparison(phi_n: np.ndarray, norm: int | float | Literal["fro", "nuc"] | None = 2) -> tuple[np.ndarray, np.ndarray]:
-    # Since ros is 0, the analytical solution should be the initial condition for all time steps.
-    difference = phi_n - phi_n[0]  # Shape: (nt, ny, nx)
+def analytical_solution_comparison(
+    phi_n: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    t: np.ndarray,
+    norm: int | float | Literal["fro", "nuc"] | None = 2,
+    ros: float = 2.29,
+    R0: float = 0.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    phi_analytical = analytical_solution(x=x, y=y, t=t, ros=ros, R0=R0)
+    difference = phi_n - phi_analytical  # Shape: (nt, ny, nx)
     norms = np.linalg.norm(difference, axis=(1, 2), ord=norm)  # Supports numeric orders, +/-inf, and matrix norms like 'fro'.
     return difference, norms
 
@@ -273,6 +287,9 @@ arrays = load_elmfire_arrays()
 np.savez_compressed(OUT_DIR / "elmfire_arrays.npz", **arrays)
 
 # Create plots
+phi0_analytical = analytical_solution(x=arrays["x"], y=arrays["y"], t=np.array([0.0]), ros=0.1, R0=0.0)
+plot_field(arrays["x"], arrays["y"], phi0_analytical[0], r"Analytical $\phi(x,y,0)$", FIG_DIR / "phi_analytical_initial.png")
+plot_field(arrays["x"], arrays["y"], phi0_analytical[-1], r"Analytical $\phi(x,y,t_{\text{final}})$", FIG_DIR / "phi_analytical_final.png")
 plot_field(arrays["x"], arrays["y"], arrays["phi"][0], r"$\phi(x,y,0)$", FIG_DIR / "phi_initial.png")
 plot_field(arrays["x"], arrays["y"], arrays["phi"][-1], r"$\phi(x,y,t_{\text{final}})$", FIG_DIR / "phi_final.png")
 plot_field(arrays["x"], arrays["y"], arrays["surface_fire"][0], r"$\text{Surface Fire}(x,y,0)$", FIG_DIR / "surface_fire_initial.png")
@@ -290,7 +307,14 @@ vs_stats = field_stats(arrays["vs"], nonnegative_only=True)
 norm = np.inf  # Use max norm for error comparison, can be changed to 2 for L2 norm or other supported norms.
 norm_label = r"\infty" if norm == np.inf else str(norm)
 if arrays["phi"].shape[0] > 1:
-    difference, error_norm = analytical_solution_comparison(arrays["phi"], norm=norm)
+    difference, error_norm = analytical_solution_comparison(
+        arrays["phi"],
+        x=arrays["x"],
+        y=arrays["y"],
+        t=arrays["t"],
+        norm=norm,
+        ros=0.1,
+    )
     plot_field(arrays["x"], arrays["y"], np.abs(difference[-1]), r"$|\phi(x,y,t_{\text{final}}) - \phi(x,y,0)|$", FIG_DIR / "phi_error_final.png")
     # Plot error curves over time
     plt.figure(figsize=(8, 6))
