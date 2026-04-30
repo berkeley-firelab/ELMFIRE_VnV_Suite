@@ -1,0 +1,9 @@
+case_id: "spatial_convergence"
+case_title: "Spatial convergence test"
+
+elmfire:
+bin: "elmfire"
+config: "data/inputs/elmfire.data"
+
+postprocess:
+figures:
