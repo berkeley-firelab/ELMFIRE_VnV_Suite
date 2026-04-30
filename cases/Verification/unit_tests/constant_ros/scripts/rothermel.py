@@ -53,32 +53,28 @@ Usage Example:
     print(f"Flame Length: {output.flame_length:.1f} ft")
 """
 
-import csv
-import math
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
-FLOAT_RASTERS = [
-	("ws", 0.0),   # Wind speed, mph
-	("wd", 0.0),   # Wind direction, deg
-	("m1", 0.0),   # 1-hr dead moisture content, %
-	("m10", 0.0),  # 10-hr dead moisture content, %
-	("m100", 0.0), # 100-hr dead moisture content, %
-	("adj", 1.0),  # Spread rate adjustment factor
-	("phi", 1.0),  # Initial value of phi field
-]
+import numpy as np
+import pandas as pd
 
-# Integer input rasters: (name, initial value)
-INT_RASTERS = [
-	("slp", 0),     # Topographical slope (deg)
-	("asp", 0),     # Topographical aspect (deg)
-	("dem", 0),     # Elevation (m)
-	("fbfm40", 102),# Fire behavior fuel model code
-	("cc", 0),      # Canopy cover (percent)
-	("ch", 0),      # Canopy height (10*meters)
-	("cbh", 0),     # Canopy base height (10*meters)
-	("cbd", 0),     # Canopy bulk density (100*kg/m3)
+
+FUEL_MODEL_COLUMNS = [
+    "id",
+    "name",
+    "is_grass",
+    "w_dead_1h",
+    "w_dead_10h",
+    "w_dead_100h",
+    "w_live_herb",
+    "w_live_woody",
+    "sigma_dead_1h",
+    "sigma_live_herb",
+    "sigma_live_woody",
+    "depth",
+    "moisture_of_extinction_pct",
+    "heat_of_combustion",
 ]
 
 @dataclass
@@ -110,22 +106,22 @@ class FuelModelTableEntry:
     id: int
     name: str
     dynamic: bool
-    w0: list[float]
-    sig: list[float]
+    w0: np.ndarray
+    sig: np.ndarray
     delta: float
     mex_dead: float
     hoc: float
     rhop: float = 32.0
     st: float = 0.055
     se: float = 0.01
-    eps: list[float] | None = None
-    f: list[float] | None = None
-    fmex: list[float] | None = None
-    fw0: list[float] | None = None
-    fsig: list[float] | None = None
-    wprime_numer: list[float] | None = None
-    wprime_denom: list[float] | None = None
-    mprime_denom: list[float] | None = None
+    eps: np.ndarray | None = None
+    f: np.ndarray | None = None
+    fmex: np.ndarray | None = None
+    fw0: np.ndarray | None = None
+    fsig: np.ndarray | None = None
+    wprime_numer: np.ndarray | None = None
+    wprime_denom: np.ndarray | None = None
+    mprime_denom: np.ndarray | None = None
     mprime_denom_14_sum: float = 0.0
     r_mprime_denom_14_sum_mex_dead: float = 0.0
     f_dead: float = 0.0
@@ -207,63 +203,42 @@ def load_fuel_models(csv_path: Path) -> dict[int, FuelModelParams]:
         Dictionary mapping fuel model IDs to FuelModelParams
     """
     fuel_models = {}
-    
-    with open(csv_path, 'r', encoding='utf-8') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            if len(row) < 14:
-                continue  # Skip incomplete rows
-            
-            try:
-                fuel_id = int(row[0])
-                name = row[1].strip()
-                bool_token = row[2].strip().upper().strip('.')
-                is_grass = bool_token in {'TRUE', 'T', '1', 'YES', 'Y'}
-                
-                # Fuel loadings (lb/ft²)
-                # Columns 3-7: w_o1, w_o2, w_o3, w_o4, w_o5
-                w_dead_1h = float(row[3])
-                w_dead_10h = float(row[4])
-                w_dead_100h = float(row[5])
-                w_live_herb = float(row[6])
-                w_live_woody = float(row[7])
-                
-                # Surface-area-to-volume ratios (1/ft)
-                # ELMFIRE convention:
-                # - Dead 10-hr and 100-hr classes use fixed constants (109, 30)
-                # - CSV columns 9 and 10 map to live herb/woody sigma
-                sigma_dead_1h = float(row[8])
-                sigma_dead_10h = 109.0
-                sigma_dead_100h = 30.0
-                
-                sigma_live_herb = float(row[9])
-                sigma_live_woody = float(row[10])
-                
-                # Additional parameters (column 11: fuel depth, column 12: moisture of extinction)
-                depth = float(row[11]) if len(row) > 11 else 1.0
-                moisture_of_extinction = float(row[12]) / 100.0 if len(row) > 12 else 0.15
-                heat_of_combustion = float(row[13]) if len(row) > 13 else 8000.0
-                
-                fuel_models[fuel_id] = FuelModelParams(
-                    id=fuel_id,
-                    name=name,
-                    is_grass=is_grass,
-                    w_dead_1h=w_dead_1h,
-                    w_dead_10h=w_dead_10h,
-                    w_dead_100h=w_dead_100h,
-                    w_live_herb=w_live_herb,
-                    w_live_woody=w_live_woody,
-                    sigma_dead_1h=sigma_dead_1h,
-                    sigma_dead_10h=sigma_dead_10h,
-                    sigma_dead_100h=sigma_dead_100h,
-                    sigma_live_herb=sigma_live_herb,
-                    sigma_live_woody=sigma_live_woody,
-                    depth=depth,
-                    moisture_of_extinction=moisture_of_extinction,
-                    heat_of_combustion=heat_of_combustion,
-                )
-            except (ValueError, IndexError):
-                continue  # Skip rows with parsing errors
+
+    fuel_df = pd.read_csv(csv_path, names=FUEL_MODEL_COLUMNS, header=None)
+
+    for row in fuel_df.itertuples(index=False):
+        try:
+            fuel_id = int(row.id)
+            name = str(row.name).strip()
+            bool_token = str(row.is_grass).strip().upper().strip('.')
+            is_grass = bool_token in {'TRUE', 'T', '1', 'YES', 'Y'}
+
+            # ELMFIRE convention:
+            # - Dead 10-hr and 100-hr classes use fixed constants (109, 30)
+            # - CSV columns sigma_live_herb/sigma_live_woody map to live classes
+            sigma_dead_10h = 109.0
+            sigma_dead_100h = 30.0
+
+            fuel_models[fuel_id] = FuelModelParams(
+                id=fuel_id,
+                name=name,
+                is_grass=is_grass,
+                w_dead_1h=float(row.w_dead_1h),
+                w_dead_10h=float(row.w_dead_10h),
+                w_dead_100h=float(row.w_dead_100h),
+                w_live_herb=float(row.w_live_herb),
+                w_live_woody=float(row.w_live_woody),
+                sigma_dead_1h=float(row.sigma_dead_1h),
+                sigma_dead_10h=sigma_dead_10h,
+                sigma_dead_100h=sigma_dead_100h,
+                sigma_live_herb=float(row.sigma_live_herb),
+                sigma_live_woody=float(row.sigma_live_woody),
+                depth=float(row.depth),
+                moisture_of_extinction=float(row.moisture_of_extinction_pct) / 100.0,
+                heat_of_combustion=float(row.heat_of_combustion),
+            )
+        except (ValueError, TypeError):
+            continue  # Skip rows with parsing errors
     
     return fuel_models
 
@@ -271,8 +246,8 @@ def load_fuel_models(csv_path: Path) -> dict[int, FuelModelParams]:
 def build_fuel_model_table_entry(fuel_model: FuelModelParams, live_herb_moisture: float = 60.0) -> FuelModelTableEntry:
     """Replicate the ELMFIRE fuel-model preprocessing for a single fuel model."""
 
-    w0 = [0.0] * 7
-    sig = [9999.0] * 7
+    w0 = np.zeros(7)
+    sig = np.full(7, 9999.0)
 
     w0[1] = fuel_model.w_dead_1h
     w0[2] = fuel_model.w_dead_10h
@@ -300,72 +275,88 @@ def build_fuel_model_table_entry(fuel_model: FuelModelParams, live_herb_moisture
     if entry.dynamic:
         live_frac = min(max((live_herb_moisture - 30.0) / (120.0 - 30.0), 0.0), 1.0)
         dead_frac = 1.0 - live_frac
-        entry.w0[4] = dead_frac * entry.w0[5]
-        entry.w0[5] = live_frac * entry.w0[5]
-        entry.sig[4] = entry.sig[5]
-        numerator = (entry.sig[1] * entry.sig[1] * entry.w0[1]) + (entry.sig[4] * entry.sig[4] * entry.w0[4])
-        denominator = (entry.sig[1] * entry.w0[1]) + (entry.sig[4] * entry.w0[4])
+        w0[4] = dead_frac * w0[5]
+        w0[5] = live_frac * w0[5]
+        sig[4] = sig[5]
+        numerator = (sig[1] * sig[1] * w0[1]) + (sig[4] * sig[4] * w0[4])
+        denominator = (sig[1] * w0[1]) + (sig[4] * w0[4])
         if denominator > 0.0:
-            entry.sig[1] = numerator / denominator
-        entry.w0[1] += entry.w0[4]
-        entry.w0[4] = 0.0
-        entry.sig[4] = 9999.0
+            sig[1] = numerator / denominator
+        w0[1] += w0[4]
+        w0[4] = 0.0
+        sig[4] = 9999.0
+        entry.w0 = w0
+        entry.sig = sig
     else:
-        entry.w0[4] = 0.0
-        entry.sig[4] = 9999.0
+        w0[4] = 0.0
+        sig[4] = 9999.0
+        entry.w0 = w0
+        entry.sig = sig
+    
+    # Compute eps for indices 1-6
+    sig_array = entry.sig
+    eps_array = np.where(sig_array > 0, np.exp(-138.0 / sig_array), 0.0)
 
-    entry.eps = [0.0] * 7
-    entry.f = [0.0] * 7
-    entry.fmex = [0.0] * 7
-    entry.fw0 = [0.0] * 7
-    entry.fsig = [0.0] * 7
-    entry.wprime_numer = [0.0] * 7
-    entry.wprime_denom = [0.0] * 7
-    entry.mprime_denom = [0.0] * 7
+    a_values = np.zeros(7)
+    w0_array = entry.w0
+    sig_array = entry.sig
     for idx in range(1, 7):
-        entry.eps[idx] = math.exp(-138.0 / entry.sig[idx]) if entry.sig[idx] > 0 else 0.0
+        a_values[idx] = sig_array[idx] * w0_array[idx] / entry.rhop
 
-    a_values = [0.0] * 7
-    for idx in range(1, 7):
-        a_values[idx] = entry.sig[idx] * entry.w0[idx] / entry.rhop
-
-    a_dead = max(sum(a_values[1:5]), 1e-9)
-    a_live = max(sum(a_values[5:7]), 1e-9)
+    a_dead = max(float(np.sum(a_values[1:5])), 1e-9)
+    a_live = max(float(np.sum(a_values[5:7])), 1e-9)
     a_overall = a_dead + a_live
     entry.f_dead = a_dead / a_overall
     entry.f_live = a_live / a_overall
 
+    f_array = np.zeros(7)
+    fmex_array = np.zeros(7)
+    fw0_array = np.zeros(7)
+    fsig_array = np.zeros(7)
+    wprime_numer_array = np.zeros(7)
+    wprime_denom_array = np.zeros(7)
+    mprime_denom_array = np.zeros(7)
+    
     for idx in range(1, 5):
-        entry.f[idx] = a_values[idx] / a_dead
-        entry.fmex[idx] = entry.f[idx] * entry.mex_dead
-        entry.fw0[idx] = entry.f[idx] * entry.w0[idx]
-        entry.fsig[idx] = entry.f[idx] * entry.sig[idx]
-        entry.wprime_numer[idx] = entry.w0[idx] * entry.eps[idx]
-        entry.mprime_denom[idx] = entry.w0[idx] * entry.eps[idx]
+        f_array[idx] = a_values[idx] / a_dead
+        fmex_array[idx] = f_array[idx] * entry.mex_dead
+        fw0_array[idx] = f_array[idx] * w0_array[idx]
+        fsig_array[idx] = f_array[idx] * sig_array[idx]
+        wprime_numer_array[idx] = w0_array[idx] * eps_array[idx]
+        mprime_denom_array[idx] = w0_array[idx] * eps_array[idx]
     for idx in range(5, 7):
-        entry.f[idx] = a_values[idx] / a_live
-        entry.fw0[idx] = entry.f[idx] * entry.w0[idx]
-        entry.fsig[idx] = entry.f[idx] * entry.sig[idx]
-        entry.wprime_denom[idx] = entry.w0[idx] * math.exp(-500.0 / entry.sig[idx]) if entry.sig[idx] > 0 else 0.0
+        f_array[idx] = a_values[idx] / a_live
+        fw0_array[idx] = f_array[idx] * w0_array[idx]
+        fsig_array[idx] = f_array[idx] * sig_array[idx]
+        wprime_denom_array[idx] = w0_array[idx] * (np.exp(-500.0 / sig_array[idx]) if sig_array[idx] > 0 else 0.0)
 
-    entry.w0_dead = sum(entry.fw0[1:5])
-    entry.w0_live = sum(entry.fw0[5:7])
+    entry.f = f_array
+    entry.fmex = fmex_array
+    entry.fw0 = fw0_array
+    entry.fsig = fsig_array
+    entry.wprime_numer = wprime_numer_array
+    entry.wprime_denom = wprime_denom_array
+    entry.mprime_denom = mprime_denom_array
+    entry.eps = eps_array
+
+    entry.w0_dead = float(np.sum(entry.fw0[1:5]))
+    entry.w0_live = float(np.sum(entry.fw0[5:7]))
     entry.wn_dead = entry.w0_dead * (1.0 - entry.st)
     entry.wn_live = entry.w0_live * (1.0 - entry.st)
-    entry.sig_dead = sum(entry.fsig[1:5])
-    entry.sig_live = sum(entry.fsig[5:7])
+    entry.sig_dead = float(np.sum(entry.fsig[1:5]))
+    entry.sig_live = float(np.sum(entry.fsig[5:7]))
     entry.sig_overall = (a_dead / a_overall) * entry.sig_dead + (a_live / a_overall) * entry.sig_live
-    entry.beta = sum(entry.w0[1:7]) / (entry.delta * entry.rhop)
+    entry.beta = float(np.sum(entry.w0[1:7])) / (entry.delta * entry.rhop)
     entry.beta_op = 3.348 / (entry.sig_overall ** 0.8189) if entry.sig_overall > 0 else 0.0
-    entry.rho_b = sum(entry.w0[1:7]) / max(entry.delta, 1e-9)
-    entry.xi = math.exp((0.792 + 0.681 * math.sqrt(entry.sig_overall)) * (0.1 + entry.beta)) / (192.0 + 0.2595 * entry.sig_overall)
+    entry.rho_b = float(np.sum(entry.w0[1:7])) / max(entry.delta, 1e-9)
+    entry.xi = np.exp((0.792 + 0.681 * np.sqrt(entry.sig_overall)) * (0.1 + entry.beta)) / (192.0 + 0.2595 * entry.sig_overall)
     entry.a_coeff = 133.0 / (entry.sig_overall ** 0.7913) if entry.sig_overall > 0 else 0.0
     entry.b_coeff = 0.02526 * entry.sig_overall ** 0.54 if entry.sig_overall > 0 else 0.0
-    entry.c_coeff = 7.47 * math.exp(-0.133 * entry.sig_overall ** 0.55) if entry.sig_overall > 0 else 0.0
-    entry.e_coeff = 0.715 * math.exp(-0.000359 * entry.sig_overall)
+    entry.c_coeff = 7.47 * np.exp(-0.133 * entry.sig_overall ** 0.55) if entry.sig_overall > 0 else 0.0
+    entry.e_coeff = 0.715 * np.exp(-0.000359 * entry.sig_overall)
     entry.gamma_prime_peak = entry.sig_overall ** 1.5 / (495.0 + 0.0594 * entry.sig_overall ** 1.5) if entry.sig_overall > 0 else 0.0
     if entry.beta_op > 0.0:
-        entry.gamma_prime = entry.gamma_prime_peak * (entry.beta / entry.beta_op) ** entry.a_coeff * math.exp(entry.a_coeff * (1.0 - entry.beta / entry.beta_op))
+        entry.gamma_prime = entry.gamma_prime_peak * (entry.beta / entry.beta_op) ** entry.a_coeff * np.exp(entry.a_coeff * (1.0 - entry.beta / entry.beta_op))
     else:
         entry.gamma_prime = 0.0
     entry.tr = 384.0 / entry.sig_overall if entry.sig_overall > 0 else 0.0
@@ -373,15 +364,15 @@ def build_fuel_model_table_entry(fuel_model: FuelModelParams, live_herb_moisture
     entry.gp_wnl_eml_es_hoc = entry.gamma_prime * entry.wn_live * (0.174 / (entry.se ** 0.19)) * entry.hoc
     entry.phisterm = 5.275 * entry.beta ** (-0.3) if entry.beta > 0.0 else 0.0
     entry.phiwterm = entry.c_coeff * (entry.beta / entry.beta_op) ** (-entry.e_coeff) if entry.beta > 0.0 and entry.beta_op > 0.0 else 0.0
-    wprime_denom_56_sum = sum(entry.wprime_denom[5:7])
-    wprime_numer_14_sum = sum(entry.wprime_numer[1:5])
-    entry.mprime_denom_14_sum = sum(entry.mprime_denom[1:5])
+    wprime_denom_56_sum = float(np.sum(entry.wprime_denom[5:7]))
+    wprime_numer_14_sum = float(np.sum(entry.wprime_numer[1:5]))
+    entry.mprime_denom_14_sum = float(np.sum(entry.mprime_denom[1:5]))
     if entry.mprime_denom_14_sum > 1e-9 and entry.mex_dead > 1e-9:
         entry.r_mprime_denom_14_sum_mex_dead = 1.0 / (entry.mprime_denom_14_sum * entry.mex_dead)
     else:
         entry.r_mprime_denom_14_sum_mex_dead = 0.0
     entry.mex_live = 100.0 if wprime_denom_56_sum <= 1e-6 else 2.9 * wprime_numer_14_sum / wprime_denom_56_sum
-    entry.unsheltered_waf = 0.0 if entry.delta <= 0.0 else (0.555 / math.sqrt(1.0 * entry.delta)) if entry.delta > 1e-9 else 0.0
+    entry.unsheltered_waf = 0.0 if entry.delta <= 0.0 else (0.555 / np.sqrt(entry.delta)) if entry.delta > 1e-9 else 0.0
     return entry
 
 
@@ -400,13 +391,13 @@ def print_fuel_model_table_entry(entry: FuelModelTableEntry) -> None:
     print(f"  rhop:             {entry.rhop:.6f} lb/ft^3  [ELMFIRE assumption]")
     print(f"  st:               {entry.st:.6f} lb/lb  [ELMFIRE assumption]")
     print(f"  se:               {entry.se:.6f} lb/lb  [ELMFIRE assumption]")
-    print(f"  w0:               {[round(value, 6) for value in entry.w0[1:7]]} lb/ft^2  [CSV]")
-    print(f"  sig:              {[round(value, 6) for value in entry.sig[1:7]]} 1/ft  [dead-1h CSV, dead-10h/100h ELMFIRE constants, live CSV]")
-    print(f"  eps:              {[round(value, 6) for value in entry.eps[1:7]] if entry.eps else []} 1  [DERIVED]")
-    print(f"  f:                {[round(value, 6) for value in entry.f[1:7]] if entry.f else []} 1  [DERIVED]")
-    print(f"  fmex:             {[round(value, 6) for value in entry.fmex[1:7]] if entry.fmex else []} 1  [DERIVED]")
-    print(f"  fw0:              {[round(value, 6) for value in entry.fw0[1:7]] if entry.fw0 else []} lb/ft^2  [DERIVED]")
-    print(f"  fsig:             {[round(value, 6) for value in entry.fsig[1:7]] if entry.fsig else []} 1/ft  [DERIVED]")
+    print(f"  w0:               {[round(float(value), 6) for value in entry.w0[1:7]]} lb/ft^2  [CSV]")
+    print(f"  sig:              {[round(float(value), 6) for value in entry.sig[1:7]]} 1/ft  [dead-1h CSV, dead-10h/100h ELMFIRE constants, live CSV]")
+    print(f"  eps:              {[round(float(value), 6) for value in entry.eps[1:7]] if entry.eps is not None else []} 1  [DERIVED]")
+    print(f"  f:                {[round(float(value), 6) for value in entry.f[1:7]] if entry.f is not None else []} 1  [DERIVED]")
+    print(f"  fmex:             {[round(float(value), 6) for value in entry.fmex[1:7]] if entry.fmex is not None else []} 1  [DERIVED]")
+    print(f"  fw0:              {[round(float(value), 6) for value in entry.fw0[1:7]] if entry.fw0 is not None else []} lb/ft^2  [DERIVED]")
+    print(f"  fsig:             {[round(float(value), 6) for value in entry.fsig[1:7]] if entry.fsig is not None else []} 1/ft  [DERIVED]")
     print(f"  w0_dead:          {entry.w0_dead:.6f} lb/ft^2  [DERIVED]")
     print(f"  w0_live:          {entry.w0_live:.6f} lb/ft^2  [DERIVED]")
     print(f"  wn_dead:          {entry.wn_dead:.6f} lb/ft^2  [DERIVED]")
@@ -502,15 +493,6 @@ def calculate_rothermel_no_wind_no_slope(
     w_live_total = w_live_5 + w_live_6
     w_total = w_dead_total + w_live_total
     
-    # === Surface area-to-volume ratios (1/ft) ===
-    # From fuel model CSV: σ values
-    sigma_1 = table.sig[1]
-    sigma_2 = table.sig[2]
-    sigma_3 = table.sig[3]
-    sigma_4 = table.sig[4]
-    sigma_5 = table.sig[5]
-    sigma_6 = table.sig[6]
-    
     # === Ovendry bulk density (lb/ft³) ===
     # ρ_b = w_o / δ  (equation 40 in Rothermel 1972)
     delta = table.delta  # Fuel bed depth (ft)
@@ -560,11 +542,10 @@ def calculate_rothermel_no_wind_no_slope(
     eta_m_dead = max(0.0, min(1.0, eta_m_dead))
 
     # ELMFIRE-style live moisture of extinction update
-    m_array = [0.0, m_1, m_2, m_3, m_4, m_5, m_6]
-    mprime_numer = [0.0] * 7
-    for idx in range(1, 5):
-        mprime_numer[idx] = (table.wprime_numer[idx] if table.wprime_numer else 0.0) * m_array[idx]
-    sum_mprime_numer = sum(mprime_numer[1:5])
+    m_array = np.array([0.0, m_1, m_2, m_3, m_4, m_5, m_6])
+    wprime_numer = table.wprime_numer
+    mprime_numer = wprime_numer * m_array
+    sum_mprime_numer = float(np.sum(mprime_numer[1:5]))
     live_extinction = table.mex_live * (1.0 - table.r_mprime_denom_14_sum_mex_dead * sum_mprime_numer) - 0.226
     live_extinction = max(live_extinction, table.mex_dead)
 
@@ -609,8 +590,7 @@ def calculate_rothermel_no_wind_no_slope(
     # Optimum reaction velocity at current packing ratio
     # Γ' = Γ'_max * (β/β_op)^A * exp[A(1 - β/β_op)]  (equation 38)
     packing_ratio_term = beta / max(beta_op, 1e-6)
-    gamma_prime = gamma_prime_max * (packing_ratio_term ** a) * \
-                  math.exp(a * (1.0 - packing_ratio_term))
+    gamma_prime = gamma_prime_max * (packing_ratio_term ** a) * np.exp(a * (1.0 - packing_ratio_term))
     
     # Propagating flux ratio (ξ) - equation (42)
     # ξ = (192 + 0.2595*σ)^(-1) * exp[(0.792 + 0.681*σ^0.5)(β + 0.1)]
@@ -624,18 +604,18 @@ def calculate_rothermel_no_wind_no_slope(
     
     # === Effective heating number (E_ig) ===
     # ELMFIRE-style class-weighted denominator terms
-    fmc = [0.0] * 7
-    qig = [0.0] * 7
-    fepsqig = [0.0] * 7
-    for idx in range(1, 7):
-        f_i = table.f[idx] if table.f else 0.0
-        fmc[idx] = f_i * m_array[idx]
-        qig[idx] = 250.0 + 1116.0 * m_array[idx]
-        eps_i = table.eps[idx] if table.eps else 0.0
-        fepsqig[idx] = f_i * eps_i * qig[idx]
+    m_array = np.array([0.0, m_1, m_2, m_3, m_4, m_5, m_6])
+    f_array = table.f
+    eps_array = table.eps
+    
+    # Vectorized computation for qig
+    qig = 250.0 + 1116.0 * m_array
+    
+    # Compute fepsqig for classes 1-6
+    fepsqig = f_array * eps_array * qig
 
-    rhob_eps_qig_dead = table.rho_b * sum(fepsqig[1:5])
-    rhob_eps_qig_live = table.rho_b * sum(fepsqig[5:7])
+    rhob_eps_qig_dead = table.rho_b * float(np.sum(fepsqig[1:5]))
+    rhob_eps_qig_live = table.rho_b * float(np.sum(fepsqig[5:7]))
     rho_b_eps_q_ig = table.f_dead * rhob_eps_qig_dead + table.f_live * rhob_eps_qig_live
     
     # === Rate of spread (no wind, no slope) ===
@@ -661,28 +641,6 @@ def calculate_rothermel_no_wind_no_slope(
     )
 
 
-# Legacy ad-hoc implementation retained for rollback/reference.
-# def calculate_rothermel_no_wind_no_slope_legacy(
-#     fuel_model: FuelModelParams,
-#     inputs: RothermelInput,
-# ) -> RothermelOutput:
-#     """Original direct-formula port kept as commented reference."""
-#
-#     # Constants
-#     FUEL_PARTICLE_DENSITY = 32.0  # lb/ft³ (ovendry density of wood)
-#     S_T = 0.0555  # Total mineral content (lb. minerals / lb. ovendry wood)
-#
-#     # === Fuel loading aggregation (lb/ft²) ===
-#     # From fuel model CSV: w_o values (equation 24 in Rothermel 1972)
-#     w_dead_1 = fuel_model.w_dead_1h
-#     w_dead_2 = fuel_model.w_dead_10h
-#     w_dead_3 = fuel_model.w_dead_100h
-#     w_dead_4 = 0.0  # 1000-hr fuel (typically not in basic models)
-#     w_live_5 = fuel_model.w_live_herb
-#     w_live_6 = fuel_model.w_live_woody
-#     ...
-
-
 def main():
     """Example usage of the Rothermel model."""
     
@@ -692,33 +650,25 @@ def main():
     if not csv_path.exists():
         print(f"Error: Fuel models file not found at {csv_path}")
         return
+
+    # Example fuel model used in this script output.
+    test_fuel_id = 102
+
+    # Read and print only the input row associated with test_fuel_id.
+    fuel_df = pd.read_csv(csv_path, names=FUEL_MODEL_COLUMNS, header=None)
+    fuel_row = fuel_df.loc[fuel_df["id"] == test_fuel_id]
+    print(f"Fuel model table row for id={test_fuel_id}:")
+    if fuel_row.empty:
+        print("No matching row found in fuel model table.")
+    else:
+        print(fuel_row.head(1).to_string(index=False))
+    print()
     
     # Load fuel models
     fuel_models = load_fuel_models(csv_path)
     print(f"Loaded {len(fuel_models)} fuel models\n")
     
-    # Use defaults produced by generate_inputs.py when available
-    # Provide helper functions to extract the default raster/int values
-    def _get_float_default(name: str, default: float = 0.0) -> float:
-        try:
-            for k, v in FLOAT_RASTERS:
-                if k == name:
-                    return float(v)
-        except Exception:
-            pass
-        return default
-
-    def _get_int_default(name: str, default: int = 0) -> int:
-        try:
-            for k, v in INT_RASTERS:
-                if k == name:
-                    return int(v)
-        except Exception:
-            pass
-        return default
-
-    # Prefer the 'fbfm40' raster default for fuel model selection (generate_inputs.py)
-    test_fuel_id = _get_int_default('fbfm40', 102)
+    # Example 1: Compute ROS for fuel model 102 with default conditions
     if test_fuel_id in fuel_models:
         fuel_model = fuel_models[test_fuel_id]
         table_entry = build_fuel_model_table_entry(fuel_model)
@@ -729,12 +679,12 @@ def main():
         print_fuel_model_table_entry(table_entry)
         print()
 
-        # Pull moisture defaults from FLOAT_RASTERS (generate_inputs.py uses 0.0 for m1/m10/m100)
-        default_m1 = _get_float_default('m1', 0.0)
-        default_m10 = _get_float_default('m10', 0.0)
-        default_m100 = _get_float_default('m100', 0.0)
+        # Use default moisture conditions
+        default_m1 = 0.0
+        default_m10 = 0.0
+        default_m100 = 0.0
 
-        print("Rate of Spread using generated defaults (No Wind, No Slope):")
+        print("Rate of Spread (No Wind, No Slope):")
         print(f"  Using fuel model id: {test_fuel_id}")
         print(f"  m1={default_m1}%, m10={default_m10}%, m100={default_m100}%")
 
@@ -743,36 +693,36 @@ def main():
             m1=default_m1,
             m10=default_m10,
             m100=default_m100,
-            # mlh=0.0,
-            # mlw=0.0,
             s_e=0.01,
         )
 
         output = calculate_rothermel_no_wind_no_slope(fuel_model, inputs)
         print(f"  Rate of Spread:      {output.rate_of_spread:.4f} ft/min , {output.rate_of_spread * 0.00508:.4f} m/s")
         print(f"  Reaction Intensity:  {output.reaction_intensity:.2f} Btu/(ft²·min)")
-        print()
     
     # Example 2: Compare multiple fuel models with standard conditions
-    print("\n" + "=" * 80)
-    print("Rate of Spread Comparison for Various Fuel Models")
-    print("(No Wind, No Slope, Moisture: m1=5%, m10=7%, m100=9%)")
-    print("=" * 80)
-    print(f"{'ID':<6} {'Name':<15} {'Dead (lb/ft²)':<15} {'Live (lb/ft²)':<15} {'ROS (ft/min)':<15}")
-    print("-" * 80)
-    
     # Sample a few representative fuel models
-    sample_ids = [1, 2, 3, 4, 102, 161, 181]
-    for fuel_id in sample_ids:
-        if fuel_id in fuel_models:
-            fuel = fuel_models[fuel_id]
-            inputs = RothermelInput(fuel_id, m1=5, m10=7, m100=9)
-            output = calculate_rothermel_no_wind_no_slope(fuel, inputs)
-            
-            w_dead = fuel.w_dead_1h + fuel.w_dead_10h + fuel.w_dead_100h
-            w_live = fuel.w_live_herb + fuel.w_live_woody
-            
-            print(f"{fuel_id:<6} {fuel.name:<15} {w_dead:<15.4f} {w_live:<15.4f} {output.rate_of_spread:<15.4f}")
+    # sample_ids = [1, 2, 3, 4, 102, 161, 181]
+    sample_ids = []
+    
+    if len(sample_ids) > 0:
+        print("\n" + "=" * 80)
+        print("Rate of Spread Comparison for Various Fuel Models")
+        print("(No Wind, No Slope, Moisture: m1=5%, m10=7%, m100=9%)")
+        print("=" * 80)
+        print(f"{'ID':<6} {'Name':<15} {'Dead (lb/ft²)':<15} {'Live (lb/ft²)':<15} {'ROS (ft/min)':<15}")
+        print("-" * 80)
+        
+        for fuel_id in sample_ids:
+            if fuel_id in fuel_models:
+                fuel = fuel_models[fuel_id]
+                inputs = RothermelInput(fuel_id, m1=5, m10=7, m100=9)
+                output = calculate_rothermel_no_wind_no_slope(fuel, inputs)
+                
+                w_dead = fuel.w_dead_1h + fuel.w_dead_10h + fuel.w_dead_100h
+                w_live = fuel.w_live_herb + fuel.w_live_woody
+                
+                print(f"{fuel_id:<6} {fuel.name:<15} {w_dead:<15.4f} {w_live:<15.4f} {output.rate_of_spread:<15.4f}")
 
 
 if __name__ == "__main__":
