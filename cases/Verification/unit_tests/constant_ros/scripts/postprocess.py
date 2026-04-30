@@ -100,11 +100,31 @@ def load_initial_phi_from_file(nx: int, ny: int) -> np.ndarray | None:
         return None
     return phi0
 
-def analytical_solution(x: np.ndarray, y: np.ndarray, t: np.ndarray, ros: float = 2.29, R0: float = 0.0) -> np.ndarray:
-    # For ROS = 0, the solution should be the initial condition for all time steps.
-    # This function is a placeholder in case we want to implement a more complex analytical solution in the future.
+def analytical_solution(
+    x: np.ndarray,
+    y: np.ndarray,
+    t: np.ndarray,
+    ros: float = 2.29,
+    R0: float = 0.0,
+    mode: str = "binary",
+) -> np.ndarray:
+    # Support two useful analytical forms:
+    # - "binary": phi = -1 inside the disk r <= R0 + ROS*t, +1 outside (binary indicator used by tests)
+    # - "signed_distance": d = r - (R0 + ROS*t) (continuous signed distance)
     X, Y = np.meshgrid(x, y)
-    return np.sqrt(X**2 + Y**2) - R0 - ros * t[:, None, None]
+    r = np.sqrt(X**2 + Y**2)  # shape (ny, nx)
+    t_arr = np.atleast_1d(t).astype(float)
+    radii = R0 + ros * t_arr  # shape (nt,)
+
+    if mode == "binary":
+        mask = r[None, :, :] <= radii[:, None, None]  # shape (nt, ny, nx)
+        phi = np.where(mask, -1.0, 1.0).astype(np.float32)
+        return phi
+    elif mode == "signed_distance":
+        d = r[None, :, :] - radii[:, None, None]
+        return d.astype(np.float32)
+    else:
+        raise ValueError(f"Unknown mode for analytical_solution: {mode}")
 
 
 def build_initial_phi_from_ignition(config: dict, nx: int, ny: int) -> np.ndarray:
@@ -269,9 +289,36 @@ def analytical_solution_comparison(
     norms = np.linalg.norm(difference, axis=(1, 2), ord=norm)  # Supports numeric orders, +/-inf, and matrix norms like 'fro'.
     return difference, norms
 
-def plot_field(x: np.ndarray, y: np.ndarray, field: np.ndarray, title: str, out_path: Path):
+def plot_field(
+    x: np.ndarray,
+    y: np.ndarray,
+    field: np.ndarray,
+    title: str,
+    out_path: Path,
+    *,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    cmap: str | None = None,
+):
+    arr = np.asarray(field)
+    if cmap is None:
+        unique = np.unique(np.nan_to_num(arr))
+        if unique.size <= 2 and np.all(np.isin(unique, [-1.0, 1.0])):
+            cmap = "bwr"
+            if vmin is None:
+                vmin = -1.0
+            if vmax is None:
+                vmax = 1.0
+        else:
+            cmap = "bwr"
+
+    if vmin is None:
+        vmin = float(np.nanmin(arr))
+    if vmax is None:
+        vmax = float(np.nanmax(arr))
+
     plt.figure(figsize=(8, 6))
-    plt.contourf(x, y, field, levels=50, cmap="inferno", vmin=np.nanmin(field), vmax=np.nanmax(field))
+    plt.contourf(x, y, arr, levels=50, cmap=cmap, vmin=vmin, vmax=vmax)
     plt.colorbar(label=title)
     plt.xlabel("x (m)")
     plt.ylabel("y (m)")
@@ -287,9 +334,22 @@ arrays = load_elmfire_arrays()
 np.savez_compressed(OUT_DIR / "elmfire_arrays.npz", **arrays)
 
 # Create plots
-phi0_analytical = analytical_solution(x=arrays["x"], y=arrays["y"], t=np.array([0.0]), ros=0.1, R0=0.0)
-plot_field(arrays["x"], arrays["y"], phi0_analytical[0], r"Analytical $\phi(x,y,0)$", FIG_DIR / "phi_analytical_initial.png")
-plot_field(arrays["x"], arrays["y"], phi0_analytical[-1], r"Analytical $\phi(x,y,t_{\text{final}})$", FIG_DIR / "phi_analytical_final.png")
+# Evaluate analytical solution on a denser grid for smoother contour plots
+t_final = arrays["t"][-1] if arrays["t"].size > 0 else 10.0
+num_dense = 800
+ros_analytical = 0.0116332  # Use the same ROS as in the analytical solution for consistency
+r0_analytical = 0.7071  # Assuming ignition starts at the origin
+x_dense = np.linspace(arrays["x"][0], arrays["x"][-1], num_dense)
+y_dense = np.linspace(arrays["y"][0], arrays["y"][-1], num_dense)
+t_dense = np.linspace(0.0, t_final, num_dense)
+# x_dense = arrays["x"]
+# y_dense = arrays["y"]
+# t_dense = arrays["t"] if arrays["t"].size > 0 else np.array([0.0], dtype=float)
+phi_analytical = analytical_solution(
+    x=x_dense, y=y_dense, t=t_dense, ros=ros_analytical, R0=r0_analytical, mode="binary"
+)
+plot_field(x_dense, y_dense, phi_analytical[0], r"Analytical $\phi(x,y,0)$", FIG_DIR / "phi_analytical_initial.png")
+plot_field(x_dense, y_dense, phi_analytical[-1], r"Analytical $\phi(x,y,t_{\text{final}})$", FIG_DIR / "phi_analytical_final.png")
 plot_field(arrays["x"], arrays["y"], arrays["phi"][0], r"$\phi(x,y,0)$", FIG_DIR / "phi_initial.png")
 plot_field(arrays["x"], arrays["y"], arrays["phi"][-1], r"$\phi(x,y,t_{\text{final}})$", FIG_DIR / "phi_final.png")
 plot_field(arrays["x"], arrays["y"], arrays["surface_fire"][0], r"$\text{Surface Fire}(x,y,0)$", FIG_DIR / "surface_fire_initial.png")
@@ -313,7 +373,8 @@ if arrays["phi"].shape[0] > 1:
         y=arrays["y"],
         t=arrays["t"],
         norm=norm,
-        ros=0.1,
+        ros=ros_analytical,
+        R0=r0_analytical,
     )
     plot_field(arrays["x"], arrays["y"], np.abs(difference[-1]), r"$|\phi(x,y,t_{\text{final}}) - \phi(x,y,0)|$", FIG_DIR / "phi_error_final.png")
     # Plot error curves over time
