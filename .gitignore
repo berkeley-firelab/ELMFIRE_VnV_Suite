@@ -62,6 +62,7 @@ rag_db
 *.toc
 !vnv_suite/**/misc
 !vnv_suite/**/inputs
+.vscode/
 
 # Folders inside the unit test cases to ignore
 cases/Verification/unit_tests/*/data/

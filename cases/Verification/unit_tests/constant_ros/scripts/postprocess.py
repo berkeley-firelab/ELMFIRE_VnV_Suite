@@ -25,6 +25,9 @@ FIG_DIR.mkdir(parents=True, exist_ok=True)
 REP_DIR.mkdir(parents=True, exist_ok=True)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
+DEFAULT_ROS = 0.0116332
+DEFAULT_R0 = 5.0
+
 # ----------------------- Add customized postprocessing code below -----------------------
 def parse_elmfire_data_config(file_path: Path) -> dict:
     config = {}
@@ -104,8 +107,8 @@ def analytical_solution(
     x: np.ndarray,
     y: np.ndarray,
     t: np.ndarray,
-    ros: float = 2.29,
-    R0: float = 0.0,
+    ros: float = DEFAULT_ROS,
+    R0: float = DEFAULT_R0,
     mode: str = "binary",
 ) -> np.ndarray:
     # Support two useful analytical forms:
@@ -125,6 +128,19 @@ def analytical_solution(
         return d.astype(np.float32)
     else:
         raise ValueError(f"Unknown mode for analytical_solution: {mode}")
+    
+# def analytical_solution(
+#     x: np.ndarray,
+#     y: np.ndarray,
+#     t: float,
+#     *,
+#     ros: float = DEFAULT_ROS,
+#     R0: float = DEFAULT_R0,
+# ) -> np.ndarray:
+#     x_grid, y_grid = np.meshgrid(x, y)
+#     radius = np.sqrt(x_grid**2 + y_grid**2)
+#     target_radius = R0 + ros * float(t)
+#     return np.where(radius <= target_radius, -1.0, 1.0).astype(np.float32)
 
 
 def build_initial_phi_from_ignition(config: dict, nx: int, ny: int) -> np.ndarray:
@@ -209,10 +225,10 @@ def load_elmfire_arrays() -> dict:
 
     # Prefer an explicit initial-condition raster when available.
     # Keep ignition-based construction as a fallback.
-    # phi0 = load_initial_phi_from_file(nx=nx_phi, ny=ny_phi)
+    phi0 = load_initial_phi_from_file(nx=nx_phi, ny=ny_phi)
     # if phi0 is None:
     # Kind of analytical solution construction based on ignition points, since ros=0 means phi should not evolve over time. This also allows us to have an initial condition even when no phi_*.tif files are output by ELMFIRE.
-    phi0 = build_initial_phi_from_ignition(config, nx=nx_phi, ny=ny_phi)
+    # phi0 = build_initial_phi_from_ignition(config, nx=nx_phi, ny=ny_phi)
 
     if phi.size == 0:
         t_phi = np.array([0.0], dtype=float)
@@ -287,6 +303,7 @@ def analytical_solution_comparison(
     phi_analytical = analytical_solution(x=x, y=y, t=t, ros=ros, R0=R0)
     difference = phi_n - phi_analytical  # Shape: (nt, ny, nx)
     norms = np.linalg.norm(difference, axis=(1, 2), ord=norm)  # Supports numeric orders, +/-inf, and matrix norms like 'fro'.
+    norms /= np.linalg.norm(phi_analytical, axis=(1, 2), ord=norm)  # Normalize by the norm of the analytical solution to get relative error.
     return difference, norms
 
 def plot_field(
@@ -337,8 +354,8 @@ np.savez_compressed(OUT_DIR / "elmfire_arrays.npz", **arrays)
 # Evaluate analytical solution on a denser grid for smoother contour plots
 t_final = arrays["t"][-1] if arrays["t"].size > 0 else 10.0
 num_dense = 800
-ros_analytical = 0.0116332  # Use the same ROS as in the analytical solution for consistency
-r0_analytical = 0.7071  # Assuming ignition starts at the origin
+# ros_analytical = 0.0116332  # Use the same ROS as in the analytical solution for consistency
+# r0_analytical = 0.7071  # Assuming ignition starts at the origin
 x_dense = np.linspace(arrays["x"][0], arrays["x"][-1], num_dense)
 y_dense = np.linspace(arrays["y"][0], arrays["y"][-1], num_dense)
 t_dense = np.linspace(0.0, t_final, num_dense)
@@ -346,7 +363,7 @@ t_dense = np.linspace(0.0, t_final, num_dense)
 # y_dense = arrays["y"]
 # t_dense = arrays["t"] if arrays["t"].size > 0 else np.array([0.0], dtype=float)
 phi_analytical = analytical_solution(
-    x=x_dense, y=y_dense, t=t_dense, ros=ros_analytical, R0=r0_analytical, mode="binary"
+    x=x_dense, y=y_dense, t=t_dense, ros=DEFAULT_ROS, R0=DEFAULT_R0, mode="binary"
 )
 plot_field(x_dense, y_dense, phi_analytical[0], r"Analytical $\phi(x,y,0)$", FIG_DIR / "phi_analytical_initial.png")
 plot_field(x_dense, y_dense, phi_analytical[-1], r"Analytical $\phi(x,y,t_{\text{final}})$", FIG_DIR / "phi_analytical_final.png")
@@ -373,8 +390,8 @@ if arrays["phi"].shape[0] > 1:
         y=arrays["y"],
         t=arrays["t"],
         norm=norm,
-        ros=ros_analytical,
-        R0=r0_analytical,
+        ros=DEFAULT_ROS,
+        R0=DEFAULT_R0,
     )
     plot_field(arrays["x"], arrays["y"], np.abs(difference[-1]), r"$|\phi(x,y,t_{\text{final}}) - \phi(x,y,0)|$", FIG_DIR / "phi_error_final.png")
     # Plot error curves over time

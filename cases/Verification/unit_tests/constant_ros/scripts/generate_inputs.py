@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-import os
 import shutil
-import subprocess
 import urllib.error
 import urllib.request
 from pathlib import Path
 
+import numpy as np
+import rasterio
+from rasterio.transform import from_bounds
+
+RADIUS = 5
 
 # Float input rasters: (name, initial value)
 FLOAT_RASTERS = [
@@ -18,7 +21,6 @@ FLOAT_RASTERS = [
 	("m10", 0.0),  # 10-hr dead moisture content, %
 	("m100", 0.0), # 100-hr dead moisture content, %
 	("adj", 1.0),  # Spread rate adjustment factor
-	("phi", 1.0),  # Initial value of phi field
 ]
 
 # Integer input rasters: (name, initial value)
@@ -35,11 +37,6 @@ INT_RASTERS = [
 
 FUEL_MODELS_URL = "https://raw.githubusercontent.com/lautenberger/elmfire/refs/heads/main/build/source/fuel_models.csv"
 FUEL_MODELS_FILENAME = "fuel_models.csv"
-
-
-def run_cmd(cmd: list[str]) -> None:
-	"""Run a command and fail fast if it exits non-zero."""
-	subprocess.run(cmd, check=True)
 
 
 def parse_elmfire_data_config(file_path: Path) -> dict[str, str]:
@@ -81,6 +78,93 @@ def download_file(url: str, destination: Path) -> None:
 	destination.write_bytes(content)
 
 
+def write_float_raster(
+	output_path: Path,
+	nx: int,
+	ny: int,
+	cell_size: float,
+	xmin: float,
+	ymin: float,
+	data: np.ndarray,
+	a_srs: str = "EPSG:32610",
+) -> None:
+	"""Write a float raster to GeoTIFF using rasterio."""
+	transform = from_bounds(xmin, ymin, xmin + nx * cell_size, ymin + ny * cell_size, nx, ny)
+	
+	with rasterio.open(
+		output_path,
+		'w',
+		driver='GTiff',
+		height=ny,
+		width=nx,
+		count=1,
+		dtype=rasterio.float32,
+		crs=a_srs,
+		transform=transform,
+		compress='deflate',
+		zlevel=9,
+		nodata=-9999,
+	) as dst:
+		dst.write(data.astype(np.float32), 1)
+
+
+def write_int_raster(
+	output_path: Path,
+	nx: int,
+	ny: int,
+	cell_size: float,
+	xmin: float,
+	ymin: float,
+	data: np.ndarray,
+	a_srs: str = "EPSG:32610",
+) -> None:
+	"""Write an integer raster to GeoTIFF using rasterio."""
+	transform = from_bounds(xmin, ymin, xmin + nx * cell_size, ymin + ny * cell_size, nx, ny)
+	
+	with rasterio.open(
+		output_path,
+		'w',
+		driver='GTiff',
+		height=ny,
+		width=nx,
+		count=1,
+		dtype=rasterio.int16,
+		crs=a_srs,
+		transform=transform,
+		compress='deflate',
+		zlevel=9,
+		nodata=-9999,
+	) as dst:
+		dst.write(data.astype(np.int16), 1)
+
+
+def create_circular_phi(
+	nx: int,
+	ny: int,
+	cell_size: float,
+	xmin: float,
+	ymin: float,
+	radius: float,
+) -> np.ndarray:
+	"""
+	Create a circular phi field.
+	
+	phi = -1.0 inside circle of given radius centered at domain center
+	phi = 1.0 outside circle
+	"""
+	# Create coordinate grids
+	x = xmin + (np.arange(nx) + 0.5) * cell_size
+	y = ymin + (np.arange(ny) + 0.5) * cell_size
+	xx, yy = np.meshgrid(x, y)
+	
+	# Calculate distance from domain center (0, 0)
+	distance = np.sqrt(xx**2 + yy**2)
+	
+	# Create phi field
+	phi = np.where(distance <= radius, -1.0, 1.0)
+	return phi
+
+
 def main() -> None:
 	case_dir = Path(__file__).resolve().parents[1]
 	data_dir = case_dir / "data"
@@ -118,83 +202,43 @@ def main() -> None:
 	ymin = xmin
 	ymax = xmax
 
-	tr = [str(cell_size), str(cell_size)]
-	te = [str(xmin), str(ymin), str(xmax), str(ymax)]
+	# Calculate grid dimensions
+	nx = int(np.round((xmax - xmin) / cell_size))
+	ny = int(np.round((ymax - ymin) / cell_size))
 
 	fuel_models_path = inputs_dir / FUEL_MODELS_FILENAME
 	download_file(FUEL_MODELS_URL, fuel_models_path)
 
-	dummy_xyz = scratch_dir / "dummy.xyz"
-	dummy_xyz.write_text(
-		"x,y,z\n"
-		"-100000,-100000,0\n"
-		"100000,-100000,0\n"
-		"-100000,100000,0\n"
-		"100000,100000,0\n",
-		encoding="utf-8",
-	)
-
-	dummy_tif = scratch_dir / "dummy.tif"
-	float_base_tif = scratch_dir / "float.tif"
-	int_base_tif = scratch_dir / "int.tif"
-
-	run_cmd([
-		"gdalwarp",
-		"-tr", "200000", "200000",
-		"-te", "-100000", "-100000", "100000", "100000",
-		"-s_srs", a_srs,
-		"-t_srs", a_srs,
-		str(dummy_xyz),
-		str(dummy_tif),
-	])
-
-	run_cmd([
-		"gdalwarp",
-		"-dstnodata", "-9999",
-		"-ot", "Float32",
-		"-tr", *tr,
-		"-te", *te,
-		str(dummy_tif),
-		str(float_base_tif),
-	])
-
-	run_cmd([
-		"gdalwarp",
-		"-dstnodata", "-9999",
-		"-ot", "Int16",
-		"-tr", *tr,
-		"-te", *te,
-		str(dummy_tif),
-		str(int_base_tif),
-	])
-
+	# Create float rasters with constant values
 	for raster_name, raster_value in FLOAT_RASTERS:
-		run_cmd([
-			"gdal_calc.py",
-			"-A", str(float_base_tif),
-			"--co=COMPRESS=DEFLATE",
-			"--co=ZLEVEL=9",
-			"--NoDataValue=-9999",
-			f"--outfile={inputs_dir / f'{raster_name}.tif'}",
-			f"--calc=A + {raster_value}",
-		])
+		data = np.full((ny, nx), raster_value, dtype=np.float32)
+		write_float_raster(
+			inputs_dir / f"{raster_name}.tif",
+			nx, ny, cell_size, xmin, ymin, data, a_srs
+		)
 
+	# Create integer rasters with constant values
 	for raster_name, raster_value in INT_RASTERS:
-		run_cmd([
-			"gdal_calc.py",
-			"-A", str(int_base_tif),
-			"--co=COMPRESS=DEFLATE",
-			"--co=ZLEVEL=9",
-			"--NoDataValue=-9999",
-			f"--outfile={inputs_dir / f'{raster_name}.tif'}",
-			f"--calc=A + {raster_value}",
-		])
+		data = np.full((ny, nx), raster_value, dtype=np.int16)
+		write_int_raster(
+			inputs_dir / f"{raster_name}.tif",
+			nx, ny, cell_size, xmin, ymin, data, a_srs
+		)
+
+	# Create circular phi field
+	phi = create_circular_phi(nx, ny, cell_size, xmin, ymin, RADIUS)
+	write_float_raster(
+		inputs_dir / "phi.tif",
+		nx, ny, cell_size, xmin, ymin, phi, a_srs
+	)
 
 	print("[OK] Input rasters generated")
 	print(f"  scratch: {scratch_dir}")
 	print(f"  inputs:  {inputs_dir}")
 	print(f"  outputs: {outputs_dir}")
 	print(f"  fuel models: {fuel_models_path}")
+	print(f"  domain: {nx}x{ny} cells, {cell_size}m resolution")
+	print(f"  circular phi radius: {RADIUS}m")
 
 
 if __name__ == "__main__":

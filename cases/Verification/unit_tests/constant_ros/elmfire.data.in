@@ -45,7 +45,7 @@ SIMULATION_DTMAX = 1.0
 /
 
 &SIMULATOR
-NUM_IGNITIONS = 1
+NUM_IGNITIONS = 0
 X_IGN(1)      = 0.0
 Y_IGN(1)      = 0.0
 T_IGN(1)      = 0.0
