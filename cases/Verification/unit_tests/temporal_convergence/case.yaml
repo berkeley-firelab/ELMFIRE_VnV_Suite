@@ -1,0 +1,9 @@
+case_id: "temporal_convergence"
+case_title: "Temporal convergence test"
+
+elmfire:
+bin: "elmfire"
+config: "data/inputs/elmfire_180.data"
+
+postprocess:
+figures:
