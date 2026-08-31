@@ -1,4 +1,7 @@
-.PHONY: new run run-all build-all main clean configure
+.PHONY: new run run-all run-verification run-validation build-all \
+	report-inputs verification-report validation-report reports main clean configure
+
+SUITE ?= all
 
 # Find all ELMFIRE config files
 ELMFIRE_CONFIGS := $(shell find cases -type f -name 'elmfire.data.in')
@@ -11,26 +14,44 @@ new:
 run:
 	@./cases/"$(CASE)"/run_case.sh
 
-# Run all cases sequentially (or with Slurm if SLURM=1)
+# Run selected cases sequentially (or with Slurm if SLURM=1).
+# Examples: make run-all SUITE=verification; make run-all SUITE=validation
 run-all:
 ifeq ($(SLURM),1)
-	@python3 ./tools/run_all_cases.py --slurm
+	@python3 ./tools/run_all.py --suite "$(SUITE)" --slurm
 else
-	@python3 ./tools/run_all_cases.py
+	@python3 ./tools/run_all.py --suite "$(SUITE)"
 endif
+
+run-verification:
+	@python3 ./tools/run_all.py --suite verification $(if $(filter 1,$(SLURM)),--slurm,)
+
+run-validation:
+	@python3 ./tools/run_all.py --suite validation $(if $(filter 1,$(SLURM)),--slurm,)
 
 # Rebuild all utilities
 build-all:
 	@./tools/build_all.sh
 
-# Build the main report
-main:
-	@cd main_report && latexmk -pdf -silent main.tex
+# Generate aggregate include lists and scientific decision tables.
+report-inputs:
+	@python3 ./tools/generate_summary_reports.py
 
-# Clean LaTeX and generated files
+verification-report: report-inputs
+	@cd main_report && latexmk -pdf -silent verification_report.tex
+
+validation-report: report-inputs
+	@cd main_report && latexmk -pdf -silent validation_report.tex
+
+reports: verification-report validation-report
+
+# Backward-compatible aggregate-report target.
+main: reports
+
+# Remove regenerable case outputs, figures, logs, report builds, Slurm files,
+# and ELMFIRE scratch artifacts while preserving source inputs and report text.
 clean:
-	@find . \( -name "*.aux" -o -name "*.log" -o -name "*.fls" -o -name "*.fdb_latexmk" \) -delete || true
-	@find cases -type f -name "figures.tex" -delete || true
+	@python3 ./tools/clean_artifacts.py --apply
 
 # Update GDAL paths + ensure all *.sh are executable
 configure:

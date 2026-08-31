@@ -1,3 +1,15 @@
-# Structure-Scale Validation
+# Structure-scale validation
 
-The WU-E model is designed to represent fire spread between structures. Accordingly, it is necessary to validate whether the modeled fire-spreading behavior is consistent with experimental observations. At present, validation can be performed using the IBHS structure-to-structure fire spread test, by comparing the WU-E predictions with the measured heat flux data and the estimated ignition time of the target structure. To further assess model performance across a broader range of scenarios, additional validation data may be generated from high-resolution CFD simulations (e.g., FDS).
+The WU-E model represents fire spread between structures. Validation cases in
+this category compare that behavior with experimental observations, such as the
+IBHS structure-to-structure fire spread tests, using measured heat flux,
+estimated ignition time, damage state, and other available observations.
+Additional reference evidence may come from appropriately documented
+high-resolution simulations such as FDS, provided their model-form limitations
+are distinguished from experimental evidence.
+
+Create or revise these cases using
+`cases/Validation/skills/elmfire-validation-case/SKILL.md`. In particular,
+document the experimental or high-fidelity reference, heat-flux and ignition
+observables, input provenance, configuration rationale, uncertainties, metric
+selection, field/time-history visualizations, and acceptance basis.

@@ -1,0 +1,61 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{booktabs,longtable,array}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{pdfpages}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\emergencystretch=2em
+
+\title{ELMFIRE Validation Summary Report}
+\author{ELMFIRE Verification and Validation Suite}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This document aggregates the standalone reports for every runnable validation
+case currently discovered under \texttt{cases/Validation}.  The opening summary
+records environment and execution configuration and reports each case's
+scientific decision from its case-local \texttt{outputs/metrics.json}; command
+completion and PDF availability are not substituted for validation evidence.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\input{generated/validation_summary.tex}
+
+\section{Scope and decision policy}
+
+Each standalone case PDF is included intact to preserve its data provenance,
+configuration rationale, figures, metrics, and limitations.  PASS and FAIL are
+used only when a case defines a justified acceptance decision.  CHARACTERIZED
+means descriptive metrics exist without a justified pass threshold.  Missing,
+unrun, incomplete, or otherwise non-decisional evidence is shown as NOT
+EVALUABLE.  The linked summary at the beginning records the aggregate-build
+environment, case-declared execution configuration, and scientific decisions
+before the complete case reports.
+
+\section{Common landscape-validation evidence}
+
+The current Camp, Thomas, and Tubbs landscape cases were reconstructed from the
+tracked \texttt{cases/Validation/3\_FIRES} archives.  Each is designed to
+compare a 50-member ELMFIRE ensemble with cumulative VIIRS active-fire
+detections.  The case reports retain the event-specific input provenance,
+namelist rationale, evidence status, and unresolved limitations.
+
+Their common spatial metrics are Jaccard overlap, precision, recall,
+$F_1$, predicted-to-observed area ratio, and Brier score.  Together these
+distinguish spatial mismatch, overgrowth, undergrowth, scale bias, and
+probabilistic error.  Because the recovered archives define no acceptance
+thresholds and do not quantify VIIRS-hull uncertainty, completed runs are
+reported as CHARACTERIZED rather than PASS or FAIL unless justified thresholds
+are declared before inspecting results.  Unresolved model-input provenance,
+VIIRS collection or granule provenance, and event-specific calibration history
+are stated explicitly in the standalone reports.
+
+\input{generated/validation_cases.tex}
+
+\end{document}

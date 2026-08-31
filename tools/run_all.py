@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import re
+import shlex
 import subprocess
 import sys
 from math import floor
-from google.cloud import storage
 import mimetypes
+
+VALID_SUITES = ("all", "verification", "validation")
+SLURM_HEADER_FILES = {
+    "verification": "slurm_verification_head.txt",
+    "validation": "slurm_validation_head.txt",
+}
 
 def usage():
     return """Usage: run_all.py [OPTIONS]
@@ -16,6 +23,10 @@ Options:
   -l, --list              List the resolved case scripts for THIS SHARD and exit
   -n, --dry-run           Show the commands without executing them
   -s, --slurm             Submit jobs via Slurm (sbatch run_case_slurm.sh)
+  --suite SCOPE           Select all, verification, or validation cases
+                          (default: all)
+  --verification-only     Alias for --suite verification
+  --validation-only       Alias for --suite validation
   --shard-index N         Zero-based shard index for this worker (overrides env)
   --shard-count K         Total number of shards/workers (overrides env)
   -h, --help              Show this help message
@@ -27,14 +38,32 @@ Notes:
       3) TASK_COUNT (custom) with index=0
       4) default: index=0, count=1
   - Each case executes from its own directory so ELMFIRE sees inputs in CWD.
-  - With --slurm, a run_case_slurm.sh wrapper is generated per case.
+  - Suite selection is applied before sharding, so shard indices refer only to
+    the selected verification or validation case set.
+  - With --slurm, a run_case_slurm.sh wrapper is generated per case using the
+    matching verification or validation header under common/.
 """
 
-def discover_cases(cases_dir):
-    """Find all run_case.sh under cases_dir, excluding template."""
+def discover_cases(cases_dir, suite="all"):
+    """Find runnable cases in the requested suite, excluding templates/legacy."""
+    if suite not in VALID_SUITES:
+        raise ValueError(f"Unknown suite scope: {suite}")
+
+    search_root = cases_dir
+    if suite != "all":
+        search_root = os.path.join(cases_dir, suite.capitalize())
+    if not os.path.isdir(search_root):
+        return []
+
     scripts = []
-    for dirpath, _, filenames in os.walk(cases_dir):
-        if "case_template" in dirpath:
+    for dirpath, dirnames, filenames in os.walk(search_root):
+        # Prune non-runnable repository material before descending into it.
+        dirnames[:] = [
+            name for name in dirnames
+            if name != "case_template" and not name.startswith("__legacy__")
+        ]
+        relative_parts = os.path.relpath(dirpath, cases_dir).split(os.sep)
+        if "case_template" in relative_parts or "__legacy__" in relative_parts:
             continue
         if "run_case.sh" in filenames:
             scripts.append(os.path.join(dirpath, "run_case.sh"))
@@ -46,8 +75,42 @@ def format_case(script, root_dir):
     rel = os.path.relpath(script, root_dir)
     return rel.removesuffix("/run_case.sh")
 
+def slurm_header_for_case(script, cases_dir, common_dir):
+    """Return the suite-specific Slurm header for a discovered case script."""
+    relative_parts = os.path.relpath(script, cases_dir).split(os.sep)
+    if not relative_parts:
+        raise ValueError(f"Cannot determine suite for case script: {script}")
+
+    suite = relative_parts[0].casefold()
+    header_name = SLURM_HEADER_FILES.get(suite)
+    if header_name is None:
+        raise ValueError(f"No Slurm header is defined for suite path: {script}")
+    return os.path.join(common_dir, header_name)
+
+def slurm_job_name(case_dir):
+    """Create a stable Slurm job name from the canonical case directory ID."""
+    case_id = os.path.basename(os.path.normpath(case_dir))
+    safe_case_id = re.sub(r"[^A-Za-z0-9_.-]+", "-", case_id).strip("-._")
+    if not safe_case_id:
+        safe_case_id = "case"
+    return f"elmfire-{safe_case_id}"[:128]
+
+def render_slurm_header(header_text, job_name):
+    """Replace a generic header job name with the case-specific job name."""
+    directive = re.compile(r"^#SBATCH\s+--job-name(?:=|\s+).*$", re.MULTILINE)
+    replacement = f"#SBATCH --job-name={job_name}"
+    if directive.search(header_text):
+        return directive.sub(replacement, header_text, count=1)
+    return replacement + "\n" + header_text
+
 def make_slurm_wrapper(case_dir, header_path):
-    """Create run_case_slurm.sh by combining slurm_head.txt + run_case.sh."""
+    """Create a Slurm wrapper that executes the original case runner.
+
+    Slurm copies submitted scripts into its spool directory.  Embedding the
+    contents of run_case.sh here would therefore make BASH_SOURCE[0] point at
+    /var/spool rather than the case, breaking case-root discovery.  Execute the
+    original script as a separate Bash program so it retains its real path.
+    """
     wrapper = os.path.join(case_dir, "run_case_slurm.sh")
     run_case = os.path.join(case_dir, "run_case.sh")
 
@@ -61,9 +124,10 @@ def make_slurm_wrapper(case_dir, header_path):
     with open(wrapper, "w") as f:
         f.write("#!/usr/bin/env bash\n\n")
         with open(header_path, "r") as hdr:
-            f.write(hdr.read().rstrip() + "\n\n")
-        with open(run_case, "r") as rc:
-            f.write(rc.read().rstrip() + "\n")
+            header = render_slurm_header(hdr.read(), slurm_job_name(case_dir))
+            f.write(header.rstrip() + "\n\n")
+        f.write(f"cd -- {shlex.quote(case_dir)}\n")
+        f.write(f"exec bash {shlex.quote(run_case)}\n")
 
     os.chmod(wrapper, 0o755)
     return wrapper
@@ -132,6 +196,10 @@ def upload_tree_to_gcs(local_root: str, bucket_url: str, prefix: str = ""):
     bucket_url: like 'gs://elmfire-vnv-reports'
     prefix: destination prefix, no leading slash (e.g., 'runs/sha123/task_0')
     """
+    # Cloud storage is optional for local listing, dry runs, and execution.
+    # Import it only when an upload has actually been requested.
+    from google.cloud import storage
+
     if not bucket_url.startswith("gs://"):
         print(f"[WARN] RESULTS_BUCKET must start with gs:// (got {bucket_url}); skipping upload.")
         return
@@ -173,6 +241,14 @@ def main():
     parser.add_argument("-l", "--list", action="store_true")
     parser.add_argument("-n", "--dry-run", action="store_true")
     parser.add_argument("-s", "--slurm", action="store_true")
+    scope = parser.add_mutually_exclusive_group()
+    scope.add_argument("--suite", choices=VALID_SUITES, default="all")
+    scope.add_argument(
+        "--verification-only", dest="suite", action="store_const", const="verification"
+    )
+    scope.add_argument(
+        "--validation-only", dest="suite", action="store_const", const="validation"
+    )
     parser.add_argument("--shard-index", type=int, default=None)
     parser.add_argument("--shard-count", type=int, default=None)
     parser.add_argument("-h", "--help", action="store_true")
@@ -190,7 +266,7 @@ def main():
     # Basic paths
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     cases_dir = os.path.join(root_dir, "cases")
-    header_path = os.path.join(root_dir, "common", "slurm_head.txt")
+    common_dir = os.path.join(root_dir, "common")
 
     # Log context for Cloud Run logs
     commit_sha = os.getenv("COMMIT_SHA", "")
@@ -204,11 +280,14 @@ def main():
         print(f"[ERROR] Cases directory not found: {cases_dir}", file=sys.stderr)
         sys.exit(1)
 
-    all_scripts = discover_cases(cases_dir)
+    all_scripts = discover_cases(cases_dir, args.suite)
     total_all = len(all_scripts)
 
     if total_all == 0:
-        print(f"[WARN] No case scripts were discovered under {cases_dir}", file=sys.stderr)
+        print(
+            f"[WARN] No {args.suite} case scripts were discovered under {cases_dir}",
+            file=sys.stderr,
+        )
         sys.exit(0)
 
     # Shard resolution
@@ -217,6 +296,7 @@ def main():
     shard_scripts = all_scripts[s:e]
     total_shard = len(shard_scripts)
 
+    print(f"[INFO] Selection: suite={args.suite}, total_selected_cases={total_all}")
     print(f"[INFO] Sharding: total_cases={total_all}, shard_index={shard_idx}, shard_count={shard_cnt}, "
           f"assigned_range=[{s}:{e}) => shard_cases={total_shard}")
 
@@ -238,13 +318,28 @@ def main():
             rel = format_case(script, root_dir)
             case_dir = os.path.dirname(script)
             if args.slurm:
-                print(f"  - {rel} (cd {case_dir} && sbatch run_case_slurm.sh)")
+                print(
+                    f"  - {rel} (job={slurm_job_name(case_dir)}; "
+                    f"cd {case_dir} && sbatch run_case_slurm.sh)"
+                )
             else:
                 print(f"  - {rel} (cd {case_dir} && bash ./run_case.sh)")
         sys.exit(0)
 
     # Actual execution
     if args.slurm:
+        conda_env = os.getenv("ELMFIRE_VNV_CONDA_ENV", "").strip()
+        if not conda_env:
+            print(
+                "[ERROR] ELMFIRE_VNV_CONDA_ENV must be exported before Slurm submission.",
+                file=sys.stderr,
+            )
+            print(
+                "[ERROR] Set it to the Conda environment name or absolute path used by the suite.",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+        print(f"[INFO] Slurm Conda environment: {conda_env}")
         print(f"[INFO] Preparing & submitting {total_shard} case(s) via Slurm ...")
     else:
         print(f"[INFO] Running {total_shard} case(s) sequentially in this shard ...")
@@ -259,10 +354,11 @@ def main():
             sys.exit(1)
 
         if args.slurm:
+            header_path = slurm_header_for_case(script, cases_dir, common_dir)
             wrapper = make_slurm_wrapper(case_dir, header_path)
             try:
                 subprocess.run(["sbatch", wrapper], cwd=case_dir, check=True)
-                print(f"[OK] Submitted {rel}")
+                print(f"[OK] Submitted {rel} as {slurm_job_name(case_dir)}")
             except subprocess.CalledProcessError as e:
                 print(f"[ERROR] sbatch failed in {case_dir}", file=sys.stderr)
                 sys.exit(e.returncode)

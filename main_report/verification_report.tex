@@ -1,0 +1,53 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{booktabs,longtable,array}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{pdfpages}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\emergencystretch=2em
+
+\title{ELMFIRE Verification Summary Report}
+\author{ELMFIRE Verification and Validation Suite}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This document aggregates the standalone reports for every runnable verification
+case currently discovered under \texttt{cases/Verification}.  The opening
+summary records environment and execution configuration and reports each case's
+scientific decision from its case-local \texttt{outputs/metrics.json}; command
+completion and PDF availability are not substituted for verification evidence.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\input{generated/verification_summary.tex}
+
+\section{Scope and decision policy}
+
+The report order follows the stable numerical CASE identifier.  Each standalone
+case PDF is included intact to preserve its equations, figures, acceptance
+criteria, and limitations.  PASS and FAIL retain the decision made by the
+case-local postprocessor.  A missing result, an unrun or incomplete workflow,
+or an unsupported capability is shown as NOT EVALUABLE.  The linked summary at
+the beginning records the aggregate-build environment, case-declared execution
+configuration, and scientific decisions before the complete case reports.
+
+\section{How to read this report}
+
+Each entry is the complete standalone PDF for one verification case.  Cases
+follow the stable order in
+\path{cases/Verification/CASE_REGISTRY.md}, and each report retains its own
+scientific context, equations, metrics, citations, and decision.  Aggregating
+the compiled PDFs keeps case-local macros, labels, bibliographies, and packages
+isolated from one another.  After standalone reports change, rebuild this guide
+with \texttt{make verification-report} or rebuild both suite reports with
+\texttt{make reports}.
+
+\input{generated/verification_cases.tex}
+
+\end{document}

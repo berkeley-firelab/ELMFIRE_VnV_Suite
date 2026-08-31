@@ -3,11 +3,15 @@
 The ELMFIRE Verification and Validation (V&V) Suite captures self-contained
 scenarios that exercise targeted portions of the ELMFIRE wildfire spread model.
 Cases are grouped first by whether they target verification or validation, and
-then by their scale (for example `cases/Validation/landscape_scale/<case>/`).
+then by verification type or validation scale (for example
+`cases/Verification/coupling_tests/<case>/` or
+`cases/Validation/landscape_scale/<case>/`).
 Each case includes the inputs required to reproduce the simulation, a scripted
 post-processing pipeline, and a LaTeX report that documents the expected
-behaviour, results, and pass/fail criteria. The repository also builds a master
-report (ELMFIRE Verification Guide) that aggregates every individual case report.
+behaviour, results, and scientific decision criteria. The repository builds two
+separate aggregate documents: an ELMFIRE Verification Summary Report and an
+ELMFIRE Validation Summary Report. Each includes the applicable standalone case
+reports and ends with a generated case-decision table.
 
 ---
 
@@ -22,7 +26,11 @@ ELMFIRE_VnV_Suite/
 │   │   └── structure_scale/
 │   │       └── <case>/     # Structure-scale validation studies
 │   ├── Verification/
-│   │   └── <case>/         # Verification cases grouped by theme
+│   │   ├── CASE_REGISTRY.md # Stable global verification identifiers
+│   │   ├── unit_tests/
+│   │   │   └── CASE##_<PURPOSE>/ # Isolated functionality and known-response tests
+│   │   └── coupling_tests/
+│   │       └── CASE##_<PURPOSE>/ # Coupled-component verification cases
 │   └── case_template/      # Template used by tools/new_case.sh
 │       ├── case.yaml       # Metadata and runtime settings for run_case.sh
 │       ├── elmfire.data.in # Case-specific ELMFIRE configuration
@@ -33,7 +41,7 @@ ELMFIRE_VnV_Suite/
 │       ├── logs/           # Runtime logs captured by run_case.sh
 │       └── report/         # LaTeX sources for the case report
 ├── common/                 # Shared resources (plot styling, latexmkrc)
-├── main_report/            # Aggregated master report (main.tex → main.pdf)
+├── main_report/            # Separate verification and validation summary reports
 ├── gcp_config/             # Dockerfile, Cloud Build + Batch templates for Google Cloud runs
 ├── tools/                  # Workflow helpers (create case, rebuild reports)
 └── Makefile                # Convenience targets that wrap the scripts
@@ -71,7 +79,7 @@ pip install numpy matplotlib rasterio
 ```
 
 Individual cases may require additional dependencies—inspect
-`cases/<category>/<case>/scripts/*.py` and install any extras (for example `scipy` or
+`cases/<case-path>/scripts/*.py` and install any extras (for example `scipy` or
 `pandas`). Keep the virtual environment activated while running cases so the
 correct packages and versions are available.
 
@@ -88,7 +96,7 @@ correct packages and versions are available.
    ```bash
    export ELMFIRE_BIN=/opt/elmfire/bin/elmfire_2025.0717
    ```
-   or edit `cases/<category>/<case>/case.yaml` to reference the absolute path under the
+   or edit `cases/<case-path>/case.yaml` to reference the absolute path under the
    `elmfire.bin` key. Using the environment variable keeps the YAML portable.
 3. **Configure path to GDAL for all test cases** run `make configure PATH_TO_GDAL=/opt/my-gdal/bin` 
    to update the PATH_TO_GDAL namelist for all test cases.
@@ -104,9 +112,9 @@ post-processes the results, and rebuilds the LaTeX report.
 
 ```bash
 # From the repository root (specify the category + case ID):
-make run CASE=Verification/wue_transient_heatflux
+make run CASE=Verification/coupling_tests/CASE19_WTH
 # or
-./cases/Verification/wue_transient_heatflux/run_case.sh
+./cases/Verification/coupling_tests/CASE19_WTH/run_case.sh
 ```
 
 The script performs the following steps:
@@ -120,11 +128,11 @@ The script performs the following steps:
    `outputs/metrics.json`, and any LaTeX fragments needed by the report.
 5. (When present) converts metrics into reusable LaTeX macros, e.g.
    `scripts/metrics_to_macro.py` → `report/metrics_macros.tex`.
-6. Builds the per-case LaTeX report (`report/case_report.tex` → PDF) and refreshes
-   the master report index via `tools/refresh_main.sh`.
+6. Builds the per-case LaTeX report (`report/case_report.tex` → PDF). Aggregate
+   report inputs are refreshed later with `make reports`.
 
 Inspect `logs/elmfire.stderr` if the simulation fails. Outputs are kept inside
-`cases/<category>/<case>/` so they can be version-controlled when appropriate.
+`cases/<case-path>/` so they can be version-controlled when appropriate.
 
 ---
 
@@ -135,18 +143,55 @@ shard the workload across multiple workers). The helper script discovers all
 `run_case.sh` files under `cases/`, even when they live inside nested
 category folders, skips the template, and honors optional
 sharding environment variables so it can be reused on Slurm or in cloud
-batch jobs.
+batch jobs. Suite selection is applied before sharding.
 
 ```bash
 # Run every case sequentially on the local workstation
 python3 tools/run_all.py
 
+# Run only verification cases
+python3 tools/run_all.py --suite verification
+
+# Run only validation cases
+python3 tools/run_all.py --suite validation
+
+# Equivalent convenience aliases
+python3 tools/run_all.py --verification-only
+python3 tools/run_all.py --validation-only
+
 # Show the planned commands without executing them
 python3 tools/run_all.py --dry-run
 
-# Submit via Slurm using the shared header at common/slurm_head.txt
-python3 tools/run_all.py --slurm
+# Submit through Slurm. Each case receives the matching header from common/.
+python3 tools/run_all.py --suite verification --slurm
+python3 tools/run_all.py --suite validation --slurm
 ```
+
+Slurm resources and module setup are defined separately in
+`common/slurm_verification_head.txt` and `common/slurm_validation_head.txt`.
+The validation header allocates 51 MPI ranks to match the three landscape-case
+runners. During wrapper generation, the generic header job name is replaced by
+the canonical case ID, for example `elmfire-CASE08_FBC` or
+`elmfire-camp_fire`. Because the log templates use Slurm's `%x` token, their
+filenames contain the same case-specific job name. Before submission, export
+`ELMFIRE_BIN` and `ELMFIRE_VNV_CONDA_ENV`; the latter must name the Conda
+environment, or its absolute path, to activate on the compute node. The Slurm
+headers fail before case execution if the environment is not exported or its
+required dependencies are unavailable. The older `common/slurm_head.txt` is retained for
+compatibility but is not used by `tools/run_all.py`.
+
+`make clean` removes everything regenerated by a normal case/report run. It
+empties active-case `outputs/`, `figures/`, `logs/`, and `scratch/` directories
+while preserving the directories for the next run; this includes stale
+`elmfire.stdout`, `elmfire.stderr`, rasters, metrics, and plots. It also removes
+generated `metrics_macros.tex`, case and aggregate report PDFs, LaTeX build
+files, `run_case_slurm.sh` wrappers, and scheduler logs named
+`slurm-*.stdout`, `slurm-*.stderr`, `slurm-*.out`, or `slurm-*.err`.
+
+The same rules apply to CASE01--CASE14 as to every other active case. Cleanup
+preserves case metadata, namelists, scripts, report source text, source inputs,
+observations, and everything under archived `__legacy__` trees. Run
+`python3 tools/clean_artifacts.py` without `--apply` to preview the exact scope.
 
 Cloud environments set `CLOUD_RUN_TASK_*`, `BATCH_TASK_*`, or `TASK_COUNT`
 automatically. You can also override the shard layout explicitly:
@@ -156,20 +201,58 @@ automatically. You can also override the shard layout explicitly:
 python3 tools/run_all.py --shard-index 1 --shard-count 4
 ```
 
+The same selections are available through Make:
+
+```bash
+make run-verification
+make run-validation
+make run-all SUITE=verification
+```
+
+## Building the aggregate reports
+
+Generate both report indexes and their status tables, then aggregate the current
+standalone case PDFs with:
+
+```bash
+make reports
+# or
+./tools/build_all.sh
+```
+
+This produces:
+
+- `main_report/verification_report.pdf` for cases under `cases/Verification/`;
+- `main_report/validation_report.pdf` for cases under `cases/Validation/`.
+
+The opening summaries are generated by `tools/generate_summary_reports.py`.
+They record the aggregate-build environment, each case's declared executable,
+namelist, MPI ranks and schema, and the decision read from
+`outputs/metrics.json`. Case names link to their detailed report sections. A
+successful shell command or LaTeX build is never treated as a scientific PASS.
+Missing, incomplete, blocked, or unrecognized results are reported as `NOT
+EVALUABLE`; validation results without a justified acceptance threshold may be
+reported as `CHARACTERIZED`. Regenerable TeX inputs and machine-readable
+summaries are written under `main_report/generated/` and are not source
+artifacts.
+
 ---
 
 ## Creating a new verification case
 
 1. **Bootstrap from the template** using the helper script or Makefile target:
    ```bash
-   ./tools/new_case.sh Verification/my_new_case
+   ./tools/new_case.sh Verification/coupling_tests/CASE30_EXM
    # or
-   make new CASE=Verification/my_new_case
+   make new CASE=Verification/coupling_tests/CASE30_EXM
    ```
-   Replace `Verification/` with the appropriate category (e.g.,
-   `Validation/landscape_scale/`). The helper copies `cases/case_template/`
-   into `cases/<category>/my_new_case/` and expands the `{{CASE_ID}}` tokens in
-   the YAML and report macros.
+   Replace `Verification/coupling_tests/` with the appropriate group (e.g.,
+   `Verification/unit_tests/` or `Validation/landscape_scale/`). The helper
+   copies `cases/case_template/` into the requested case path and expands the
+   `{{CASE_ID}}` tokens in
+   the YAML and report macros. The helper does not allocate identifiers: consult
+   `cases/Verification/CASE_REGISTRY.md` first and replace `CASE30_EXM` with the
+   next unused number and an appropriate purpose abbreviation.
 
 2. **Edit case metadata**:
    - `case.yaml` — update `case_title`, set path to the elmfire excutable (or rely on
@@ -186,12 +269,13 @@ python3 tools/run_all.py --shard-index 1 --shard-count 4
      “Simulation Setup” and “Assumptions” subsections.
 
 4. **Implement post-processing** in `scripts/postprocess.py`:
-   - Import helpers from `common/` if desired (e.g. `plot_styles.py`).
+   - Keep operational logic in the case; do not import a sibling or suite-level
+     runtime helper.
    - Write figures to `figures/`, capture numerical metrics in a dictionary, and
      save them to `outputs/metrics.json`.
    - If you need LaTeX-ready macros, either extend the script to write them or
      add a helper like `metrics_to_macro.py` (see the
-     `wue_transient_heatflux` case for an example).
+     `CASE19_WTH` case for an example).
 
 5. **Draft the case report**:
    - Use `report/case_body.tex` to describe the problem, expected results, and
@@ -199,17 +283,39 @@ python3 tools/run_all.py --shard-index 1 --shard-count 4
    - Reference generated figures via standard LaTeX commands. Additional macros
      can be created in `report/case_macros.tex`.
 
+For new verification work, follow
+`cases/Verification/skills/elmfire-verification-case/SKILL.md` and allocate the
+next stable identifier in `cases/Verification/CASE_REGISTRY.md`.
+
+When testing the suite against a different ELMFIRE revision, follow
+[`docs/namelist-versioning.md`](docs/namelist-versioning.md) and the repository
+skill at `skills/elmfire-namelist-versioning/SKILL.md`. The workflow extracts a
+schema from the target source, creates review-only migration candidates, and
+checks the test-critical invariants stored in each mutable case's `case.yaml`.
+Scientific intent and reasoning remain in the case report; the suite does not
+use per-case `scientific_intent.yaml` files.
+
+For historical-fire, landscape, structure, or experimental validation work,
+follow `cases/Validation/skills/elmfire-validation-case/SKILL.md`. It orchestrates
+data provenance, configuration justification, preprocessing, postprocessing,
+input statistics, observation comparisons, validation metrics, result
+visualization, and a standalone report for the ELMFIRE Validation Guide.
+
 6. **Run the end-to-end pipeline**:
    ```bash
-   ./cases/Verification/my_new_case/run_case.sh
+   ./cases/Verification/coupling_tests/CASE30_EXM/run_case.sh
    ```
    Swap in the category path you selected in step 1.
    Iterate on the configuration, post-processing, or report content until the
    outputs and PDF look correct.
 
-7. **Version-control the case** by adding new inputs, scripts, figures, metrics,
-   and report sources to Git. Large raw rasters can be excluded if they are
-   reproducible elsewhere (scripts should be provided); otherwise coordinate storage with the team.
+7. **Version-control the case** by adding its metadata, source inputs, scripts,
+   and report sources to Git. Put irreplaceable observations or approved
+   baselines under a clearly named source/reference directory, not under
+   `outputs/`, `figures/`, `logs/`, or `scratch/`; those runtime directories are
+   regenerated by the case pipeline and removed by `make clean`. Large raw
+   rasters can be excluded if they are reproducible elsewhere (scripts should
+   be provided); otherwise coordinate storage with the team.
 
 ---
 
@@ -281,19 +387,21 @@ for each affected case:
 3. **Review acceptance criteria** in `report/case_body.tex` to confirm they still
    apply. Adjust tolerances if model changes warrant it and document the
    rationale in the “Discussion” section.
-4. **Re-run** `./cases/<category>/<case>/run_case.sh` to generate fresh outputs, metrics,
+4. **Re-run** `./cases/<case-path>/run_case.sh` to generate fresh outputs, metrics,
    and the updated PDF.
 5. **Inspect diffs** in `outputs/metrics.json`, plots under `figures/`, and the
    LaTeX report. Highlight notable changes in the Discussion section.
-6. **Regenerate the master report** (especially after multiple cases are
+6. **Regenerate both aggregate reports** (especially after multiple cases are
    refreshed):
    ```bash
    ./tools/build_all.sh
    # or
    make build-all
    ```
-   This rebuilds every case report, rewrites `main_report/cases.tex`, and
-   produces an updated `main_report/main.pdf` aggregating all cases.
+   This regenerates the report include lists and decision tables, then produces
+   `main_report/verification_report.pdf` and
+   `main_report/validation_report.pdf`. Existing standalone case PDFs are
+   included intact.
 7. **Commit and tag** the refreshed results. Include the ELMFIRE version number
    in your commit message or Git tag to keep an auditable history.
 
@@ -303,13 +411,14 @@ for each affected case:
 
 - Activate the Python environment and ensure the desired ELMFIRE binary is on
   hand before running any case scripts.
-- Use `make run CASE=<category>/<id>` for spot checks, `./tools/new_case.sh` to seed new
-  cases, and `./tools/build_all.sh` to rebuild everything (case PDFs + master
-  report).
-- Keep `outputs/metrics.json`, generated figures, and LaTeX sources under
-  version control. Logs can be cleared if they grow too large.
+- Use `make run CASE=<case-path>` for spot checks, `make run-verification` or
+  `make run-validation` for scoped execution, `./tools/new_case.sh` to seed new
+  cases, and `./tools/build_all.sh` to rebuild both aggregate reports.
+- Keep case metadata, source inputs, scripts, observations/baselines, and LaTeX
+  sources under version control. Treat metrics, generated figures, logs,
+  scratch data, and compiled PDFs as reproducible run products; `make clean`
+  removes them.
 - Document all assumptions and parameter choices in the case report so future
   maintainers can understand and reproduce the verification scenario.
 - Prefer referencing the executable via `ELMFIRE_BIN` to avoid hard-coding
   machine-specific paths in `case.yaml`.
-

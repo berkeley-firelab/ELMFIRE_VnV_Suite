@@ -57,12 +57,22 @@ rag_db
 .aux
 *.stderr
 *.stdout
+**/run_case_slurm.sh
+**/slurm-*.err
+**/slurm-*.out
+**/slurm-*.stderr
+**/slurm-*.stdout
 *.synctex.gz
 *.out
 *.toc
 !vnv_suite/**/misc
 !vnv_suite/**/inputs
 .vscode/
+
+# Regenerable repository-level report and scratch artifacts
+/main_report/generated/
+/output/
+/tmp/
 
 # Folders inside the unit test cases to ignore
 cases/Verification/unit_tests/*/data/
