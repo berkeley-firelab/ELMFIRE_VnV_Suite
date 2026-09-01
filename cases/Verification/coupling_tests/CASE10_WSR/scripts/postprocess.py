@@ -269,10 +269,10 @@ def metric(name, limit, calculated=None, passed=None, note=""):
     """Create a complete metric row; unavailable calculations never leave blanks."""
     if calculated is None:
         calculated_text = "N/A"
-        status = "NOT EVALUATED"
+        status = "NOT EVALUABLE"
     elif isinstance(calculated, (int, float, np.floating)) and not np.isfinite(calculated):
         calculated_text = "N/A"
-        status = "NOT EVALUATED"
+        status = "NOT EVALUABLE"
         note = note or "The required finite comparison value was unavailable."
     else:
         calculated_text = (
@@ -391,14 +391,14 @@ def calculate_metrics(case, manifest, profiles):
                 metric(f"{test} ignition-time relative error", f"<= {limits[ignition_key]}",
                        ignition_value, np.isfinite(ignition_value) and ignition_value <= limits[ignition_key]),
             ])
-    evaluated_native = [row for row in rows[:5] if row["status"] != "NOT EVALUATED"]
+    evaluated_native = [row for row in rows[:5] if row["status"] != "NOT EVALUABLE"]
     native_status = (
         "NOT RUN" if not evaluated_native else
         ("PASS" if all(row["status"] == "PASS" for row in evaluated_native) else "FAIL")
     )
     missing_capability = any(not item["runnable"] for item in manifest)
     overall = (
-        "NOT EVALUATED (capability missing)" if missing_capability else
+        "NOT EVALUABLE (capability missing)" if missing_capability else
         ("PASS" if all(row["status"] == "PASS" for row in rows) else "FAIL")
     )
     return rows, native_status, overall

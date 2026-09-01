@@ -1,0 +1,30 @@
+\section{Verification purpose}
+This case verifies the upstream coupling from 20-ft wind, canopy cover, canopy height, and fuel-bed depth through ELMFIRE's wind-adjustment factor (WAF) into Rothermel ROS.  It distinguishes an input-height conversion error from a defect in the Rothermel wind factor.  It can expose percent/fraction canopy errors, height-times-ten errors, sheltered/unsheltered branch errors, or missing WAF application.  The question is whether all canopy variants reproduce the independently predicted final ROS within \RosTolerance{} while reaction intensity remains within \IrTolerance{}.
+
+\section{Mathematical formulation and numerical implementation}
+ELMFIRE calculates $U_{mf}=WAF\,U_{20}$.  Without canopy it uses a logarithmic fuel-bed-height expression.  With canopy it evaluates a sheltered factor from canopy cover and height, limits it by the unsheltered factor, and blends the two when $0.3333CC<0.05$.  The resulting midflame speed enters $\phi_w=C U_{mf}^{B}(\beta/\beta_{op})^{-E}$.  The case oracle restates these equations directly and does not read ELMFIRE output to estimate WAF.
+
+\section{Derivation of expected behavior}
+For fixed \WindTwenty{} and fuel model 2, reaction intensity is invariant because canopy affects wind adjustment but not the configured surface fuel or moisture.  ROS differences are completely predicted by the independently calculated WAF and Rothermel wind factor.  The zero-canopy variant selects the unsheltered formula; canopy combinations exercise transition and sheltered branches.
+
+\section{Verification metrics and acceptance criteria}
+Maximum direct-ROS relative error is 0.03, reaction-intensity error is 0.01, and TOA-derived ROS error is 0.06; TOA regression requires $R^2\ge0.995$.  Constant reaction intensity is retained as a control that detects unintended crown or canopy-fuel coupling.  All ten variants are required and missing fields give NOT EVALUABLE.
+
+\section{Simulation configuration and predicted outcome}
+
+The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every variant, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} are fixed at 5 s unless the configured 0.2 CFL limit requires a smaller value. Across this sweep the resulting oracle CFL spans 0.011--0.063; this avoids a discrete-front resonance observed when every variant was tuned to the same fractional-cell advance and remains well above ELMFIRE's 0.001 normalized-PHI stall threshold. A zero-ROS variant also uses the 5 s step and is evaluated from direct fields without requiring TOA propagation. The evaluator always requires uniquely named rasters tied to the one final dump record. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
+Canopy cover is 0, 10, 30, or 60\%; canopy heights are 5, 15, and \SI{30}{m} where applicable.  The raster stores cover in percent and height times ten, matching explicit namelist flags.  Fuel model 2, dead moisture 5/7/9\%, live moisture 90\%, and zero slope are fixed.  A finite west-to-east ignition strip has a planar east face in the interior analysis corridor and ends inside the lateral boundaries.  Crown fire is disabled even though canopy inputs are present.  ROS should vary only through WAF while $I_R$ remains fixed.
+
+\section{Actual simulation results}
+The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} variants and reports \textbf{\VerificationStatus}.
+\IfFileExists{../figures/sweep_response.pdf}{\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{sweep_response.pdf}\caption{Expected and simulated canopy/WAF response at fixed 20-ft wind.}\end{figure}}{}
+
+\section{Calculated metrics and verification decision}
+\begin{center}\begin{tabular}{@{}llll@{}}\toprule Metric & Limit & Calculated & Status\\\midrule\MetricRows\bottomrule\end{tabular}\end{center}
+The authoritative decision is \textbf{\VerificationStatus}.
+
+\section{Technical interpretation}
+A uniform wind-scale error suggests incorrect 20-ft units.  Errors confined to canopy variants implicate sheltered WAF or canopy scaling.  Varying reaction intensity indicates an unintended canopy or crown-fire pathway.  Correct direct ROS but biased TOA implicates level-set propagation.
+
+\section{Scope and limitations}
+This is an implementation-specific coupling test, not a validation of canopy wind profiles.  It uses one fuel, one 20-ft wind, uniform canopy fields, and the current ELMFIRE WAF algorithm.  A deliberate algorithm change requires oracle and report review.

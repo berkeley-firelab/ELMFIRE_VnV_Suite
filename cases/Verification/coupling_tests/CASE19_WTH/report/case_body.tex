@@ -52,6 +52,7 @@ HRRPUA uses the center cell; DFC and radiation use the documented 11-by-11 windo
 \section{Simulation configuration and predicted outcome}
 
 \begin{center}
+\small
 \begin{tabular}{@{}llll@{}}\toprule
 Parameter & Value & Units & Isolation role\\\midrule
 Domain raster & \(20\times20\) cells & -- & centered WUI source and audit window\\
@@ -72,19 +73,19 @@ Only case-local ELMFIRE GeoTIFFs are used. Current status is \textbf{\Verificati
 \begin{figure}[H]\centering
 \IfFileExists{../figures/whole_domain_result.pdf}{\includegraphics[width=0.46\textwidth]{whole_domain_result.pdf}}{\fbox{No case-local WUI field is available.}}
 \IfFileExists{../figures/verification_summary.pdf}{\includegraphics[width=0.98\textwidth]{verification_summary.pdf}}{}
-\caption{Case-local final DFC audit window and transient reference/output summaries.}
+\caption{Final whole-domain DFC heat flux in kW m$^{-2}$ and transient reference-versus-ELMFIRE histories for HRRPUA, DFC, and radiation. All panels are generated from the required case-local transient GeoTIFF stacks; the histories show every selected output time and the spatial panel shows the final DFC output.}
 \end{figure}
 
 \section{Calculated metrics and verification decision}
 
 \begin{center}
+\small
 \begin{tabular}{@{}llll@{}}\toprule
 Metric & Expected value or limit & Calculated value & Status\\\midrule
 \MetricRows
 \bottomrule\end{tabular}
 \end{center}
-The authoritative decision is \textbf{\VerificationStatus}, sourced from
-\texttt{outputs/metrics.json} through generated \texttt{metrics\_macros.tex}.
+The authoritative decision is \textbf{\VerificationStatus}. The generated table is sourced directly from the case-local metrics JSON.
 
 \section{Technical interpretation}
 

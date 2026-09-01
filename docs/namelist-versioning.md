@@ -88,6 +88,28 @@ omit that value from the invariant set and constrain the variant-generating
 script. Generated namelists are not the source of truth when a case-local script
 recreates them from a canonical template.
 
+Set `template: true` on a file entry only when its canonical namelist contains
+standalone `@TOKEN@` directives expanded by the deterministic case-local
+preprocessor. The validator checks every literal assignment and invariant in
+the template while allowing those explicit directives; normal namelists reject
+them. Variant-specific values should be checked in separate file entries only
+when they are essential to the experiment.
+
+A capability-only case that intentionally does not execute ELMFIRE records the
+exception explicitly instead of inventing a dummy namelist:
+
+```yaml
+namelist_contract:
+  schema_version: 1
+  applicability: "not_applicable"
+  reason: "The required source capability and adapter are unavailable."
+  report: "report/case_body.tex"
+  files: []
+```
+
+The validator reports `NOT APPLICABLE` for this reviewed condition. Omitting a
+contract, a reason, or a required namelist remains an error.
+
 ## Review gates
 
 - **Schema gate:** every explicit key exists in the target source group.

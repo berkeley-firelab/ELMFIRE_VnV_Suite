@@ -319,7 +319,7 @@ def metric(
         value=None,
         passed=None,
         note="",
-        unavailable_status="NOT EVALUATED"):
+        unavailable_status="NOT EVALUABLE"):
     """Create one explicit metric row without blank or non-finite calculated fields."""
     if value is None or (isinstance(value, (int, float, np.floating))
                          and not np.isfinite(value)):
@@ -334,7 +334,7 @@ def metric(
             "metric": name,
             "limit": limit,
             "calculated": str(value),
-            "status": "NOT EVALUATED",
+            "status": "NOT EVALUABLE",
             "note": note}
     return {
         "metric": name,
@@ -443,8 +443,8 @@ def calculate_metrics(case, manifest, profiles):
         overall = "NOT RUN"
     elif any(row["status"] == "FAIL" for row in decision_rows):
         overall = "FAIL"
-    elif any(row["status"] == "NOT EVALUATED" for row in decision_rows):
-        overall = "NOT EVALUATED"
+    elif any(row["status"] == "NOT EVALUABLE" for row in decision_rows):
+        overall = "NOT EVALUABLE"
     else:
         overall = "PASS"
     diagnostics = {}

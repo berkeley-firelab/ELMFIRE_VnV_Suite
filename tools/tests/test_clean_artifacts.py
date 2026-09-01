@@ -63,6 +63,45 @@ class ArtifactClassificationTests(unittest.TestCase):
         self.assertFalse(CLEAN.is_slurm_artifact(Path("slurm_validation_head.txt")))
         self.assertTrue(CLEAN.is_slurm_artifact(Path("slurm-123.out")))
 
+    def test_all_verification_variants_are_regenerable_runtime_trees(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            variant_directories = {
+                root / "cases/Verification/unit_tests/CASE34_FMS/variants",
+                root / "cases/Verification/coupling_tests/CASE01_BET/variants",
+                root / "cases/Verification/coupling_tests/CASE29_SUP/variants",
+            }
+            for variants in variant_directories:
+                generated_input = variants / "example/inputs/phi.tif"
+                generated_input.parent.mkdir(parents=True)
+                generated_input.write_text("generated", encoding="utf-8")
+
+            validation_variants = (
+                root / "cases/Validation/landscape_scale/fire/variants"
+            )
+            (validation_variants / "source.txt").parent.mkdir(parents=True)
+            (validation_variants / "source.txt").write_text(
+                "preserved", encoding="utf-8"
+            )
+
+            original_root = CLEAN.ROOT_DIR
+            try:
+                CLEAN.ROOT_DIR = root
+                _, runtime_directories, _ = CLEAN.cleanup_inventory()
+                cleaned = CLEAN.empty_runtime_directories(runtime_directories, apply=True)
+            finally:
+                CLEAN.ROOT_DIR = original_root
+
+            self.assertEqual(set(runtime_directories), variant_directories)
+            self.assertEqual(cleaned, len(variant_directories))
+            for variants in variant_directories:
+                self.assertTrue(variants.is_dir())
+                self.assertEqual(list(variants.iterdir()), [])
+            self.assertEqual(
+                (validation_variants / "source.txt").read_text(encoding="utf-8"),
+                "preserved",
+            )
+
     def test_runtime_contents_are_removed_but_directories_and_inputs_remain(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

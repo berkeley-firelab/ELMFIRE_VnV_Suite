@@ -1,0 +1,34 @@
+\section{Verification purpose}
+This case verifies ELMFIRE's public custom fuel-table interface and the Rothermel response to one-at-a-time changes in dead 1-h load, 1-h SAV, fuel-bed depth, dead extinction moisture, and heat content.  It can expose column misalignment, ignored custom values, stale precomputed coefficients, or unit conversion errors.  The question is whether every generated code-\CustomFuelCode{} row produces independently calculated reaction intensity and ROS within \IrTolerance{} and \RosTolerance{}.
+
+\section{Mathematical formulation and numerical implementation}
+The custom row supplies class loads $w_0$, surface-area-to-volume ratios $\sigma$, depth $\delta$, dead extinction $M_x$, and heat content $h$.  These feed packing ratio $\beta=\sum w_0/(\delta\rho_p)$, optimum packing, reaction velocity, propagating flux, damping, heat sink, and
+\begin{equation}R_0=I_R\xi/(\rho_b\epsilon Q_{ig}).\end{equation}
+The formulation follows Andrews (2018), RMRS-GTR-371.  Particle density and mineral constants are fixed by the inspected ELMFIRE interface and therefore are not claimed as user-sweepable variables.
+
+\section{Derivation of expected behavior}
+The baseline row is copied and exactly one public column is changed in each variant.  A case-local fuel table is written beside that variant and read independently by the oracle.  The full equation is recalculated rather than imposing a monotonic trend: load, SAV, and depth have competing effects through packing and reaction velocity, so a simple ordering would be scientifically unjustified.
+
+\section{Verification metrics and acceptance criteria}
+Maximum relative errors are 0.02 for direct ROS and 0.01 for reaction intensity.  Variants predicted at or above \SI{0.10}{m.min^{-1}} additionally require TOA-derived ROS error at most 0.05 and minimum $R^2=0.995$; slower variants are assessed from direct ROS and intensity.  Pointwise equality to a complete recalculation detects both ignored columns and wrong nonlinear propagation.  The baseline and ten low/high variants are all required.
+
+\section{Simulation configuration and predicted outcome}
+
+The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every positive oracle ROS, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} are selected so the expected front advances 5\% of one cell per step (CFL 0.05, below the configured 0.2 limit). This keeps the PHI change above ELMFIRE's fixed stall scale even if the implementation produces only a small fraction of the reference speed. A zero-ROS variant retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The analytically selected stop time is rounded upward to a whole second because the current ELMFIRE time loop stores the duration as an integer; this preserves the intended duration and guarantees the terminal output dump. The evaluator always requires uniquely named rasters tied to the one final dump record. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
+All variants use fuel code \CustomFuelCode, 5/7/9\% dead moisture, 90\% live moisture, zero wind and slope, and \SI{10}{m} cells.  A finite ignition strip supplies a planar east face in the interior analysis corridor while remaining clear of the lateral grid boundaries.  The baseline row uses 0.10/0.05/0.02 dead loads, 0.08 live-woody load, 1-h SAV 2000 \si{ft^{-1}}, depth \SI{1}{ft}, dead extinction 25\%, and heat content \SI{8000}{Btu.lb^{-1}}.  Each output should match its own oracle; no universal increasing trend is predicted.
+
+\section{Actual simulation results}
+The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} variants and reports \textbf{\VerificationStatus}.
+\ifnum\CompletedVariantCount>0
+\IfFileExists{../figures/sweep_response.pdf}{\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{sweep_response.pdf}\caption{Hand calculations (open diamonds, solid lines) and ELMFIRE predictions (filled circles, dashed lines) for the custom fuel-table variants. Each comparison pair uses the same color.}\end{figure}}{}
+\fi
+
+\section{Calculated metrics and verification decision}
+\begin{center}\begin{tabular}{@{}llll@{}}\toprule Metric & Limit & Calculated & Status\\\midrule\MetricRows\bottomrule\end{tabular}\end{center}
+The authoritative decision is \textbf{\VerificationStatus}.
+
+\section{Technical interpretation}
+If only one low/high pair fails, its fuel-table column or dependent coefficient is suspect.  A common intensity error suggests table parsing or units; correct intensity with wrong ROS points to heat sink, density, or flux ratio.  Identical results across a changed pair indicate the column was ignored.
+
+\section{Scope and limitations}
+This case tests only parameters exposed by the current custom table and one synthetic baseline.  It does not test particle density, mineral contents, spatial mixtures, dynamic curing, or physical realism of the synthetic fuel.

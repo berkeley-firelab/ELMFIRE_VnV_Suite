@@ -311,7 +311,7 @@ def write_variant(case_dir, template, case, spec, feature_available):
     capability = (
         "available; variant may be executed"
         if runnable else
-        f"NOT EVALUATED: case metadata does not enable {case['feature_keyword']}"
+        f"NOT EVALUABLE: case metadata does not enable {case['feature_keyword']}"
     )
     return {
         **spec,

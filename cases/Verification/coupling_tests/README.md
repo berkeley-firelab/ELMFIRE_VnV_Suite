@@ -9,6 +9,13 @@ reformulations of the simplified end-to-end scenarios in Section 3.2 of the
 ELMFIRE Guide. Their original harness and reference material are retained under
 `__legacy__/` and are not active cases.
 
+`CASE30_MIT` through `CASE33_SDO` are portable, executable-level successors
+to the distinct black-box scenarios in Adam Laird's test collection. The
+source-to-case mapping, including internal routines that cannot be observed
+through the normal ELMFIRE executable, is documented in
+`../ADAM_TEST_MIGRATION.md`. The active successors contain no Fortran and do
+not depend on the retained `../build_adam/` source tree at runtime.
+
 Use `../skills/elmfire-verification-case/SKILL.md` when creating or reviewing a
 general verification case. The historical spotting-specific skill remains
 under `__legacy__/spotting_model/` as domain reference material.
@@ -20,3 +27,10 @@ source checkout. Spotting cases that launch ELMFIRE therefore retain their
 reviewed fuel-model tables under their own `data/misc/` directory. Prospective
 features are enabled only by explicit, reviewed case metadata, never by a
 runtime source-code search.
+
+`CASE40_WSD` verifies vector addition and level-set ellipse construction when
+Rothermel wind and slope forcing compete. `CASE42_WAF` verifies the upstream
+coupling from 20-ft wind and canopy inputs through ELMFIRE's wind-adjustment
+factor into the Rothermel response. Their scalar reference equations are
+case-local, but their decisions intentionally cover more than one runtime
+component, so they remain coupling tests.

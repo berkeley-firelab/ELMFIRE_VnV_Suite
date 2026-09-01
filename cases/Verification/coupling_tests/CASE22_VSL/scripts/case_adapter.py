@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 
 import matplotlib
 
@@ -47,12 +48,37 @@ def read_variants(case_dir: Path):
     return variants
 
 
+def materialize_variant_namelist(
+    case_dir: Path, label: str, config_rel: Path
+) -> Path:
+    """Create a generated variant namelist from case-local source material.
+
+    The root ``elmfire.data.in`` remains the default source.  A scientifically
+    distinct variant may instead provide ``scripts/namelists/<label>.in``.
+    Nothing below ``variants/`` is treated as source material.
+    """
+    config_path = case_dir / config_rel
+    if config_path == case_dir / "elmfire.data.in":
+        if not config_path.is_file():
+            raise FileNotFoundError(config_path)
+        return config_path
+
+    template = case_dir / "scripts" / "namelists" / f"{label}.in"
+    source = template if template.is_file() else case_dir / "elmfire.data.in"
+    if not source.is_file():
+        raise FileNotFoundError(
+            f"No source namelist for {label}: expected {template} or "
+            f"{case_dir / 'elmfire.data.in'}"
+        )
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(source, config_path)
+    return config_path
+
+
 def generate_inputs(case_dir: Path) -> None:
     """Generate deterministic GUIDE rasters next to each local namelist."""
     for label, config_rel, guide_name in read_variants(case_dir):
-        config_path = case_dir / config_rel
-        if not config_path.is_file():
-            raise FileNotFoundError(config_path)
+        config_path = materialize_variant_namelist(case_dir, label, config_rel)
         guide_case = GUIDE_CASES[guide_name]
         GUIDE.generate_case_inputs(config_path.parent, config_path, guide_case)
         print(f"[OK] {label}: generated inputs for {guide_name}")

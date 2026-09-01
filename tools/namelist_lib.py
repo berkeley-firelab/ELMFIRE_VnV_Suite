@@ -12,6 +12,7 @@ from typing import Any, Iterable
 
 
 GROUP_RE = re.compile(r"^\s*&([A-Za-z][A-Za-z0-9_]*)\s*$")
+TEMPLATE_DIRECTIVE_RE = re.compile(r"^\s*@[A-Za-z][A-Za-z0-9_]*@\s*$")
 ASSIGN_START_RE = re.compile(
     r"(?:^|,)\s*([A-Za-z][A-Za-z0-9_]*(?:\([^=]*\))?)\s*=\s*"
 )
@@ -61,8 +62,16 @@ def base_key(key: str) -> str:
     return key.split("(", 1)[0].strip().upper()
 
 
-def parse_namelist(path: Path) -> list[Assignment]:
-    """Parse one-assignment-per-line ELMFIRE namelists without evaluating values."""
+def parse_namelist(
+    path: Path, *, allow_template_placeholders: bool = False
+) -> list[Assignment]:
+    """Parse an ELMFIRE namelist without evaluating assignment values.
+
+    A canonical case template may contain a standalone ``@TOKEN@`` that a
+    deterministic preprocessor replaces with one or more assignments. Such a
+    directive is ignored only when the caller explicitly enables template
+    placeholders; ordinary namelists continue to reject it.
+    """
     assignments: list[Assignment] = []
     group: str | None = None
     for line_number, original in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -79,6 +88,8 @@ def parse_namelist(path: Path) -> list[Assignment]:
             group = None
             continue
         if group is None:
+            continue
+        if allow_template_placeholders and TEMPLATE_DIRECTIVE_RE.match(line):
             continue
         matches = list(ASSIGN_START_RE.finditer(line))
         if not matches or matches[0].start() != 0:
@@ -152,14 +163,42 @@ def schema_paths(schema: dict[str, Any]) -> set[str]:
     return result
 
 
-def contract_files(case_yaml: Path) -> list[dict[str, Any]]:
+def namelist_contract(case_yaml: Path) -> dict[str, Any]:
+    """Load and validate the common namelist-contract envelope."""
     metadata = load_yaml(case_yaml)
     contract = metadata.get("namelist_contract")
     if not isinstance(contract, dict):
         raise NamelistError(f"{case_yaml}: missing namelist_contract")
     if contract.get("schema_version") != 1:
         raise NamelistError(f"{case_yaml}: namelist_contract.schema_version must be 1")
+    applicability = contract.get("applicability", "required")
+    if applicability not in {"required", "not_applicable"}:
+        raise NamelistError(
+            f"{case_yaml}: namelist_contract.applicability must be required or not_applicable"
+        )
+    if applicability == "not_applicable":
+        reason = contract.get("reason")
+        if not isinstance(reason, str) or not reason.strip():
+            raise NamelistError(
+                f"{case_yaml}: a not_applicable namelist contract requires a reason"
+            )
+    return contract
+
+
+def contract_applicability(case_yaml: Path) -> str:
+    """Return whether the case executes an ELMFIRE namelist."""
+    return str(namelist_contract(case_yaml).get("applicability", "required"))
+
+
+def contract_files(case_yaml: Path) -> list[dict[str, Any]]:
+    contract = namelist_contract(case_yaml)
     files = contract.get("files")
+    if contract.get("applicability", "required") == "not_applicable":
+        if files not in (None, []):
+            raise NamelistError(
+                f"{case_yaml}: a not_applicable namelist contract cannot list files"
+            )
+        return []
     if not isinstance(files, list) or not files:
         raise NamelistError(f"{case_yaml}: namelist_contract.files must be a non-empty list")
     return files

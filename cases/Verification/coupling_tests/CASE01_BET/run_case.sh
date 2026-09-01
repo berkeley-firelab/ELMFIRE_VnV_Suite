@@ -10,6 +10,7 @@ set -euo pipefail
 
 CASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+ELMFIRE_BIN="${ELMFIRE_BIN:-elmfire}"
 
 # Stage 1: generate deterministic rasters, namelists, and the variant manifest.
 echo "[INFO] Preprocessing $(basename "$CASE_DIR")"

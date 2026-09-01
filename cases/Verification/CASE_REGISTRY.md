@@ -33,6 +33,19 @@ This is the authoritative mapping of stable verification identifiers to case pur
 | `CASE27_FBT` | coupling | Lagrangian firebrand generation and transport |
 | `CASE28_OVA` | coupling | Overnight spread-rate adjustment |
 | `CASE29_SUP` | coupling | Initial- and extended-attack suppression |
+| `CASE30_MIT` | coupling | Multiple-ignition topology, scheduling, and boundary handling |
+| `CASE31_PFT` | coupling | Planar-front transport across fuel transitions and breaks |
+| `CASE32_RCV` | coupling | Raster-orientation covariance under a 90-degree rotation |
+| `CASE33_SDO` | coupling | Slope-driven directional surface-fire spread |
+| `CASE34_FMS` | unit | Standard fuel-model Rothermel response sweep |
+| `CASE35_WSS` | unit | Midflame wind-speed Rothermel response and limiting |
+| `CASE36_SLS` | unit | Slope-factor Rothermel response and limiting |
+| `CASE37_DMS` | unit | Dead-fuel moisture damping and extinction |
+| `CASE38_LMS` | unit | Static live-fuel moisture damping and extinction |
+| `CASE39_DHC` | unit | Dynamic herbaceous curing and fuel-load transfer |
+| `CASE40_WSD` | coupling | Wind-slope vector addition and spread direction |
+| `CASE41_CFP` | unit | Custom fuel-table parameter response |
+| `CASE42_WAF` | coupling | Wind-adjustment-factor coupling to Rothermel spread |
 
 ## Naming rules
 

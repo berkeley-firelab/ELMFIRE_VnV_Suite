@@ -25,7 +25,8 @@ def latex(value: object) -> str:
         "{": r"\{",
         "}": r"\}",
     }
-    return "".join(replacements.get(character, character) for character in text)
+    escaped = "".join(replacements.get(character, character) for character in text)
+    return escaped.replace("<=", r"\ensuremath{\le}").replace(">=", r"\ensuremath{\ge}")
 
 
 def main() -> None:

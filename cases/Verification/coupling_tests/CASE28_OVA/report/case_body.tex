@@ -1,63 +1,79 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \texttt{\CaseID}. This case verifies the time-dependent diurnal adjustment applied by the level-set solver. Constant fuels, moisture, wind, and slope isolate the clock-dependent multiplier. The verification question is whether detected slowdown and recovery occur within one hour of the calculated transition times.
+\textbf{Case ID:} \texttt{\CaseID}. This case verifies coupling among the simulation clock, solar burn-period calculation, and surface-fire diurnal multiplier. With uniform fuel, moisture, wind, and slope, the question is whether ELMFIRE reduces and restores radial advance at the prescribed clock hours, each within \SI{1}{hour}. The case exposes clock offsets, failed midnight wrapping, reversed interval tests, or an unapplied multiplier; it does not calibrate the multiplier.
 
 \section{Mathematical formulation and numerical implementation}
 
-The spread-rate update multiplies the baseline velocity by a diurnal factor \(D(t)\). Inside the burn period \(D=1\); outside it \(D\) equals the overnight adjustment. ELMFIRE computes hour of day from forecast start plus simulation time and derives the burn-period bounds from solar timing.
+For simulation time $t$ seconds and forecast start $H_0$, ELMFIRE uses
+\begin{equation}H(t)=\operatorname{mod}\!\left(H_0+t/3600,24\right).\end{equation}
+The solar routine calculates sunrise and sunset from the lower-left coordinate, year, and hour of year. With default center fraction $f_c=0.667$ and burn length $L_b=\SI{10}{hour}$,
+\begin{align}H_c&=H_{\rm rise}+f_c(H_{\rm set}-H_{\rm rise}),\\H_b&=H_c-L_b/2,&H_e&=H_c+L_b/2.\end{align}
+The stop hour is wrapped above 24. For this non-wrapping interval,
+\begin{equation}D(t)=\begin{cases}1,&H_b\le H(t)\le H_e,\\0.1,&H(t)<H_b\ \text{or}\ H(t)>H_e.\end{cases}\end{equation}
+The spread-rate calculation multiplies its unadjusted rate by $D(t)$. Uniform flat, wind-free conditions produce an approximately circular fire whose equivalent radius $r(t)=\sqrt{A(t)/\pi}$ has full and reduced slope plateaus.
 
 \section{Derivation of expected behavior}
 
-For the configured calendar time and projected location, the burn-period calculation gives an end near 17.5 h and a start near 7.5 h. On uniform terrain the equivalent burned radius \(r(t)=\sqrt{A(t)/\pi}\) has slope proportional to \(D(t)\), so transitions in radial advance identify the two clock times.
+The controlled response specifies burn-period start \SI{7.5}{hour} and stop \SI{17.5}{hour}. Full-to-reduced and reduced-to-full transitions are therefore expected at those respective clock hours. Since $H_0=\SI{10}{hour}$, the events first occur approximately \SI{7.5}{hour} and \SI{21.5}{hour} after ignition and repeat during the three-day run. This oracle follows from the controlled targets and clock equations; calculated times are independently inferred from the arrival raster.
 
 \section{Verification metrics and acceptance criteria}
 
-The postprocessor derives radial advance from the arrival-time raster, classifies full and reduced-rate plateaus, and records the median full-to-reduced and reduced-to-full clock transitions. This domain-wide metric is selected instead of a single-cell rate because it is robust to raster quantization. Each transition uses absolute tolerance one hour, and both must pass.
+The evaluator selects the lexically latest \texttt{time\_of\_arrival\_*} GeoTIFF, masks nodata and values outside $0\le t<10^{8}$ seconds, and requires 50 burned cells. Analysis ends at the earliest domain-edge arrival so boundary truncation cannot mimic slowdown. At \SI{30}{minute} intervals, burned-cell count is converted to equivalent radius and differenced. After radius exceeds three cells, rates below half the 80th percentile of positive rates are reduced. Median full-to-reduced and reduced-to-full clock hours are then calculated.
+
+\begin{center}\begin{tabular}{@{}llll@{}}
+\toprule Metric & Target & Acceptance rule & Role \\
+\midrule
+Reduction starts & \SI{17.5}{hour} & absolute error $\le\SI{1}{hour}$ & burn-period stop \\
+Reduction ends & \SI{7.5}{hour} & absolute error $\le\SI{1}{hour}$ & burn-period start \\
+\bottomrule\end{tabular}\end{center}
+
+Both rows are required. A missing raster, insufficient burned area or duration, or undetected transition produces NOT EVALUABLE, never PASS.
 
 \section{Simulation configuration and predicted outcome}
 
-The three-day, 30 m simulation uses uniform Fuel Model 3, zero wind and slope, central ignition, forecast start hour 10, hour of year 2890, current year 2025, and diurnal adjustment enabled. Predicted radial growth alternates between full and reduced slopes.
+\begin{center}\begin{tabular}{@{}lll@{}}
+\toprule Input & Value & Verification role \\
+\midrule
+Domain/grid & $126\times126$; \SI{30}{m} & circular-front resolution \\
+CRS & EPSG:32635 & location for solar calculation \\
+Fuel/terrain & uniform FM3; zero slope & constant baseline spread \\
+Wind/dead moisture & zero; 6, 7, 8 percent & constant forcing \\
+Live moisture & herb 60; woody 90 percent & constant forcing \\
+Ignition & $(1890,1890)$ m at $t=0$ & centered radial growth \\
+Time control & \SI{1}{s}; \SI{259200}{s} stop & three daily cycles \\
+Calendar & year 2025; hour 2890; start 10 & clock coupling \\
+Diurnal control & enabled; factor 0.1 & two rate plateaus \\
+Output & final TOA, spread rate, FLIN & case-local evidence \\
+\bottomrule\end{tabular}\end{center}
+
+The predicted arrival field is concentric; contour spacing contracts overnight and expands during the burn period, with both transitions inside their acceptance bands.
 
 \section{Actual simulation results}
 
-The required evidence is generated only from case-local ELMFIRE outputs. The current postprocessing status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} required metric rows pass across \VariantCount{} variant(s). A missing output is reported as NOT RUN or NOT EVALUABLE and is not interpreted as verification evidence.
+The variant generated the required evidence. The evaluator selected \path{outputs/time_of_arrival_0000001_0266400.tif}, a $126\times126$, \SI{30}{m}, EPSG:32635 raster whose values are arrival seconds. The log reports eventual front stagnation on the finite domain followed by successful shutdown; the evaluator excludes edge contact and later stagnation.
 
-
-\begin{figure}[H]
-  \centering
-  \IfFileExists{../figures/whole_domain_result.pdf}{%
-    \includegraphics[width=0.82\textwidth,height=0.58\textheight,keepaspectratio]{whole_domain_result.pdf}%
-  }{\fbox{\parbox{0.85\textwidth}{No case-local whole-domain ELMFIRE raster is available.}}}
-  \caption{Representative whole-domain case-local ELMFIRE output. The generated figure records its source path, coordinate reference system, and variant.}
-\end{figure}
-
+Postprocessing evaluated \VariantCount{} variant and all \MetricCount{} required rows. The decision is \textbf{\VerificationStatus}, with \PassingMetricCount{} passing rows. Missing measurements would appear as NOT EVALUABLE.
 
 \begin{figure}[H]
-  \centering
-  \IfFileExists{../figures/verification_summary.pdf}{%
-    \includegraphics[width=\textwidth,height=0.58\textheight,keepaspectratio]{verification_summary.pdf}%
-  }{\fbox{\parbox{0.85\textwidth}{No case-local summary figure is available.}}}
-  \caption{Case-local expected and measured verification metrics. A missing measured value denotes unavailable or incomplete ELMFIRE output.}
+\centering
+\IfFileExists{../figures/whole_domain_result.pdf}{\includegraphics[width=0.82\textwidth,height=0.58\textheight,keepaspectratio]{whole_domain_result.pdf}}{\fbox{\parbox{0.85\textwidth}{No case-local whole-domain arrival-time raster is available.}}}
+\caption{Final time of arrival for variant \texttt{main}, in seconds, from \protect\path{outputs/time_of_arrival_0000001_0266400.tif}. The $3780\times3780$ m EPSG:32635 domain shows the near-circular geometry required by the radial metric. Acceptance is determined by the generated table.}
 \end{figure}
 
 \section{Calculated metrics and verification decision}
 
-\begin{center}
-\begin{tabular}{@{}llll@{}}
-\toprule
-Variant / metric & Expected & Calculated & Status \\
+\begin{center}\begin{tabular}{@{}llll@{}}
+\toprule Variant / metric & Expected & Calculated & Status \\
 \midrule
 \MetricRows
-\bottomrule
-\end{tabular}
-\end{center}
+\bottomrule\end{tabular}\end{center}
 
-The authoritative overall decision is \textbf{\VerificationStatus} and is generated by \texttt{scripts/postprocess.py} from \texttt{outputs/metrics.json}; it is not recomputed in this report.
+This authoritative table and \textbf{\VerificationStatus} are generated by \path{scripts/postprocess.py} from \path{outputs/metrics.json}; the report does not recompute them. Comparison symbols remain in LaTeX math mode, so $\le$ and $\ge$ cannot be misparsed as table markup.
 
 \section{Technical interpretation}
 
-A common time offset indicates clock/calendar interpretation; missing contrast suggests the diurnal multiplier was not applied or output duration was inadequate. No scientific conclusion should be drawn when the status is NOT RUN or NOT EVALUABLE.
+Both required transitions are evaluable and within their one-hour bands. This supports the forecast-hour offset, midnight wrapping, solar burn-period selection, and application of the factor to surface spread. Half-hour sampling limits timing resolution. A common transition shift would indicate clock, calendar, coordinate, or solar timing; missing contrast would suggest an unapplied multiplier, changing forcing, or insufficient pre-edge history. These alternatives are not supported by the complete PASS result.
 
 \section{Scope and limitations}
 
-The test checks timing, not the empirical magnitude of a site-specific overnight reduction. This case provides implementation-verification evidence only.
+This synthetic case covers one date, location, fuel, factor, and grid. It does not validate factor magnitude, other seasons or coordinate systems, a burn interval wrapping midnight, heterogeneity, wind, or crown-fire, spotting, suppression, and interpolation interactions. The estimator assumes circular growth, discards post-edge behavior, samples every \SI{30}{minute}, and infers rather than records the internal factor. This is implementation verification, not validation of real-fire nocturnal behavior.

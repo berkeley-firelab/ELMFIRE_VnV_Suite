@@ -1,0 +1,30 @@
+\section{Verification purpose}
+This coupling case verifies how ELMFIRE combines Rothermel wind and slope factors into a direction of maximum spread (DMS), head speed, and fire ellipse.  Wind direction rotates through \AngleSet{} relative to upslope while magnitudes remain fixed.  It can expose degree/radian errors, wind-from/wind-to reversal, aspect reversal, swapped raster axes, scalar addition in place of vector addition, or incorrect ellipse construction.  The question is whether all variants meet the DMS, head-ROS, length/width, and intensity limits.
+
+\section{Mathematical formulation and numerical implementation}
+Let upslope azimuth be zero and wind-to azimuth be $\alpha$.  The dimensionless forcing vector is
+\begin{equation}\boldsymbol\phi=\phi_s(0,1)+\phi_w(\sin\alpha,\cos\alpha),\end{equation}
+so $\theta_{DMS}=\operatorname{atan2}(\phi_x,\phi_y)$ and $R_H=R_0(1+|\boldsymbol\phi|)$.  ELMFIRE derives an effective wind from $|\boldsymbol\phi|$ and uses its Rothermel length-to-width relation, capped at eight.  Because these quantities are defined on the sloping surface, the preprocessor makes the initial circle and the postprocessor measures distances in slope-surface coordinates rather than mixing them with map-plane northing.  The scalar factors follow Andrews (2018), RMRS-GTR-371; vectoring and ellipse propagation exercise ELMFIRE's level-set implementation.
+
+\section{Derivation of expected behavior}
+Aligned wind and slope add; opposed forcing subtracts in vector space and the stronger component sets direction.  At intermediate angles, the expected DMS lies between the two forcing directions, not generally at the arithmetic mean of angles.  The case-local oracle independently evaluates $\phi_s$, $\phi_w$, their vector magnitude and azimuth, head ROS, effective wind, and length/width.
+
+\section{Verification metrics and acceptance criteria}
+Maximum circular DMS error is \DirectionTolerance{}, maximum head-ROS relative error is 0.05, maximum length/width relative error is 0.10, and maximum intensity relative error is 0.01.  DMS is inferred from the farthest one percent of the burned footprint, subject to at least 100 burned cells and at least five farthest-front samples. Head ROS is a TOA regression in a narrow predicted-axis corridor with at least ten samples. Length/width uses full-footprint slope-surface extents projected along and across the DMS. Reaction intensity is the median over valid burned cells and requires at least 90 percent coverage of that footprint. These complementary metrics distinguish direction, speed, shape, and output completeness.  Every variant is required.
+
+\section{Simulation configuration and predicted outcome}
+Fuel model 2 is used on a \SI{1400}{m} square, \SI{10}{m} grid with a \SI{30}{m}-radius signed-distance ignition clipped to $[-1,1]$.  Slope is 50\% with upslope north; target midflame wind is \SI{4}{mph}.  Dead moistures are 5/7/9\%, live-herb moisture is 60\%, and live-woody moisture is 90\% in both every generated namelist and the independent oracle. Wind-from azimuth is generated so the wind-to vector has the required relative angle. Each variant's initial and maximum timestep corresponds to 5\% of one cell of predicted head travel (CFL 0.05 versus the 0.2 limit), retaining margin above the fixed stall comparison. Crown fire, spotting, WUI, stochastic wind, and acceleration are disabled.  The footprint should rotate smoothly and change head extension as the vectors move from aligned to opposed. The evaluator accepts only the unique TOA and reaction-intensity rasters identified by a final dump record at the configured 1800 s stop time.
+
+\section{Actual simulation results}
+The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} variants and reports \textbf{\VerificationStatus}. The generated diagnostic is: \textit{\VerificationReason}.
+\IfFileExists{../figures/vector_response.pdf}{\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{vector_response.pdf}\caption{Expected and measured DMS azimuth and head ROS.}\end{figure}}{}
+
+\section{Calculated metrics and verification decision}
+\begin{center}\begin{tabular}{@{}llll@{}}\toprule Metric & Limit & Calculated & Status\\\midrule\MetricRows\bottomrule\end{tabular}\end{center}
+The authoritative decision is \textbf{\VerificationStatus}.
+
+\section{Technical interpretation}
+A 180-degree error indicates a wind-from or aspect reversal.  A 90-degree error suggests swapped axes or azimuth convention.  Correct direction but excessive head speed suggests scalar addition.  Correct DMS and head speed with wrong length/width isolates effective-wind or ellipse construction.
+
+\section{Scope and limitations}
+This test uses one fuel, one slope magnitude, one wind magnitude, uniform terrain, and a single grid.  It verifies deterministic code behavior rather than observed fire shape.  Complex terrain and resolution convergence remain separate concerns.

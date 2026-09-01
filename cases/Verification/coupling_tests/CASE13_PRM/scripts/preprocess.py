@@ -210,10 +210,10 @@ def main():
     adapter = bool(case["source_adapter_implemented"])
     runnable = feature and adapter
     if not feature:
-        reason = ("NOT EVALUATED: case metadata does not enable "
+        reason = ("NOT EVALUABLE: case metadata does not enable "
                   + case["required_feature_keyword"])
     elif not adapter:
-        reason = "NOT EVALUATED: case adapter for the required feature is not enabled"
+        reason = "NOT EVALUABLE: case adapter for the required feature is not enabled"
     else:
         reason = "available"
 

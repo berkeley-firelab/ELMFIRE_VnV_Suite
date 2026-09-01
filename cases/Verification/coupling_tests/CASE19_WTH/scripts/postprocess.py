@@ -110,6 +110,7 @@ def save_figures(
     times_dfc: np.ndarray,
     dfc_reference: np.ndarray,
     dfc_output: np.ndarray,
+    dfc_whole: np.ndarray,
     times_rad: np.ndarray,
     rad_reference: np.ndarray,
     rad_output: np.ndarray,
@@ -134,7 +135,7 @@ def save_figures(
     plt.close(fig)
 
     fig, ax = plt.subplots(figsize=(6.2, 5.2))
-    image = ax.imshow(np.ma.asarray(dfc_output[-1]), origin="lower", cmap="inferno")
+    image = ax.imshow(np.ma.asarray(dfc_whole[-1]), origin="lower", cmap="inferno")
     ax.set(xlabel="Audit-window column", ylabel="Audit-window row",
            title=f"Final ELMFIRE DFC field at t={times_dfc[-1]:g} s")
     fig.colorbar(image, ax=ax, label=r"DFC heat flux (kW m$^{-2}$)")
@@ -180,7 +181,7 @@ def main() -> None:
         passed = all(metric["status"] == "PASS" for metric in metrics)
         save_figures(
             times_hrr, hrr_reference, hrr_output,
-            times_dfc, dfc_reference, dfc_output,
+            times_dfc, dfc_reference, dfc_output, dfc_stack,
             times_rad, rad_reference, rad_output,
         )
         write_metrics({

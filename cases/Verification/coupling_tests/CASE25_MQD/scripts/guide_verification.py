@@ -346,7 +346,7 @@ CASES = [
         ],
         metric="firebrand_distribution",
         notes="Firebrand generation + lognormal transport for the dominant "
-              "source cell: ember count vs 1036, ln-distance mu/sigma vs 2.72/1.31.",
+              "source cell: ember count vs 8450, ln-distance mu/sigma vs 2.42/1.31.",
     ),
     Case(
         name="Overnight",
@@ -372,7 +372,7 @@ CASES = [
         targets=[Target("time at simulation end", 88200.0, "s", tol_pct=15.0)],
         metric="sim_end_time",
         notes="Extended attack contains the fire and ends the run; success metric "
-              "is the simulation end time (tstop), analytically ~10800 s.",
+              "is the 88200 s reference-guide simulation end time (tstop).",
     ),
     Case(
         name="Suppression-initial",

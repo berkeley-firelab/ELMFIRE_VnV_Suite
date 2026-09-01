@@ -8,7 +8,8 @@ import json
 from pathlib import Path
 
 from namelist_lib import (
-    NamelistError, assignment_map, base_key, contract_files, load_json,
+    NamelistError, assignment_map, base_key, contract_applicability,
+    contract_files, load_json,
     parse_namelist, parse_scalar, schema_paths, values_equal,
 )
 
@@ -27,9 +28,13 @@ def main() -> int:
     valid_paths = schema_paths(schema)
     errors: list[str] = []
     checked = 0
+    applicability = "required"
     try:
-        files = ([{"path": item, "invariants": {}} for item in args.namelist]
-                 if args.namelist else contract_files(case_yaml))
+        if args.namelist:
+            files = [{"path": item, "invariants": {}} for item in args.namelist]
+        else:
+            applicability = contract_applicability(case_yaml)
+            files = contract_files(case_yaml)
         for entry in files:
             relative = entry.get("path")
             if not isinstance(relative, str):
@@ -39,7 +44,13 @@ def main() -> int:
             if not path.is_file():
                 errors.append(f"missing namelist: {relative}")
                 continue
-            assignments = parse_namelist(path)
+            template = entry.get("template", False)
+            if not isinstance(template, bool):
+                errors.append(f"{relative}: template must be true or false")
+                continue
+            assignments = parse_namelist(
+                path, allow_template_placeholders=template
+            )
             actual = assignment_map(assignments)
             for assignment in assignments:
                 if assignment.base_path not in valid_paths:
@@ -60,7 +71,12 @@ def main() -> int:
                     errors.append(f"{relative}: {key} is {actual_value!r}, expected {expected!r}")
     except (NamelistError, OSError, ValueError) as exc:
         errors.append(str(exc))
-    passing_status = "SCHEMA ONLY" if args.namelist and not errors else "PASS"
+    if applicability == "not_applicable" and not errors:
+        passing_status = "NOT APPLICABLE"
+    elif args.namelist and not errors:
+        passing_status = "SCHEMA ONLY"
+    else:
+        passing_status = "PASS"
     result = {"case": str(case_root), "schema": str(args.schema), "checked_invariants": checked,
               "status": passing_status if not errors else "FAIL", "errors": errors}
     if args.json:

@@ -12,8 +12,8 @@
 \input{case_macros.tex}
 \input{technical_macros.tex}
 \IfFileExists{metrics_macros.tex}{\input{metrics_macros.tex}}{%
-  \def\OverallStatus{NOT EVALUATED}%
-  \def\MetricRows{Metrics unavailable & required & unavailable & NOT EVALUATED\tabularnewline}}
+  \def\OverallStatus{NOT EVALUABLE}%
+  \def\MetricRows{Metrics unavailable & required & unavailable & NOT EVALUABLE\tabularnewline}}
 
 % Missing generated metric keys are conspicuous instead of producing blank
 % report cells that could be mistaken for valid values.
@@ -25,7 +25,7 @@
     \textcolor{red}{\textbf{MISSING:#1}}%
   \fi}
 \makeatother
-\providecommand{\OverallStatus}{NOT EVALUATED}
+\providecommand{\OverallStatus}{NOT EVALUABLE}
 \providecommand{\CompletedVariantCount}{0}
 \providecommand{\RequestedVariantCount}{0}
 

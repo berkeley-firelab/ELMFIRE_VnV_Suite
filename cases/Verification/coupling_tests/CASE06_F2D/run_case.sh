@@ -9,6 +9,7 @@ set -euo pipefail
 
 CASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+ELMFIRE_BIN="${ELMFIRE_BIN:-elmfire}"
 
 # Stage 1: create deterministic inputs and refresh the local namelist.
 echo "[INFO] Preprocessing $(basename "$CASE_DIR")"

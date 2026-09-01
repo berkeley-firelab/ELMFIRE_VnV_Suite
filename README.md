@@ -188,6 +188,13 @@ generated `metrics_macros.tex`, case and aggregate report PDFs, LaTeX build
 files, `run_case_slurm.sh` wrappers, and scheduler logs named
 `slurm-*.stdout`, `slurm-*.stderr`, `slurm-*.out`, or `slurm-*.err`.
 
+Every active verification `CASE*/variants/` tree is also a generated artifact:
+`make clean` empties it, and the case preprocessor reconstructs all variant
+namelists, deterministic inputs, and manifests before execution. Keep variant
+definitions, special namelist templates, observations, and other source
+material outside `variants/`; the GUIDE-derived cases use
+`scripts/namelists/` when a variant differs from the root `elmfire.data.in`.
+
 The same rules apply to CASE01--CASE14 as to every other active case. Cleanup
 preserves case metadata, namelists, scripts, report source text, source inputs,
 observations, and everything under archived `__legacy__` trees. Run

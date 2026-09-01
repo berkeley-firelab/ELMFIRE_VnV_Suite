@@ -137,7 +137,7 @@ def spearman(x_values, y_values):
 def metric(name, limit, value, passed=None, status=None, note=""):
     """Create one explicit metric record containing its limit, calculated value, status, and note."""
     if status is None:
-        status = "NOT EVALUATED" if value is None else ("PASS" if passed else "FAIL")
+        status = "NOT EVALUABLE" if value is None else ("PASS" if passed else "FAIL")
     if value is None:
         shown = "N/A"
     elif isinstance(value, float):
@@ -180,12 +180,12 @@ def calculate_metrics(case, design, results, capability):
     capability_ok = bool(capability["required_feature_available"] and
                          capability["source_adapter_implemented"])
     rows.append(metric("Exact single-structure capability", "available", None,
-                       status="PASS" if capability_ok else "NOT EVALUATED",
+                       status="PASS" if capability_ok else "NOT EVALUABLE",
                        note=capability["status"]))
     completeness = len(results) / expected if results else 0.0
     rows.append(metric("Current result completeness", "100%", completeness,
                        completeness >= limits["result_completeness_min"],
-                       status=("PASS" if completeness >= 1.0 else "NOT EVALUATED")))
+                       status=("PASS" if completeness >= 1.0 else "NOT EVALUABLE")))
     if len(results) != expected:
         note = "All 270 current-design outputs are required."
         names = [
@@ -196,7 +196,7 @@ def calculate_metrics(case, design, results, capability):
             ("Moderate/edge-wind ROS ratio", ">= 1.10"),
             ("Maximum firebrand-driven ROS", "<= 0.08 m/s"),
         ]
-        rows.extend(metric(name, limit, None, status="NOT EVALUATED", note=note)
+        rows.extend(metric(name, limit, None, status="NOT EVALUABLE", note=note)
                     for name, limit in names)
         return rows
 
@@ -372,7 +372,7 @@ def main():
     rows = calculate_metrics(case, design, results, capability)
     fully_evaluated = len(results) == case["metrics"]["design_point_count"]
     if not fully_evaluated:
-        status = "NOT EVALUATED"
+        status = "NOT EVALUABLE"
     else:
         status = "PASS" if all(row["status"] == "PASS" for row in rows) else "FAIL"
     payload = {

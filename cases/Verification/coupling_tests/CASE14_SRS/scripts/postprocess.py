@@ -244,7 +244,7 @@ def main():
                        f"{len(completed)}/{len(manifest)}", len(completed) == len(manifest),
                        completion_note,
                        status=("PASS" if len(completed) == len(manifest) else
-                               "NOT RUN" if not completed else "NOT EVALUATED")))
+                               "NOT RUN" if not completed else "NOT EVALUABLE")))
     if len(completed) == len(manifest):
         value10 = ros_by_dx.get(10.0)
         rows.append(metric(
@@ -298,7 +298,7 @@ def main():
     if not completed:
         status = "NOT RUN"
     elif len(completed) < len(manifest):
-        status = "NOT EVALUATED"
+        status = "NOT EVALUABLE"
     else:
         status = "PASS" if all(row["status"] == "PASS" for row in rows) else "FAIL"
     payload = {

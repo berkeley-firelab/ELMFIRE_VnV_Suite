@@ -61,6 +61,95 @@ class VerificationPortabilityTests(unittest.TestCase):
             self.assertIn("BASH_SOURCE[0]", runner, case.name)
             self.assertIsNone(absolute_path.search(runner), case.name)
 
+    def test_case_runners_define_the_elmfire_executable_they_use(self) -> None:
+        default = re.compile(
+            r"ELMFIRE_BIN\s*=\s*[\"']?\$\{ELMFIRE_BIN:-elmfire\}"
+        )
+        for case in self.active_cases():
+            runner = (case / "run_case.sh").read_text(encoding="utf-8")
+            if "$ELMFIRE_BIN" in runner or "${ELMFIRE_BIN}" in runner:
+                self.assertRegex(runner, default, case.name)
+
+    def test_rothermel_sweeps_generate_bounded_phi_inputs(self) -> None:
+        common_cases = (
+            "unit_tests/CASE34_FMS",
+            "unit_tests/CASE35_WSS",
+            "unit_tests/CASE36_SLS",
+            "unit_tests/CASE37_DMS",
+            "unit_tests/CASE38_LMS",
+            "unit_tests/CASE39_DHC",
+            "unit_tests/CASE41_CFP",
+            "coupling_tests/CASE42_WAF",
+        )
+        bounded_expression = (
+            "np.clip(signed_distance_m / CELL_SIZE_M, -1.0, 1.0)"
+        )
+        for relative in common_cases:
+            helper = VERIFICATION / relative / "scripts/case_support.py"
+            text = helper.read_text(encoding="utf-8")
+            self.assertIn(bounded_expression, text)
+            self.assertIn("TARGET_FRONT_ADVANCE_FRACTION = 0.05", text)
+            self.assertIn('"SIMULATION_DTMAX": round(timestep_max_s, 6)', text)
+
+        wind_slope = (
+            VERIFICATION
+            / "coupling_tests/CASE40_WSD/scripts/preprocess.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn("np.hypot(xx, surface_y) - INITIAL_RADIUS_M", wind_slope)
+        self.assertIn("timestep_for_ros(head_ros_m_min)", wind_slope)
+
+        planar_front = (
+            VERIFICATION
+            / "coupling_tests/CASE31_PFT/scripts/preprocess.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "np.clip(signed_distance / CELL, -1.0, 1.0)", planar_front
+        )
+
+    def test_case_variants_are_not_nested_under_data(self) -> None:
+        for case in self.active_cases():
+            self.assertFalse(
+                (case / "data/variants").exists(),
+                f"{case.name} stores generated variants below data/",
+            )
+
+    def test_case19_accepts_indexed_dump_names_and_physical_times(self) -> None:
+        helper = (
+            VERIFICATION
+            / "coupling_tests/CASE19_WTH/scripts/raster_functions.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn(r'_d?(\d{7})\.tif$', helper)
+        self.assertIn('row["time_seconds"]', helper)
+
+    def test_guide_adapter_notes_match_the_active_contracts(self) -> None:
+        for number in range(20, 30):
+            matches = list(SPOTTING.glob(f"CASE{number:02d}_*/scripts/guide_verification.py"))
+            self.assertEqual(len(matches), 1, f"CASE{number:02d}")
+            text = matches[0].read_text(encoding="utf-8")
+            self.assertNotIn("ember count vs 1036", text)
+            self.assertNotIn("analytically ~10800 s", text)
+
+    def test_guide_variant_namelists_have_sources_outside_variants(self) -> None:
+        for number in range(20, 30):
+            matches = list(SPOTTING.glob(f"CASE{number:02d}_*"))
+            self.assertEqual(len(matches), 1, f"CASE{number:02d}")
+            case = matches[0]
+            adapter = (case / "scripts/case_adapter.py").read_text(encoding="utf-8")
+            self.assertIn("materialize_variant_namelist", adapter)
+            for raw in (case / "scripts/variants.tsv").read_text(
+                encoding="utf-8"
+            ).splitlines():
+                if not raw.strip() or raw.lstrip().startswith("#"):
+                    continue
+                label, config_rel, _ = raw.split("\t")
+                if not config_rel.startswith("variants/"):
+                    continue
+                special = case / "scripts/namelists" / f"{label}.in"
+                self.assertTrue(
+                    special.is_file() or (case / "elmfire.data.in").is_file(),
+                    f"{case.name}/{label} has no source namelist",
+                )
+
     def test_adapter_modules_are_case_local(self) -> None:
         for case in self.active_cases():
             scripts = case / "scripts"

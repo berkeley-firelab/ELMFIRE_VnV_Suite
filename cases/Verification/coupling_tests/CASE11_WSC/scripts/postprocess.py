@@ -174,7 +174,7 @@ def metric(name, limit, value=None, passed=None, note=""):
             "metric": name,
             "limit": limit,
             "calculated": "N/A",
-            "status": "NOT EVALUATED",
+            "status": "NOT EVALUABLE",
             "note": note or "The required finite comparison was unavailable.",
         }
     calculated = (
@@ -330,8 +330,8 @@ def calculate_metrics(case, manifest, profiles):
         "surface_coupled_median_load_relative_range": coupled_load_range,
     }
     overall = (
-        "NOT EVALUATED"
-        if any(row["status"] == "NOT EVALUATED" for row in rows)
+        "NOT EVALUABLE"
+        if any(row["status"] == "NOT EVALUABLE" for row in rows)
         else ("PASS" if all(row["status"] == "PASS" for row in rows) else "FAIL")
     )
     return rows, diagnostics, overall

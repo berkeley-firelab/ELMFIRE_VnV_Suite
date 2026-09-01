@@ -1,0 +1,34 @@
+\section{Verification purpose}
+This executable-level known-response test verifies that ELMFIRE reads standard fuel-model parameters and evaluates the no-wind, no-slope Rothermel surface spread model for \FuelSet.  It exercises fuel-table parsing, class weighting, reaction intensity, heat sink, and the base rate of spread while crown fire, spotting, buildings, acceleration, wind, and slope are excluded.  It can expose column-order, unit, weighting, and model-selection errors.  This is implementation verification, not comparison with an observed fire.  The verification question is whether all five variants reproduce the independent reaction-intensity and base-ROS calculations within \IrTolerance{} and \RosTolerance{}, with TOA-derived ROS within 5\%.
+
+\section{Mathematical formulation and numerical implementation}
+The no-wind, no-slope rate is
+\begin{equation}R_0=\frac{I_R\xi}{\rho_b\epsilon Q_{ig}},\end{equation}
+where $I_R$ is reaction intensity, $\xi$ is the propagating-flux ratio, $\rho_b$ is bulk density, $\epsilon$ is effective heating number, and $Q_{ig}=250+1116M_f$ in native Rothermel units.  Dead and live classes are area-weighted before their moisture-damping contributions are combined.  The equations and standard fuel definitions follow Patricia L. Andrews, \emph{The Rothermel Surface Fire Spread Model and Associated Developments}, RMRS-GTR-371 (2018).  ELMFIRE returns spread rate in metres per minute and reaction intensity in \si{kW.m^{-2}}.
+
+\section{Derivation of expected behavior}
+The case-local \texttt{rothermel\_reference.py} reads the same frozen fuel-table rows but independently evaluates every algebraic step stated above.  It does not import ELMFIRE source or use a simulation output as a reference.  Each predicted $I_R$ and $R_0$ is therefore a deterministic known response.  A bounded planar signed-distance front turns the scalar normal speed into a second independent prediction, $t(x)=t_0+(x-x_0)/(R_0/60)$.
+
+\section{Verification metrics and acceptance criteria}
+The direct spread raster tests the calculated speed with maximum relative error 0.02; the reaction-intensity raster tests the source term with maximum relative error 0.01.  Their medians use colocated valid cells at the planar head, beginning one cell behind the initial east face, so direct verification does not require the front to traverse a downstream corridor. Linear regression of positive arrival time against interior $x$ coordinate tests propagation independently: maximum ROS error is 0.05 and minimum $R^2$ is 0.995. TOA is required only for variants whose planned duration supports a multi-cell fit. All five variants and all four aggregate metrics are required; missing or malformed required evidence gives NOT EVALUABLE.
+
+\section{Simulation configuration and predicted outcome}
+
+The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every positive oracle ROS, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} are selected so the expected front advances 5\% of one cell per step (CFL 0.05, below the configured 0.2 limit). This keeps the PHI change above ELMFIRE's fixed stall scale even if the implementation produces only a small fraction of the reference speed. A zero-ROS variant retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The evaluator always requires uniquely named rasters tied to the one final dump record. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
+The domain is \SI{1400}{m} square with \SI{10}{m} cells.  A finite \SI{50}{m}-wide ignition strip has a planar east face initially at $x=-\SI{400}{m}$ and terminates well inside the north and south boundaries; the interior analysis corridor is therefore one-dimensional without presenting ELMFIRE with an edge-to-edge contained front.  Moistures are 5, 7, and 9\% for dead classes and 90\% for both live classes.  Wind and slope are zero.  Run duration is selected from the predicted rate to provide approximately \SI{300}{m} of travel.  The interior results should be planar but need not have a monotonic ordering across fuel models because packing, SAV, load, depth, and extinction moisture interact.
+
+\section{Actual simulation results}
+The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} required variants.  Its authoritative state is \textbf{\VerificationStatus}.  No plotted curve is substituted for missing simulation artifacts.
+\ifnum\CompletedVariantCount>0
+\IfFileExists{../figures/sweep_response.pdf}{\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{sweep_response.pdf}\caption{Hand-calculated and ELMFIRE rate of spread (ROS, m/min) and reaction intensity (kW/m2) for all five completed standard-fuel variants. Each fuel model uses one color in both panels; open diamonds denote the independent hand calculation and filled circles denote ELMFIRE.}\end{figure}}{}
+\fi
+
+\section{Calculated metrics and verification decision}
+\begin{center}\begin{tabular}{@{}llll@{}}\toprule Metric & Limit & Calculated & Status\\\midrule\MetricRows\bottomrule\end{tabular}\end{center}
+The overall decision is \textbf{\VerificationStatus}; a successful executable exit alone is not a pass.
+
+\section{Technical interpretation}
+An isolated intensity discrepancy implicates fuel parsing, class weighting, or moisture damping.  Correct intensity with incorrect direct ROS implicates flux ratio, density, heat sink, adjustment, or output units.  Correct direct ROS with a TOA discrepancy implicates level-set transport, raster orientation, or time units.
+
+\section{Scope and limitations}
+The case verifies five representative standard fuels at one moisture state.  It does not validate Rothermel against experiments, exhaust all fuel models, or test wind, slope, curing, crown fire, or spatial heterogeneity; those mechanisms have separate cases.

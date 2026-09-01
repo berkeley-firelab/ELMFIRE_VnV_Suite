@@ -1,0 +1,37 @@
+\section{Verification purpose}
+
+\textbf{Case ID:} \texttt{\CaseID}. This case verifies that ELMFIRE's raster indexing and level-set transport are covariant under a \RotationAngle{} rotation. It is the portable successor to Adam Laird's \texttt{inputs-orientation} scenario.
+
+\section{Mathematical formulation and numerical implementation}
+
+For homogeneous isotropic forcing, the operator $\mathcal{L}$ in $\partial_t\phi=\mathcal{L}(\phi)$ commutes with any rigid rotation $Q$: $\mathcal{L}(\phi\circ Q^{-1})=(\mathcal{L}\phi)\circ Q^{-1}$. A square north-up raster rotated by exactly 90 degrees requires no interpolation, so cell-by-cell comparison is available.
+
+\section{Derivation of expected behavior}
+
+The rotated variant is generated with \texttt{numpy.rot90} from the asymmetric L-shaped initial negative-$\phi$ region. Fuel, moisture, slope, and wind are spatially uniform. Therefore the rotated arrival-time validity mask and values must equal a 90-degree rotation of the original result, apart from bounded grid-level roundoff.
+
+\section{Verification metrics and acceptance criteria}
+
+Finite-mask intersection over union must be at least 0.99. On mutually finite cells, normalized mean absolute arrival-time error must be at most 0.02. Mask agreement detects row/column reversal and georeferencing errors; value error detects orientation-dependent numerical evolution.
+
+\section{Simulation configuration and predicted outcome}
+
+Both variants use a 2000 m square domain at \CellSize{}, Fuel Model 10, flat terrain, zero wind, and identical timing. The only changed scientific input is the exact raster rotation of \texttt{phi.tif}. The second result is predicted to be the corresponding rotation of the first.
+
+\section{Actual simulation results}
+
+The generated status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} metrics pass across \VariantCount{} variants. Missing output produces NOT EVALUABLE.
+\begin{figure}[H]\centering\IfFileExists{../figures/verification_summary.pdf}{\includegraphics[width=\textwidth]{verification_summary.pdf}}{\fbox{No result figure is available.}}\caption{Original, independently rotated, and difference arrival-time fields.}\end{figure}
+
+\section{Calculated metrics and verification decision}
+
+\begin{center}\begin{tabular}{@{}llll@{}}\toprule Metric & Expected & Calculated & Status \\\midrule \MetricRows \bottomrule\end{tabular}\end{center}
+The authoritative decision is \textbf{\VerificationStatus} from \texttt{outputs/metrics.json}.
+
+\section{Technical interpretation}
+
+Mask disagreement indicates inconsistent raster orientation, bounds, or row/column indexing. Value disagreement with matching masks indicates a directional bias in transport or output serialization.
+
+\section{Scope and limitations}
+
+The 90-degree test avoids resampling and therefore does not assess arbitrary-angle reprojection. It verifies executable behavior, not the internal bilinear-interpolation routine in isolation.

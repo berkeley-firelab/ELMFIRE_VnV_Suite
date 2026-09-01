@@ -1,0 +1,37 @@
+\section{Verification purpose}
+
+\textbf{Case ID:} \texttt{\CaseID}. This case verifies the observable coupling of topographic slope into directional surface-fire spread through the standard ELMFIRE executable. It is the portable successor to Adam Laird's no-wind-with-slope component scenario and retains a flat control.
+
+\section{Mathematical formulation and numerical implementation}
+
+ELMFIRE combines the no-wind spread rate with a slope factor before supplying a direction-dependent normal speed $V_n(\theta)$ to $\partial_t\phi+V_n|\nabla\phi|=0$. With zero wind and zero slope, rotational symmetry is expected. A uniform nonzero slope breaks that symmetry along the fall-line axis.
+
+\section{Derivation of expected behavior}
+
+The flat control has equal forcing in all azimuths and therefore equal horizontal and vertical extents. The \SlopeAngle{} variant changes only slope and aspect; it must differ from the control and its final footprint must be elongated. These are metamorphic consequences of the governing coupling and do not require duplication of ELMFIRE's internal slope formula.
+
+\section{Verification metrics and acceptance criteria}
+
+Flat-control extent anisotropy must not exceed 0.05. The slope footprint's major/minor extent ratio must be at least 1.10. Normalized mean absolute arrival-time difference between slope and flat variants must be at least 0.05. The first metric detects grid bias, while the latter two show that slope is both active and directional.
+
+\section{Simulation configuration and predicted outcome}
+
+Both variants use a 2000 m square domain at \CellSize{}, Fuel Model 10, 3/5/6 percent dead-fuel moisture, zero wind, and a central point ignition. The slope variant uses 30 degrees and aspect 270 degrees; the control uses zero slope. The slope result is predicted to be anisotropic and measurably different from the circular control.
+
+\section{Actual simulation results}
+
+The generated status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} metrics pass across \VariantCount{} variants. Missing outputs produce NOT EVALUABLE.
+\begin{figure}[H]\centering\IfFileExists{../figures/verification_summary.pdf}{\includegraphics[width=\textwidth]{verification_summary.pdf}}{\fbox{No result figure is available.}}\caption{Flat-control, slope, and difference arrival-time fields.}\end{figure}
+
+\section{Calculated metrics and verification decision}
+
+\begin{center}\begin{tabular}{@{}llll@{}}\toprule Metric & Expected & Calculated & Status \\\midrule \MetricRows \bottomrule\end{tabular}\end{center}
+The authoritative decision is \textbf{\VerificationStatus} from \texttt{outputs/metrics.json}.
+
+\section{Technical interpretation}
+
+An anisotropic control indicates grid-orientation bias. A near-unity slope footprint or negligible field difference indicates that slope/aspect inputs were not consumed or not coupled to spread. Unexpected rotation should prompt inspection of aspect convention and raster orientation.
+
+\section{Scope and limitations}
+
+This case verifies directional response, not the absolute value of the slope coefficient and not agreement with an experimental fire. Existing CASE22 and CASE24 exercise more complex terrain interactions; this case isolates the slope-only executable response.

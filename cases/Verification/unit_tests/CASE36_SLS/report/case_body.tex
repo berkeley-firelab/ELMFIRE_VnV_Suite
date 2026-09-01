@@ -1,0 +1,34 @@
+\section{Verification purpose}
+This case verifies the scalar Rothermel slope response for \FuelSet{} over \SlopeSet{} rise over run.  It tests slope-raster units, conversion to $\tan^2\phi$, fuel-dependent packing response, and ELMFIRE's slope-factor cap without wind.  The verification question is whether all 35 variants reproduce independently calculated intensity and slope-enhanced ROS within the stated tolerances.
+
+\section{Mathematical formulation and numerical implementation}
+The no-wind response is
+\begin{equation}R=R_0(1+\phi_s),\qquad \phi_s=5.275\,\beta^{-0.3}\tan^2\phi .\end{equation}
+Here reported slope percent is rise/run times 100 and the raster value is the angle $\phi=\tan^{-1}(s/100)$ in degrees.  The formulation follows Andrews (2018), RMRS-GTR-371.  The inspected ELMFIRE source additionally caps $\phi_s$ at the maximum wind factor derived from its wind limit; the oracle reproduces and reports that implementation policy.
+
+\section{Derivation of expected behavior}
+Before the cap, plotting $\phi_s$ against $\tan\phi$ on logarithmic axes has slope two.  For each fuel and raster angle, the local oracle calculates $R_0$, the uncapped factor, the cap, and final $R$.  Because the initial level set is planar and aligned with the upslope direction, the output normal speed equals this scalar head-spread prediction.
+
+\section{Verification metrics and acceptance criteria}
+Maximum relative errors are 0.02 for direct ROS, 0.01 for reaction intensity, and 0.05 for TOA-derived ROS; TOA regression requires $R^2\ge0.995$. The direct and oracle ROS values are slope-surface speeds. Accordingly, the TOA regression converts map easting to distance along the sloping surface using $x_s=x_0+(x-x_0)/\cos\theta$ before fitting speed. Pointwise analytical errors are used instead of a trend-only test because degrees-versus-percent mistakes can preserve monotonicity.  All variants and output fields must exist.
+
+\section{Simulation configuration and predicted outcome}
+
+The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every positive oracle ROS, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} are selected so the expected front advances 5\% of one cell per step (CFL 0.05, below the configured 0.2 limit). This keeps the PHI change above ELMFIRE's fixed stall scale even if the implementation produces only a small fraction of the reference speed. A zero-ROS variant retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The analytically selected stop time is rounded upward to a whole second because the current ELMFIRE time loop stores the duration as an integer; this preserves the intended duration and guarantees the terminal output dump. The evaluator always requires uniquely named rasters tied to the one final dump record. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
+Each \SI{1400}{m} square domain uses \SI{10}{m} cells and a finite ignition strip with a planar east face in the interior analysis corridor.  The strip does not touch the lateral grid boundaries.  Wind is zero, dead moisture is fixed at 5/7/9\%, and live moisture is 90\%.  Aspect is chosen so upslope is aligned with propagation.  Slope inputs are generated as floating-point degrees from the listed percentages.  ROS should rise quadratically in $\tan\phi$ before any source-defined plateau.
+
+\section{Actual simulation results}
+The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} variants and has state \textbf{\VerificationStatus}.
+\ifnum\CompletedVariantCount>0
+\IfFileExists{../figures/sweep_response.pdf}{\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{sweep_response.pdf}\caption{Hand calculations (open diamonds, solid lines) and ELMFIRE predictions (filled circles, dashed lines). Each fuel-model pair uses the same color.}\end{figure}}{}
+\fi
+
+\section{Calculated metrics and verification decision}
+\begin{center}\begin{tabular}{@{}llll@{}}\toprule Metric & Limit & Calculated & Status\\\midrule\MetricRows\bottomrule\end{tabular}\end{center}
+The overall decision is \textbf{\VerificationStatus}.
+
+\section{Technical interpretation}
+Large errors growing with slope indicate a units or tangent error.  Fuel-dependent errors implicate packing ratio or table selection.  A premature or absent plateau indicates changed cap semantics.  An accurate direct field but biased TOA indicates propagation or coordinate handling.
+
+\section{Scope and limitations}
+This test covers uniform positive slopes aligned with the front.  It does not verify vector competition between wind and slope, complex terrain, or experimental fire behavior; CASE40 covers the directional coupling.
