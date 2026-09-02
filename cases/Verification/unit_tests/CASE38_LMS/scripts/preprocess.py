@@ -7,7 +7,11 @@ from rothermel_reference import calculate, read_fuel_models
 
 CASE_DIR = Path(__file__).resolve().parents[1]
 FUEL_CODES = (142, 146, 148)
-LIVE_MOISTURE_PERCENT = (30.0, 50.0, 70.0, 90.0, 120.0, 150.0, 180.0, 200.0)
+# These shrub models carry live woody, rather than live herbaceous, fuel.
+# ELMFIRE applies a 60% lower bound to live-woody moisture during weather
+# interpolation, so values below 60% would not represent their configured
+# input and cannot be used as distinct verification points.
+LIVE_MOISTURE_PERCENT = (60.0, 70.0, 90.0, 120.0, 150.0, 180.0, 200.0)
 
 
 def main() -> None:

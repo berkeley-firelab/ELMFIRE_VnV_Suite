@@ -19,7 +19,11 @@ def main() -> None:
     for code in FUEL_CODES:
         fuel = fuels[code]
         for percent in SLOPE_PERCENT:
-            degrees = math.degrees(math.atan(percent / 100.0))
+            requested_degrees = math.degrees(math.atan(percent / 100.0))
+            # ELMFIRE indexes its precomputed slope table with NINT(SLP), so
+            # generate the effective integer-degree input that the solver uses
+            # and derive the reference from that same, explicit condition.
+            degrees = float(math.floor(requested_degrees + 0.5))
             expected = calculate(fuel, m1=0.05, m10=0.07, m100=0.09,
                                  mlh=0.90, mlw=0.90, slope_degrees=degrees)
             variant_id = f"fuel_{code:03d}_s_{int(percent):03d}"
@@ -34,6 +38,8 @@ def main() -> None:
             )
             variants.append({"id": variant_id, "group": fuel.name, "x": percent,
                 "fuel_model": code, "slope_percent": percent, "slope_degrees": degrees,
+                "requested_slope_degrees": requested_degrees,
+                "effective_slope_percent": 100.0 * math.tan(math.radians(degrees)),
                 "expected_ros_m_min": expected["ros_m_min"],
                 "expected_ir_kw_m2": expected["reaction_intensity_kw_m2"],
                 "reference": expected})

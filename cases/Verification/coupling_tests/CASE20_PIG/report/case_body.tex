@@ -2,13 +2,42 @@
 
 \textbf{Case ID:} \texttt{\CaseID}. This case verifies the coupled surface-fire and level-set rate response to a central point ignition in uniform fuel with zero wind and zero slope. Rotational symmetry supplies a diagnostic for directional bias or raster-orientation errors, while the formal decision tests the coupling between fire behavior and level-set normal velocity. The verification question is whether the required maximum spread rate is within 10 percent of \(1.51~\mathrm{m\,min^{-1}}\); isotropic arrival geometry is reported as supporting evidence but is not yet a separate acceptance component.
 
+The scientific setup and historical expected response are reconstructed from Section~3.2 of the supplied \emph{ELMFIRE Guide}. The Guide is used as reference provenance, not as an instruction or a substitute for evidence. Configuration statements below are checked against the generated GeoTIFFs and namelist; current results and decisions come only from case-local outputs and generated metrics. Where the generated experiment differs from the historical example, the report states that difference explicitly.
+
 \section{Mathematical formulation and numerical implementation}
 
 ELMFIRE advances the level-set field using \(\partial\phi/\partial t+V_n|\nabla\phi|=0\).  With spatially uniform fuel, moisture, wind, and slope, \(V_n=R_0\) is independent of azimuth.  The zero contour must therefore evolve from the ignition neighborhood toward a circle.  The final \texttt{vs} raster records the local normal spread rate in metres per minute because \texttt{SPREAD\_RATE\_IN\_M} is enabled.
 
+The surface-fire scalar supplied to the level set is the Rothermel no-wind/no-slope rate
+\begin{equation}
+R_0=\frac{I_R\,\xi}{\rho_b\,\epsilon\,Q_{ig}}, \qquad Q_{ig}=250+1116M_f,
+\end{equation}
+where reaction intensity \(I_R\), propagating-flux ratio \(\xi\), bulk density \(\rho_b\), effective heating number \(\epsilon\), and fuel moisture \(M_f\) are evaluated from the generated Fuel Model~3 and moisture inputs. This equation chain follows Andrews (2018), \emph{The Rothermel Surface Fire Spread Model and Associated Developments}; the Guide supplies the configured known-response value.
+
 \section{Derivation of expected behavior}
 
 For constant \(R_0\), the front radius is \(r(t)=r(0)+R_0t\).  The independently tabulated Fuel Model 3 response for the configured moisture and no-wind/no-slope condition is \(R_0=1.51~\mathrm{m\,min^{-1}}\).  Rotational symmetry is an invariant; the quantitative decision uses the rate because it directly tests the fire-behavior value passed to propagation.
+
+% BEGIN EXPLICIT METRIC DERIVATION
+The independent no-wind/no-slope reference is calculated from
+\[
+ R_0=\frac{I_R\xi}{\rho_b\epsilon Q_{ig}},\qquad
+ Q_{ig}=250+1116M_f,
+\]
+using generated Fuel Model~3 and
+\((M_{1h},M_{10h},M_{100h},M_{lh},M_{lw})
+=(0.06,0.07,0.08,0.60,0.90)\).  The independent calculation gives
+\(I_R=549.174~\mathrm{kW\,m^{-2}}\) and
+\(R_0=1.51183~\mathrm{m\,min^{-1}}\), reported to the Guide precision as
+\(R_{\mathrm{ref}}=1.51~\mathrm{m\,min^{-1}}\)
+(\(1.51183/0.3048=4.960~\mathrm{ft\,min^{-1}}\)).
+The decision metric is therefore
+\[
+ e_R=\frac{|R_{\max}-1.51|}{1.51},
+\]
+where \(R_{\max}\) is the maximum finite final \texttt{vs} value, and the
+substituted acceptance test is \(e_R\leq0.10\).
+% END EXPLICIT METRIC DERIVATION
 
 \section{Verification metrics and acceptance criteria}
 
@@ -17,6 +46,32 @@ The head-ROS metric is the maximum finite value in the required final \texttt{vs
 \section{Simulation configuration and predicted outcome}
 
 The case uses a \(126\times126\), 30 m grid in EPSG:32635, uniform Fuel Model 3, 6 percent one-hour moisture, flat terrain, zero wind, and a central ignition.  The predicted output is an approximately circular arrival-time field with a uniform mature spread rate near \(1.51~\mathrm{m\,min^{-1}}\).
+
+\begin{center}
+\begin{tabular}{@{}p{0.20\textwidth}p{0.20\textwidth}p{0.12\textwidth}p{0.38\textwidth}@{}}
+\toprule
+Parameter & Configured value & Units & Role in the experiment \\
+\midrule
+Grid & \(126\times126\) at 30 & m per cell & Resolves the whole spatial response on the generated north-up raster \\
+Projection & EPSG:32635 & --- & Fixes the map-coordinate and row-orientation convention \\
+Time control & \(\Delta t=1\), \(t_{stop}=259200\) & s & Whole-second step; stop time is an exact timestep multiple \\
+Meteorology interval & 3600 & s & Defines weather-band timing and stalled-final compatibility \\
+Live moisture & herb 60; woody 90 & percent & Holds live-fuel damping fixed while the named mechanism is isolated \\
+Evidence & prepared inputs; final case outputs & --- & Separates configuration provenance from acceptance evidence \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
 
 \section{Actual simulation results}
 
@@ -44,7 +99,7 @@ Variant / metric & Expected & Calculated & Status \\
 \end{tabular}
 \end{center}
 
-The authoritative overall decision is \textbf{\VerificationStatus} and is generated by \path{scripts/postprocess.py} from \path{outputs/metrics.json}; it is not recomputed in this report.
+The displayed overall decision is \textbf{\VerificationStatus}. When \path{outputs/metrics.json} exists, \path{scripts/postprocess.py} generates every table value and status; when it is absent, the standalone wrapper renders NOT EVALUABLE with no invented rows.
 
 \section{Technical interpretation}
 

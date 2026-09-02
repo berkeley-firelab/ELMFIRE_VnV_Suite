@@ -8,6 +8,7 @@ ELMFIRE_BIN="${ELMFIRE_BIN:-elmfire}"
 mkdir -p "$CASE_DIR/logs/matplotlib" "$CASE_DIR/outputs" "$CASE_DIR/figures"
 export MPLCONFIGDIR="$CASE_DIR/logs/matplotlib"
 "$PYTHON_BIN" "$CASE_DIR/scripts/preprocess.py"
+"$PYTHON_BIN" "$CASE_DIR/scripts/spatial_evidence.py"
 
 while IFS= read -r variant; do
   echo "[INFO] CASE30_MIT: $variant"

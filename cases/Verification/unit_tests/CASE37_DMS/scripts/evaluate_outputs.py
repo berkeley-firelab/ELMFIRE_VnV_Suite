@@ -19,12 +19,21 @@ INITIAL_FRONT_X_M = -400.0
 CELL_SIZE_M = 10.0
 CORRIDOR_X_MAX_M = INITIAL_FRONT_X_M + 250.0
 CORRIDOR_HALF_HEIGHT_M = 150.0
+ZERO_ROS_EPS = 1.0e-6
+IR_ZERO_REFERENCE_MAX_KW_M2 = 1.0e-6
+IR_ZERO_ABSOLUTE_TOLERANCE_KW_M2 = 1.0e-3
 
 
 def _terminal_outputs(
-    variant_root: Path, toa_required: bool
-) -> tuple[Path | None, Path | None, Path | None, list[str]]:
-    """Resolve unique final rasters and prove the run reached its stop time."""
+    variant_root: Path, toa_required: bool, expected_zero_spread: bool
+) -> tuple[
+    Path | None,
+    Path | None,
+    Path | None,
+    dict[str, object] | None,
+    list[str],
+]:
+    """Resolve unique rasters under the regular or explicitly stalled terminal contract."""
     try:
         text = (variant_root / "elmfire.data").read_text(encoding="utf-8")
         matches = re.findall(
@@ -33,6 +42,27 @@ def _terminal_outputs(
         if len(matches) != 1:
             raise ValueError("SIMULATION_TSTOP is not unique")
         tstop = float(matches[0].replace("D", "E").replace("d", "e"))
+        timestep_matches = re.findall(
+            r"(?mi)^\s*SIMULATION_DT\s*=\s*([0-9.eEdD+-]+)", text
+        )
+        met_step_matches = re.findall(
+            r"(?mi)^\s*DT_METEOROLOGY\s*=\s*([0-9.eEdD+-]+)", text
+        )
+        if len(timestep_matches) != 1 or len(met_step_matches) != 1:
+            raise ValueError("time-control assignments are not unique")
+        timestep = float(
+            timestep_matches[0].replace("D", "E").replace("d", "e")
+        )
+        met_step = float(
+            met_step_matches[0].replace("D", "E").replace("d", "e")
+        )
+        if (
+            not all(math.isfinite(value) for value in (tstop, timestep, met_step))
+            or tstop < 0.0
+            or timestep <= 0.0
+            or met_step <= 0.0
+        ):
+            raise ValueError("time controls must be finite and valid")
         manifests = sorted((variant_root / "outputs").glob("dump_times_*.csv"))
         if len(manifests) != 1:
             raise ValueError("dump-times manifest is not unique")
@@ -47,12 +77,51 @@ def _terminal_outputs(
         if len(final_rows) != 1:
             raise ValueError("final dump record is not unique")
         final_time = float(final_rows[0]["time_seconds"])
-        if toa_required and not math.isclose(
+        regular_terminal_dump = math.isclose(
             final_time, tstop, rel_tol=0.0, abs_tol=1.0e-3
-        ):
-            raise ValueError("final dump did not reach SIMULATION_TSTOP")
+        )
+        pre_jump_time = final_time - met_step
+        grid_tolerance = max(1.0e-3, abs(timestep) * 1.0e-6)
+        pre_jump_on_grid = (
+            pre_jump_time >= -grid_tolerance
+            and pre_jump_time <= tstop + grid_tolerance
+            and math.isclose(
+                pre_jump_time,
+                round(pre_jump_time / timestep) * timestep,
+                rel_tol=0.0,
+                abs_tol=grid_tolerance,
+            )
+        )
+        near_stop_stall = pre_jump_on_grid and abs(pre_jump_time - tstop) <= (
+            timestep + grid_tolerance
+        )
+        expected_extinction_stall = (
+            expected_zero_spread
+            and pre_jump_on_grid
+            and pre_jump_time < tstop - timestep - grid_tolerance
+        )
+        stalled_terminal_dump = (
+            final_time > tstop
+            and (near_stop_stall or expected_extinction_stall)
+        )
+        if not (regular_terminal_dump or stalled_terminal_dump):
+            raise ValueError("final dump is incompatible with the terminal evidence contract")
+        if regular_terminal_dump:
+            evidence_mode = "regular"
+        elif expected_extinction_stall:
+            evidence_mode = "stalled_expected_extinction"
+        else:
+            evidence_mode = "stalled_near_stop"
+        terminal_evidence = {
+            "mode": evidence_mode,
+            "configured_tstop_s": tstop,
+            "configured_timestep_s": timestep,
+            "configured_meteorology_interval_s": met_step,
+            "recorded_final_time_s": final_time,
+            "pre_jump_time_s": pre_jump_time if stalled_terminal_dump else None,
+        }
     except (OSError, KeyError, TypeError, ValueError, csv.Error):
-        return None, None, None, ["terminal_dump"]
+        return None, None, None, None, ["terminal_dump"]
 
     stamp = int(math.floor(final_time + 0.5))  # ELMFIRE uses Fortran NINT.
     output = variant_root / "outputs"
@@ -65,9 +134,17 @@ def _terminal_outputs(
         )
         return paths[0] if len(paths) == 1 else None
 
-    spread = one(f"vs_*_{stamp:07d}.tif")
-    intensity = one(f"ir_*_{stamp:07d}.tif")
-    toa = one(f"time_of_arrival*_{stamp:07d}.tif")
+    if stalled_terminal_dump:
+        # The stalled-front branch advances T by DT_METEOROLOGY before its
+        # unconditional final dump; I7.7 filenames then contain asterisks.
+        # Accept only one uniquely named raster of each required type.
+        spread = one("vs_*_*.tif")
+        intensity = one("ir_*_*.tif")
+        toa = one("time_of_arrival*_*.tif")
+    else:
+        spread = one(f"vs_*_{stamp:07d}.tif")
+        intensity = one(f"ir_*_{stamp:07d}.tif")
+        toa = one(f"time_of_arrival*_{stamp:07d}.tif")
     unavailable = []
     if spread is None:
         unavailable.append("direct_ros")
@@ -75,7 +152,7 @@ def _terminal_outputs(
         unavailable.append("reaction_intensity")
     if toa_required and toa is None:
         unavailable.append("time_of_arrival")
-    return spread, intensity, toa, unavailable
+    return spread, intensity, toa, terminal_evidence, unavailable
 
 
 def _front_contract(path: Path) -> bool:
@@ -225,8 +302,11 @@ def evaluate(case_dir: Path) -> dict[str, object]:
         expected_ros = float(variant["expected_ros_m_min"])
         expected_ir = float(variant["expected_ir_kw_m2"])
         toa_required = bool(variant.get("toa_required", expected_ros >= 0.10))
-        spread_path, ir_path, toa_path, unavailable = _terminal_outputs(
-            variant_root, toa_required
+        expected_zero_spread = expected_ros <= ZERO_ROS_EPS
+        spread_path, ir_path, toa_path, terminal_evidence, unavailable = (
+            _terminal_outputs(
+                variant_root, toa_required, expected_zero_spread
+            )
         )
         if not _front_contract(front_path):
             unavailable.append("front_initialization")
@@ -262,8 +342,11 @@ def evaluate(case_dir: Path) -> dict[str, object]:
         if unavailable:
             missing[variant_id] = sorted(set(unavailable))
             continue
-        measured_ros = float(np.median(spread_values))
-        measured_ir = float(np.median(ir_values))
+        # Direct fields are sparse solver diagnostics: zero or off-axis values may
+        # coexist with the homogeneous direction-of-maximum-spread value. The
+        # upper envelope is the configured head ROS and reaction intensity.
+        measured_ros = float(np.max(spread_values))
+        measured_ir = float(np.max(ir_values))
         source_files = [
             str(spread_path.relative_to(case_dir)),
             str(ir_path.relative_to(case_dir)),
@@ -279,12 +362,18 @@ def evaluate(case_dir: Path) -> dict[str, object]:
                 "toa_ros_m_min": toa_ros,
                 "toa_r2": toa_r2,
                 "ros_relative_error": _relative_error(measured_ros, expected_ros),
-                "ir_relative_error": _relative_error(measured_ir, expected_ir),
+                "ir_relative_error": (
+                    None
+                    if abs(expected_ir) <= IR_ZERO_REFERENCE_MAX_KW_M2
+                    else _relative_error(measured_ir, expected_ir)
+                ),
+                "ir_absolute_error_kw_m2": abs(measured_ir - expected_ir),
                 "toa_ros_relative_error": (
                     _relative_error(toa_ros, expected_ros)
                     if toa_ros is not None
                     else None
                 ),
+                "terminal_evidence": terminal_evidence,
                 "source_files": source_files,
             }
         )
@@ -292,7 +381,20 @@ def evaluate(case_dir: Path) -> dict[str, object]:
     required = len(specification["variants"])
     complete = len(rows) == required and not missing
     ros_max = max((float(row["ros_relative_error"]) for row in rows), default=None)
-    ir_max = max((float(row["ir_relative_error"]) for row in rows), default=None)
+    ir_relative_rows = [
+        row for row in rows if row["ir_relative_error"] is not None
+    ]
+    ir_zero_rows = [
+        row for row in rows
+        if abs(float(row["expected_ir_kw_m2"])) <= IR_ZERO_REFERENCE_MAX_KW_M2
+    ]
+    ir_max = max(
+        (float(row["ir_relative_error"]) for row in ir_relative_rows), default=None
+    )
+    ir_zero_abs_max = max(
+        (float(row["ir_absolute_error_kw_m2"]) for row in ir_zero_rows),
+        default=None,
+    )
     propagating = [row for row in rows if row["toa_required"]]
     toa_metrics_required = any(
         bool(
@@ -327,6 +429,17 @@ def evaluate(case_dir: Path) -> dict[str, object]:
             "status": _metric_status(
                 complete,
                 ir_max is not None and ir_max <= tolerances["ir_relative_error"],
+            ),
+        },
+        {
+            "name": "maximum near-extinction reaction-intensity absolute error",
+            "expected": f"<= {IR_ZERO_ABSOLUTE_TOLERANCE_KW_M2}",
+            "calculated": ir_zero_abs_max,
+            "units": "kW/m2",
+            "status": _metric_status(
+                complete,
+                ir_zero_abs_max is not None
+                and ir_zero_abs_max <= IR_ZERO_ABSOLUTE_TOLERANCE_KW_M2,
             ),
         },
     ]

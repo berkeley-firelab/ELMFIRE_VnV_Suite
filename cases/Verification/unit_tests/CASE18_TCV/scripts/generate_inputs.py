@@ -14,8 +14,8 @@ CRS = "EPSG:32610"
 NODATA = -9999.0
 DOMAIN_SIZE_M = 256.0
 FIXED_RESOLUTION = 1024
-TIME_GRIDS = [180, 360, 720, 1440]
-IGNITION_RADIUS_M = 5.0
+TIME_GRIDS = [45, 90, 180, 360]
+IGNITION_RADIUS_M = 20.0
 SPREAD_ADJUSTMENT = 1.0
 SIMULATION_DURATION_S = 360.0
 
@@ -65,7 +65,11 @@ def write_inputs(inputs_dir: Path, *, resolution: int, domain_size_m: float,
         x = xmin + (np.arange(resolution) + 0.5) * cell_size
         y = ymax - (np.arange(resolution) + 0.5) * cell_size
         xx, yy = np.meshgrid(x, y)
-        phi[np.hypot(xx, yy) <= ignition_radius_m] = -1.0
+        # Initialize the level set as a resolved signed-distance field. A
+        # discontinuous +/-1 mask changes its effective radius with dx and
+        # contaminates the measured convergence order.
+        signed_distance = np.hypot(xx, yy) - ignition_radius_m
+        phi = np.clip(signed_distance / cell_size, -1.0, 1.0).astype(np.float32)
     write_raster(inputs_dir / "phi.tif", phi, transform=transform, dtype="float32")
 
 
@@ -82,8 +86,10 @@ def main() -> None:
     case_dir = Path(__file__).resolve().parents[1]
     data_dir = case_dir / "data"
     inputs_dir = data_dir / "inputs"
-    (data_dir / "outputs").mkdir(parents=True, exist_ok=True)
-    (data_dir / "scratch").mkdir(parents=True, exist_ok=True)
+    for generated in (inputs_dir, data_dir / "outputs", data_dir / "scratch"):
+        if generated.exists():
+            shutil.rmtree(generated)
+        generated.mkdir(parents=True, exist_ok=True)
 
     write_inputs(
         inputs_dir, resolution=FIXED_RESOLUTION, domain_size_m=DOMAIN_SIZE_M,

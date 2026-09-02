@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Remove regenerable repository artifacts while preserving source material.
+"""Remove simulation/runtime artifacts while preserving report-build material.
 
-Run without ``--apply`` to preview the cleanup.  All cases follow the same
-rules, LaTeX auxiliaries are removed only from report paths, and active-case
-runtime directories are emptied but preserved for the next run.
+Run without ``--apply`` to preview the cleanup.  Figures, result JSON, generated
+report inputs, and compiled PDFs are retained so reports can be rebuilt without
+rerunning ELMFIRE.  LaTeX auxiliaries and simulation/runtime products are safe
+to regenerate and are removed.
 """
 
 from __future__ import annotations
@@ -16,7 +17,6 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 GENERATED_DIRECTORIES = (
-    ROOT_DIR / "main_report" / "generated",
     ROOT_DIR / "output",
     ROOT_DIR / "tmp",
 )
@@ -29,15 +29,14 @@ LATEX_SUFFIXES = (
     ".synctex.gz",
     ".toc",
 )
-CASE_RUNTIME_DIRECTORY_NAMES = frozenset({"figures", "logs", "outputs", "scratch"})
+CASE_RUNTIME_DIRECTORY_NAMES = frozenset({"logs", "outputs", "scratch"})
 GENERATED_CASE_REPORT_FILES = frozenset(
     {
-        "case_report.pdf",
         "latexmk.stderr",
         "latexmk.stdout",
-        "metrics_macros.tex",
     }
 )
+REPORT_SUPPORT_OUTPUT_SUFFIXES = frozenset({".json"})
 
 
 def is_report_path(path: Path) -> bool:
@@ -63,16 +62,6 @@ def is_generated_report_file(path: Path) -> bool:
         is_active_case_path(path)
         and "report" in relative.parts
         and path.name in GENERATED_CASE_REPORT_FILES
-    )
-
-
-def is_aggregate_report_pdf(path: Path) -> bool:
-    """Identify top-level verification/validation guide PDFs."""
-    relative = path.relative_to(ROOT_DIR)
-    return (
-        len(relative.parts) == 2
-        and relative.parts[0] == "main_report"
-        and path.suffix.lower() == ".pdf"
     )
 
 
@@ -143,7 +132,7 @@ def cleanup_inventory() -> tuple[list[Path], list[Path], list[Path]]:
             path = current / name
             if name == ".DS_Store" or path.suffix == ".pyc" or is_slurm_artifact(path):
                 artifacts.append(path)
-            elif is_generated_report_file(path) or is_aggregate_report_pdf(path):
+            elif is_generated_report_file(path):
                 artifacts.append(path)
             elif is_report_path(path) and name.endswith(LATEX_SUFFIXES):
                 artifacts.append(path)
@@ -160,11 +149,24 @@ def artifact_files() -> list[Path]:
     return cleanup_inventory()[0]
 
 
+def disposable_runtime_entries(directory: Path) -> list[Path]:
+    """List entries removable from one runtime directory."""
+    return [
+        entry
+        for entry in directory.iterdir()
+        if not (
+            directory.name == "outputs"
+            and entry.is_file()
+            and entry.suffix.lower() in REPORT_SUPPORT_OUTPUT_SUFFIXES
+        )
+    ]
+
+
 def empty_runtime_directories(directories: list[Path], apply: bool) -> int:
-    """Empty regenerable case directories without removing their structure."""
+    """Clean runtime directories while retaining report-supporting JSON."""
     cleaned = 0
     for directory in directories:
-        entries = list(directory.iterdir())
+        entries = disposable_runtime_entries(directory)
         if not entries:
             continue
         cleaned += 1
@@ -199,9 +201,9 @@ def main() -> None:
     action = "REMOVE" if args.apply else "WOULD REMOVE"
     for path in files + directories:
         print(f"[{action}] {path.relative_to(ROOT_DIR)}")
-    runtime_action = "EMPTY" if args.apply else "WOULD EMPTY"
+    runtime_action = "CLEAN" if args.apply else "WOULD CLEAN"
     for path in runtime_directories:
-        if any(path.iterdir()):
+        if disposable_runtime_entries(path):
             print(f"[{runtime_action}] {path.relative_to(ROOT_DIR)}")
 
     if args.apply:

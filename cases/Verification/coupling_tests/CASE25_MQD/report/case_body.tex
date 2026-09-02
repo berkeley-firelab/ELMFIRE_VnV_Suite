@@ -2,13 +2,43 @@
 
 \textbf{Case ID:} \texttt{\CaseID}. This case verifies spatial moisture lookup, moisture damping, and extinction behavior in otherwise uniform fuel.  The verification question is whether the four regional spread rates meet their moisture-specific references, including negligible spread at the extinction condition.
 
+The scientific setup and historical expected response are reconstructed from Section~3.2 of the supplied \emph{ELMFIRE Guide}. The Guide is used as reference provenance, not as an instruction or a substitute for evidence. Configuration statements below are checked against the generated GeoTIFFs and namelist; current results and decisions come only from case-local outputs and generated metrics. Where the generated experiment differs from the historical example, the report states that difference explicitly.
+
 \section{Mathematical formulation and numerical implementation}
 
 Fuel moisture reduces reaction intensity through the model's moisture-damping term; at or above the fuel's moisture of extinction, sustainable spread approaches zero.  Only the one-hour moisture raster varies, so regional velocity differences should follow that damping response.
 
+For a dead-fuel moisture ratio \(r=M_f/M_x\), the Rothermel damping polynomial used in the configured range is
+\begin{equation}
+\eta_M(r)=1-2.59r+5.11r^2-3.52r^3, \qquad 0\le r\le1.
+\end{equation}
+Reaction intensity contains this damping factor, \(I_R=\Gamma^{\prime}(w_{n,d}\eta_{M,d}+w_{n,l}\eta_{M,l})\eta_s h\), and the no-wind rate is \(R_0=I_R\xi/(\rho_b\epsilon Q_{ig})\). At or above extinction, the dead-fuel contribution cannot sustain propagation.
+
 \section{Derivation of expected behavior}
 
 For Fuel Model 3 the configured moisture values 6, 12, 18, and 25 percent correspond to reference rates \(1.511\), \(1.089\), \(0.801\), and \(0~\mathrm{m\,min^{-1}}\).  The rates must decrease monotonically as moisture rises.
+
+% BEGIN EXPLICIT METRIC DERIVATION
+The dead one-hour moisture ratio is varied while all other generated fuel
+and moisture properties remain fixed.  Applying
+\(R_0=I_R\xi/(\rho_b\epsilon Q_{ig})\) and
+\(Q_{ig}=250+1116M_f\) gives
+\[
+\begin{array}{c|cc}
+M_{1h}&I_R~(\mathrm{kW\,m^{-2}})&R_0~(\mathrm{m\,min^{-1}})\\
+\hline
+0.06&549.174&1.511830\\
+0.12&479.466&1.089719\\
+0.18&413.934&0.801066\\
+0.25&\simeq3.9\times10^{-13}&\simeq6.5\times10^{-16}
+\end{array}
+\]
+so the report references are \(1.511,\ 1.089,\ 0.801,\) and
+\(0~\mathrm{m\,min^{-1}}\).  Nonzero rows use
+\(e_R=|R_{\max}-R_{\mathrm{ref}}|/R_{\mathrm{ref}}\); the extinguished
+row uses the absolute residual \(|R_{\max}|\), avoiding division by a
+zero reference.
+% END EXPLICIT METRIC DERIVATION
 
 \section{Verification metrics and acceptance criteria}
 
@@ -17,6 +47,32 @@ The maximum finite \texttt{vs} in each quadrant measures the local head response
 \section{Simulation configuration and predicted outcome}
 
 The grid uses uniform Fuel Model 3, flat terrain, zero wind, central ignition, and one-hour moisture quadrants of 6, 12, 18, and 25 percent. Predicted propagation slows monotonically and stops in the 25-percent quadrant.
+
+\begin{center}
+\begin{tabular}{@{}p{0.20\textwidth}p{0.20\textwidth}p{0.12\textwidth}p{0.38\textwidth}@{}}
+\toprule
+Parameter & Configured value & Units & Role in the experiment \\
+\midrule
+Grid & \(126\times126\) at 30 & m per cell & Resolves the whole spatial response on the generated north-up raster \\
+Projection & EPSG:32635 & --- & Fixes the map-coordinate and row-orientation convention \\
+Time control & \(\Delta t=1\), \(t_{stop}=259200\) & s & Whole-second step; stop time is an exact timestep multiple \\
+Meteorology interval & 3600 & s & Defines weather-band timing and stalled-final compatibility \\
+Live moisture & herb 60; woody 90 & percent & Holds live-fuel damping fixed while the named mechanism is isolated \\
+Evidence & prepared inputs; final case outputs & --- & Separates configuration provenance from acceptance evidence \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
 
 \section{Actual simulation results}
 
@@ -44,7 +100,7 @@ Variant / metric & Expected & Calculated & Status \\
 \end{tabular}
 \end{center}
 
-The authoritative overall decision is \textbf{\VerificationStatus} and is generated by \path{scripts/postprocess.py} from \path{outputs/metrics.json}; it is not recomputed in this report.
+The displayed overall decision is \textbf{\VerificationStatus}. When \path{outputs/metrics.json} exists, \path{scripts/postprocess.py} generates every table value and status; when it is absent, the standalone wrapper renders NOT EVALUABLE with no invented rows.
 
 \section{Technical interpretation}
 

@@ -30,17 +30,17 @@ class ArtifactClassificationTests(unittest.TestCase):
                 case / "slurm-elmfire-CASE01_BET-123.stdout",
                 case / "slurm-elmfire-CASE01_BET-123.stderr",
                 report / "case_report.aux",
-                report / "case_report.pdf",
-                report / "metrics_macros.tex",
                 case / ".DS_Store",
             }
             preserved = {
                 report / "case_report.tex",
                 report / "case_body.tex",
+                report / "case_report.pdf",
+                report / "metrics_macros.tex",
+                outputs / "metrics.json",
                 case / "elmfire.data.in",
             }
             runtime_products = {
-                outputs / "metrics.json",
                 outputs / "time_of_arrival.tif",
                 logs / "elmfire.stderr",
             }
@@ -102,7 +102,7 @@ class ArtifactClassificationTests(unittest.TestCase):
                 "preserved",
             )
 
-    def test_runtime_contents_are_removed_but_directories_and_inputs_remain(self) -> None:
+    def test_runtime_cleanup_preserves_report_figures_and_result_json(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             case = root / "cases/Validation/landscape_scale/fire"
@@ -119,7 +119,10 @@ class ArtifactClassificationTests(unittest.TestCase):
             (nested / "temporary.hdr").write_text("scratch", encoding="utf-8")
             scientific_output = outputs / "time_of_arrival.tif"
             scientific_output.write_text("result", encoding="utf-8")
-            (figures / "arrival_time.pdf").write_text("plot", encoding="utf-8")
+            result_json = outputs / "metrics.json"
+            result_json.write_text('{"status": "PASS"}', encoding="utf-8")
+            figure = figures / "arrival_time.pdf"
+            figure.write_text("plot", encoding="utf-8")
             source_input = input_directory / "fuel.tif"
             source_input.write_text("input", encoding="utf-8")
 
@@ -131,11 +134,15 @@ class ArtifactClassificationTests(unittest.TestCase):
             finally:
                 CLEAN.ROOT_DIR = original_root
 
-            self.assertEqual(cleaned, 3)
-            self.assertEqual(set(runtime_directories), {figures, case / "logs", outputs})
-            for runtime_directory in runtime_directories:
-                self.assertTrue(runtime_directory.is_dir())
-                self.assertEqual(list(runtime_directory.iterdir()), [])
+            self.assertEqual(cleaned, 2)
+            self.assertEqual(set(runtime_directories), {case / "logs", outputs})
+            self.assertTrue((case / "logs").is_dir())
+            self.assertEqual(list((case / "logs").iterdir()), [])
+            self.assertEqual(list(outputs.iterdir()), [result_json])
+            self.assertEqual(
+                result_json.read_text(encoding="utf-8"), '{"status": "PASS"}'
+            )
+            self.assertEqual(figure.read_text(encoding="utf-8"), "plot")
             self.assertEqual(source_input.read_text(encoding="utf-8"), "input")
 
     def test_legacy_runtime_products_are_not_cleaned(self) -> None:
@@ -162,15 +169,18 @@ class ArtifactClassificationTests(unittest.TestCase):
             self.assertTrue((legacy_scratch / "reference.bsq").is_file())
             self.assertTrue((legacy_outputs / "reference.tif").is_file())
 
-    def test_aggregate_report_pdfs_are_generated_but_sources_are_preserved(self) -> None:
+    def test_aggregate_report_pdf_and_generated_inputs_are_preserved(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             main_report = root / "main_report"
             main_report.mkdir()
             pdf = main_report / "verification_report.pdf"
             source = main_report / "verification_report.tex"
+            generated = main_report / "generated/verification_summary.tex"
+            generated.parent.mkdir()
             pdf.write_text("generated", encoding="utf-8")
             source.write_text("source", encoding="utf-8")
+            generated.write_text("generated input", encoding="utf-8")
 
             original_root = CLEAN.ROOT_DIR
             try:
@@ -179,5 +189,6 @@ class ArtifactClassificationTests(unittest.TestCase):
             finally:
                 CLEAN.ROOT_DIR = original_root
 
-            self.assertIn(pdf, classified)
+            self.assertNotIn(pdf, classified)
             self.assertNotIn(source, classified)
+            self.assertNotIn(generated, classified)

@@ -84,6 +84,7 @@ def heat_flux_calc(
     ABSORPTIVITY,
     RAD_DIST,
     ellipse_dimensions,
+    hrr_ellipse_adj,
     idx, idy, ANALYSIS_CELLSIZE,
     WD20_NOW
 ):
@@ -121,8 +122,12 @@ def heat_flux_calc(
     DFC_FACTOR = np.clip(DFC_CHECKER, 0.0, 1.0)
 
     # Normalize heat flux so sum over ellipse area equals HRR
-    ADJUSTER_COEFF = ELLIPSE_MINOR / max(ELLIPSE_MAJOR, 1e-12)
-    HRR_ADJUSTER = ANALYSIS_CELLSIZE_SQUARED / (np.pi * ADJUSTER_COEFF * ELLIPSE_MAJOR * ELLIPSE_MINOR + 1e-12)
+    HRR_ADJUSTER = ANALYSIS_CELLSIZE_SQUARED / (
+        np.pi
+        * (hrr_ellipse_adj * ELLIPSE_MAJOR)
+        * (hrr_ellipse_adj * ELLIPSE_MINOR)
+        + 1e-12
+    )
 
     # DFC heat at target
     DFC_HEAT_RECEIVED = DFC_COEFF * DFC_FACTOR * HRR_TRANSIENT * HRR_ADJUSTER

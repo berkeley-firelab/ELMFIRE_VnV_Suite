@@ -9,11 +9,13 @@ mkdir -p "$CASE_DIR/logs"
 export MPLCONFIGDIR="$CASE_DIR/logs/matplotlib"
 
 "$PYTHON_BIN" "$CASE_DIR/scripts/generate_inputs.py"
+"$PYTHON_BIN" "$CASE_DIR/scripts/spatial_evidence.py"
 
 while IFS=$'\t' read -r label config_rel guide_name; do
   [[ -z "$label" || "$label" == \#* ]] && continue
   config_path="$CASE_DIR/$config_rel"
   variant_dir=$(dirname "$config_path")
+  rm -rf -- "$variant_dir/outputs" "$variant_dir/scratch"
   mkdir -p "$variant_dir/outputs" "$variant_dir/scratch"
   echo "[INFO] Running $guide_name ($label)"
   (

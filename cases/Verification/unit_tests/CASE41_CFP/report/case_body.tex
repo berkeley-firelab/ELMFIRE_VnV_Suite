@@ -9,13 +9,67 @@ The formulation follows Andrews (2018), RMRS-GTR-371.  Particle density and mine
 \section{Derivation of expected behavior}
 The baseline row is copied and exactly one public column is changed in each variant.  A case-local fuel table is written beside that variant and read independently by the oracle.  The full equation is recalculated rather than imposing a monotonic trend: load, SAV, and depth have competing effects through packing and reaction velocity, so a simple ordering would be scientifically unjustified.
 
+% BEGIN EXPLICIT METRIC DERIVATION
+Each custom-fuel reference is recalculated from
+\(R_0=I_R\xi/(\rho_b\epsilon Q_{ig})\), changing only the indicated
+fuel-table column.  The substitutions produced from the generated table are
+\[
+\begin{array}{c|rr}
+\text{variant}&R_{\mathrm{ref}}~(\mathrm{m\,min^{-1}})
+&I_{R,\mathrm{ref}}~(\mathrm{kW\,m^{-2}})\\\hline
+\text{baseline}&0.411242&1045.499\\
+w_{1h}=0.05&0.253350&688.121\\
+w_{1h}=0.15&0.551674&1379.611\\
+SAV=1000&0.241692&960.426\\
+SAV=3000&0.662626&1074.561\\
+d=0.5&0.225975&910.468\\
+d=2.0&0.694647&991.942\\
+M_x=15\%&0.371790&945.198\\
+M_x=35\%&0.438500&1114.797\\
+h=6000&0.308432&784.125\\
+h=10000&0.514053&1306.874
+\end{array}
+\]
+For example, replacing the baseline 1-h load \(0.10\) by
+\(0.05~\mathrm{lb\,ft^{-2}}\) changes
+\(R_0=1.349221\) to \(0.831202~\mathrm{ft\,min^{-1}}\);
+multiplication by 0.3048 gives \(0.253350~\mathrm{m\,min^{-1}}\).
+Each variant uses
+\(e_R=|R_{\max}-R_{\mathrm{ref}}|/
+\max(|R_{\mathrm{ref}}|,10^{-8})\) and the analogous \(e_I\).
+The TOA fit \(t=a+bx\) gives \(R_{\mathrm{TOA}}=60/b\) and
+\(R^2=1-SSE/SST\).  The aggregate substitutions are
+\(\max e_R\leq0.02\), \(\max e_I\leq0.01\),
+\(\max e_{\mathrm{TOA}}\leq0.05\), and \(\min R^2\geq0.995\).
+% END EXPLICIT METRIC DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 Maximum relative errors are 0.02 for direct ROS and 0.01 for reaction intensity.  Variants predicted at or above \SI{0.10}{m.min^{-1}} additionally require TOA-derived ROS error at most 0.05 and minimum $R^2=0.995$; slower variants are assessed from direct ROS and intensity.  Pointwise equality to a complete recalculation detects both ignored columns and wrong nonlinear propagation.  The baseline and ten low/high variants are all required.
 
 \section{Simulation configuration and predicted outcome}
 
-The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every positive oracle ROS, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} are selected so the expected front advances 5\% of one cell per step (CFL 0.05, below the configured 0.2 limit). This keeps the PHI change above ELMFIRE's fixed stall scale even if the implementation produces only a small fraction of the reference speed. A zero-ROS variant retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The analytically selected stop time is rounded upward to a whole second because the current ELMFIRE time loop stores the duration as an integer; this preserves the intended duration and guarantees the terminal output dump. The evaluator always requires uniquely named rasters tied to the one final dump record. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
+The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every positive oracle ROS, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} use the whole-second value obtained by rounding the 5\%-of-cell target downward, with a one-second minimum; every generated value remains below the configured CFL limit of 0.2. The stop time is rounded upward to an exact integer multiple of that step. This avoids a shortened final step that can trigger ELMFIRE's stalled-front branch and corrupt the terminal timestamp. A zero-ROS variant retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The evaluator always requires uniquely named rasters tied to one final dump record. It accepts a stalled-final record only when subtracting the configured meteorology interval reconstructs the requested stop time within one configured timestep. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
 All variants use fuel code \CustomFuelCode, 5/7/9\% dead moisture, 90\% live moisture, zero wind and slope, and \SI{10}{m} cells.  A finite ignition strip supplies a planar east face in the interior analysis corridor while remaining clear of the lateral grid boundaries.  The baseline row uses 0.10/0.05/0.02 dead loads, 0.08 live-woody load, 1-h SAV 2000 \si{ft^{-1}}, depth \SI{1}{ft}, dead extinction 25\%, and heat content \SI{8000}{Btu.lb^{-1}}.  Each output should match its own oracle; no universal increasing trend is predicted.
+
+\begin{center}\begin{tabular}{p{0.22\textwidth}p{0.24\textwidth}p{0.12\textwidth}p{0.32\textwidth}}\toprule
+Parameter & Configured value & Units & Role \\
+\midrule Domain/grid & 1400 m square; 10 & m/cell & Planar interior propagation \\
+Custom fuel code & \CustomFuelCode & code & Selects variant-local table row \\
+Changes & load, SAV, depth, extinction, heat & native table units & One-at-a-time interface exercise \\
+Wind/slope & 0 / 0 & mph / degrees & Isolates custom fuel response \\
+Timing & generated whole-second step and exact-multiple stop & s & Terminal-evidence compatibility \\
+\bottomrule\end{tabular}\end{center}
+
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
 
 \section{Actual simulation results}
 The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} variants and reports \textbf{\VerificationStatus}.

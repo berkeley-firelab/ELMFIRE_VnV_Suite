@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import csv
 import json
 from pathlib import Path
 
@@ -28,11 +29,14 @@ WIND_SPEED_MPH = 15.0
 BUILDING_AREA_M = 10.0
 BUILDING_SEPARATION_M = 10.0
 WIND_PROPORTIONALITY = 1.0
+HRR_ELLIPSE_ADJ = 0.5
 EARLY_TIME_S = 300.0
 DEVELOPED_TIME_S = 3900.0
 DECAY_TIME_S = 4200.0
 PEAK_HRRPUA_KW_M2 = 400.0
 RELATIVE_L1_TOLERANCE = 0.005
+EXPECTED_STOP_TIME_S = 5000.0
+MINIMUM_DUMP_COUNT = 5
 
 
 def write_metrics(payload: dict) -> None:
@@ -65,6 +69,7 @@ def reference_fields(times: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndar
                     ABSORPTIVITY,
                     RADIATION_CUTOFF_M,
                     ellipse,
+                    HRR_ELLIPSE_ADJ,
                     float(idx),
                     float(idy),
                     CELL_SIZE_M,
@@ -103,6 +108,68 @@ def audit_window(stack: np.ndarray) -> np.ndarray:
     return np.flip(stack[:, 5:16, 5:16], axis=1)
 
 
+def validate_time_coverage(*time_arrays: np.ndarray) -> None:
+    """Require fresh, aligned dumps spanning every design-fire phase."""
+    arrays = [np.asarray(values, dtype=float) for values in time_arrays]
+    if any(values.shape != arrays[0].shape for values in arrays[1:]):
+        raise ValueError("transient fields have different dump counts")
+    if any(not np.allclose(values, arrays[0], rtol=0.0, atol=1.0e-6)
+           for values in arrays[1:]):
+        raise ValueError("transient fields have different physical timestamps")
+    times = arrays[0]
+    if len(times) < MINIMUM_DUMP_COUNT or np.any(np.diff(times) <= 0.0):
+        raise ValueError("transient timestamp sequence is incomplete or non-increasing")
+    phase_coverage = (
+        np.any(times <= EARLY_TIME_S),
+        np.any((times > EARLY_TIME_S) & (times <= DEVELOPED_TIME_S)),
+        np.any((times > DEVELOPED_TIME_S) & (times <= DECAY_TIME_S)),
+        np.any(times > DECAY_TIME_S),
+    )
+    if not all(phase_coverage):
+        raise ValueError("transient dumps do not span growth, plateau, decay, and post-decay")
+
+    dump_paths = sorted(OUT_DIR.glob("dump_times_*.csv"))
+    if len(dump_paths) != 1:
+        raise ValueError(f"expected one dump-times CSV, found {len(dump_paths)}")
+    with dump_paths[0].open(newline="", encoding="utf-8") as stream:
+        rows = list(csv.DictReader(stream, skipinitialspace=True))
+    if len(rows) != len(times):
+        raise ValueError("dump-times row count does not match transient raster count")
+    final_rows = [row for row in rows
+                  if row["is_final_dump"].strip().upper() in {"T", "TRUE", "1"}]
+    if len(final_rows) != 1:
+        raise ValueError(f"expected one final dump record, found {len(final_rows)}")
+    final_time = float(final_rows[0]["time_seconds"])
+    if abs(final_time - EXPECTED_STOP_TIME_S) > 1.0e-6:
+        raise ValueError(
+            f"final dump time {final_time:g} does not match stop {EXPECTED_STOP_TIME_S:g}"
+        )
+
+
+
+def validate_isolated_source(hrr_stack: np.ndarray) -> None:
+    """Require every nonzero HRR dump to contain only the center WUI source."""
+    values = np.ma.filled(np.ma.asarray(hrr_stack), 0.0)
+    saw_active_source = False
+    for index, field in enumerate(values, start=1):
+        active = np.argwhere(np.abs(field) > 1.0e-8)
+        if len(active) > 1:
+            raise ValueError(
+                f"dump {index} contains {len(active)} active HRR cells; "
+                "the single-source configuration is contaminated"
+            )
+        if len(active) == 1:
+            saw_active_source = True
+        if len(active) == 1 and tuple(active[0]) != (10, 10):
+            raise ValueError(
+                f"dump {index} active HRR cell is {tuple(active[0])}, expected (10, 10)"
+            )
+
+
+    if not saw_active_source:
+        raise ValueError("no active center HRR source was found")
+
+
 def save_figures(
     times_hrr: np.ndarray,
     hrr_reference: np.ndarray,
@@ -135,9 +202,10 @@ def save_figures(
     plt.close(fig)
 
     fig, ax = plt.subplots(figsize=(6.2, 5.2))
-    image = ax.imshow(np.ma.asarray(dfc_whole[-1]), origin="lower", cmap="inferno")
+    peak_index = int(np.argmax(np.ma.sum(np.ma.asarray(dfc_whole), axis=(1, 2))))
+    image = ax.imshow(np.ma.asarray(dfc_whole[peak_index]), origin="lower", cmap="inferno")
     ax.set(xlabel="Audit-window column", ylabel="Audit-window row",
-           title=f"Final ELMFIRE DFC field at t={times_dfc[-1]:g} s")
+           title=f"Peak ELMFIRE DFC field at t={times_dfc[peak_index]:g} s")
     fig.colorbar(image, ax=ax, label=r"DFC heat flux (kW m$^{-2}$)")
     fig.tight_layout()
     fig.savefig(FIG_DIR / "whole_domain_result.pdf", bbox_inches="tight")
@@ -154,6 +222,10 @@ def main() -> None:
         hrr_stack, times_hrr, *_ = load_stack(str(patterns["hrr"]))
         dfc_stack, times_dfc, *_ = load_stack(str(patterns["dfc"]))
         rad_stack, times_rad, *_ = load_stack(str(patterns["rad"]))
+
+        validate_time_coverage(times_hrr, times_dfc, times_rad)
+
+        validate_isolated_source(hrr_stack)
 
         hrr_reference, _, _ = reference_fields(times_hrr)
         _, dfc_reference, _ = reference_fields(times_dfc)
@@ -189,6 +261,9 @@ def main() -> None:
             "overall_status": "PASS" if passed else "FAIL",
             "verification_passed": passed,
             "required_outputs_complete": True,
+            "dump_count": int(len(times_hrr)),
+            "terminal_output_time_s": float(times_hrr[-1]),
+            "active_source_limit": 1,
             "selected_output_patterns": {key: str(value.relative_to(CASE_DIR)) for key, value in patterns.items()},
             "metrics": metrics,
         })

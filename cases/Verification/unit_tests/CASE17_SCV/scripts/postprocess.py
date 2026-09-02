@@ -9,6 +9,7 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import contourpy
 import numpy as np
 import rasterio
 
@@ -36,9 +37,23 @@ def finite_values(array: np.ndarray) -> np.ndarray:
     return values[np.isfinite(values)]
 
 
-def equivalent_burned_radius(phi: np.ndarray, cell_size_m: float) -> float:
-    burned_cells = int(np.count_nonzero(np.ma.filled(phi < 0.0, False)))
-    return float(np.sqrt(burned_cells * cell_size_m**2 / np.pi))
+def equivalent_burned_radius(phi: np.ndarray, transform) -> float:
+    """Return the radius of the largest closed, linearly interpolated PHI=0 contour."""
+    values = np.ma.filled(phi, np.nan).astype(float)
+    rows, cols = values.shape
+    x = transform.c + (np.arange(cols) + 0.5) * transform.a
+    y = transform.f + (np.arange(rows) + 0.5) * transform.e
+    generator = contourpy.contour_generator(x=x, y=y, z=values)
+    areas = []
+    closure_tolerance = max(abs(float(transform.a)), abs(float(transform.e)))
+    for line in generator.lines(0.0):
+        if len(line) < 4 or np.linalg.norm(line[0] - line[-1]) > closure_tolerance:
+            continue
+        xx, yy = line[:, 0], line[:, 1]
+        areas.append(0.5 * abs(float(np.dot(xx, np.roll(yy, 1)) - np.dot(yy, np.roll(xx, 1)))))
+    if not areas or max(areas) <= 0.0:
+        raise ValueError("No closed PHI=0 contour is available")
+    return float(np.sqrt(max(areas) / np.pi))
 
 
 def plot_domain(path: Path, title: str, output_path: Path) -> None:
@@ -67,7 +82,7 @@ DOMAIN_SIZE_M = 256.0
 FINEST_ERROR_TOLERANCE_M = 1.0
 
 REFERENCE_ROS_M_PER_S = 0.0116332
-INITIAL_RADIUS_M = 5.0
+INITIAL_RADIUS_M = 20.0
 FINAL_TIME_S = 360.0
 MINIMUM_OBSERVED_ORDER = 0.8
 
@@ -104,7 +119,7 @@ def main() -> None:
             continue
         phi, meta = read_raster(phi_path)
         dx = abs(float(meta["transform"].a))
-        radius = equivalent_burned_radius(phi, dx)
+        radius = equivalent_burned_radius(phi, meta["transform"])
         rows.append({"resolution": resolution, "dx_m": dx, "radius_m": radius,
                      "absolute_error_m": abs(radius - expected_radius),
                      "source": str(phi_path.relative_to(CASE_DIR))})

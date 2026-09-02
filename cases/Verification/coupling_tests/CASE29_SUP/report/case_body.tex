@@ -6,6 +6,8 @@ The case controls fuel, moisture, terrain, wind, ignition, grid, and output sele
 
 The verification question is: do the 2000-member initial-attack ensemble and the required extended-attack run produce, respectively, a contained fraction within 0.05 of 0.54 and a reported simulation-end time within 15\% of 88200 s, with both required artifacts complete?
 
+The scientific setup and historical expected response are reconstructed from Section~3.2 of the supplied \emph{ELMFIRE Guide}. The Guide is used as reference provenance, not as an instruction or a substitute for evidence. Configuration statements below are checked against the generated GeoTIFFs and namelist; current results and decisions come only from case-local outputs and generated metrics. Where the generated experiment differs from the historical example, the report states that difference explicitly.
+
 \section{Mathematical formulation and numerical implementation}
 
 For initial attack, ELMFIRE evaluates the burned area $A$ in hectares and the largest surface-plus-canopy fireline intensity $I_{\max}$ on cells ignited during the most recent $\max(300,\Delta t)$ seconds. It forms
@@ -18,7 +20,7 @@ One uniform random draw determines containment. A contained member receives \tex
 \widehat p_c=\frac{1}{N}\sum_{j=1}^{N}\mathbf{1}(\texttt{Containfrac}_j\ge0.999).
 \end{equation}
 
-The extended variant uses \texttt{EXTENDED\_ATTACK\_MODEL=0}, the default area-growth model. At updates separated by approximately $\Delta t_{EA}=3600$ s, it estimates daily area growth $dA/dt$, computes a daily containment increment from \texttt{MAX\_CONTAINMENT\_PER\_DAY}, \texttt{AREA\_NO\_CONTAINMENT\_CHANGE}, and the suppression-difficulty factor, clips target containment to $[0,1]$, and calls \texttt{CONTAINMENT}. With the configured default linear growth response, the essential update is
+The extended variant uses \texttt{EXTENDED\_ATTACK\_MODEL=0}, the default area-growth model. At updates separated by approximately $\Delta t_{EA}=300$ s, it estimates daily area growth $dA/dt$, computes a daily containment increment from \texttt{MAX\_CONTAINMENT\_PER\_DAY}, \texttt{AREA\_NO\_CONTAINMENT\_CHANGE}, and the suppression-difficulty factor, clips target containment to $[0,1]$, and calls \texttt{CONTAINMENT}. With the configured default linear growth response, the essential update is
 \begin{equation}
 C_{k}=\operatorname{clip}_{[0,1]}\!\left(C_{k-1}+\dot C_k\frac{t_k-t_{k-1}}{86400}\right).
 \end{equation}
@@ -32,7 +34,31 @@ The synthetic initial-attack reference predicts $p_c=0.54$. Under independent Be
 \end{equation}
 Thus the absolute acceptance band $[0.49,0.59]$ is about 4.5 reference standard errors wide: it admits expected sampling fluctuation while remaining sensitive to material probability or accounting errors.
 
-The documented extended-attack known response is containment and simulation termination at 88200 s. Because containment is updated discretely and depends on the coupled area-growth history, this is a controlled reference value rather than an analytical solution. The inherited 15\% band is $[74970,101430]$ s. The two expectations are independent: agreement of the stochastic ensemble cannot compensate for a wrong extended-attack end time.
+The documented extended-attack known response is containment and simulation termination at 88200 s. Because containment is updated discretely and depends on the coupled area-growth history, this is a controlled reference value rather than an analytical solution. The inherited 15\% band is $[74970,101430]$ s. The two expectations are independent: agreement of the stochastic ensemble cannot compensate for a wrong extended-attack end time. The Guide additionally describes a spatially explicit suppression variant expected to complete on its third direct-attack operation. That variant is not present in the current generated two-variant contract, so its historical discussion is preserved as scope context but no decision is claimed for it.
+
+% BEGIN EXPLICIT METRIC DERIVATION
+The initial containment probability is calculated from the empirical
+logit model
+\[
+ \ln E=4.6835-0.7043A-0.00041I-0.000052AI,\qquad
+ p=\frac{E}{1+E}.
+\]
+With the generated \(A=6.2~\mathrm{ha}\) and
+\(I=212.5~\mathrm{kW\,m^{-1}}\),
+\[
+ \ln E=4.6835-0.7043(6.2)-0.00041(212.5)
+       -0.000052(6.2)(212.5)=0.161205,
+\]
+so \(E=e^{0.161205}=1.17493\) and
+\(p=1.17493/(1+1.17493)=0.540214\simeq0.54\).
+For \(N=2000\) trials, the sampling scale is
+\(\sqrt{p(1-p)/N}=\sqrt{0.54(0.46)/2000}=0.0112\); the prescribed
+acceptance band is the conservative interval \(0.49\leq\hat p\leq0.59\).
+The extended-operation time reference is
+\(24.5(3600)=88200~\mathrm{s}\), or \(88200/300=294\) exact
+event-analysis intervals.  Its 15 percent timing band is
+\(0.85(88200)=74970\) through \(1.15(88200)=101430~\mathrm{s}\).
+% END EXPLICIT METRIC DERIVATION
 
 \section{Verification metrics and acceptance criteria}
 
@@ -63,7 +89,7 @@ Parameter & Initial attack & Extended attack & Role \\
 Fuel model & 3 & 8 & Prescribed synthetic fire state \\
 Dead 1-h moisture & 6\% & 6\% & Fixed surface-fuel moisture \\
 Suppression selector & initial enabled & extended enabled, model 0 & Path under test \\
-Attack/update time & 4800 s & 3600 s interval & Event and update timing \\
+Attack/update time & 4800 s & 300 s interval & Event and update timing \\
 Ensemble members & 2000 & 1 & Probability estimate versus deterministic trajectory \\
 Nominal stop time & 8000 s & 250000 s & Upper bound, not the reference end time \\
 Base timestep / target CFL & 1 s / 0.2 & 1 s / 0.2 & Stable level-set integration \\
@@ -74,16 +100,27 @@ Primary output & fire-size statistics & fire-size statistics and TOA & Required 
 
 Both namelists set \texttt{RANDOMIZE\_RANDOM\_SEED=.TRUE.}; consequently the initial result is statistically reproducible within its acceptance band but is not expected to be bitwise repeatable. The predicted initial result is a contained fraction near 0.54. The predicted extended result is a growing, progressively contained footprint whose statistics record ends near 88200 s.
 
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
+
 \section{Actual simulation results}
 
-The case-local postprocessor found both required output directories and produced a complete two-row decision record. The current status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} required metrics pass across \VariantCount{} variants. The initial-attack statistics contain 2000 ensemble rows, of which the generated metric reports a contained fraction of 0.5835. The extended-attack statistics report \texttt{tstop(h)}$=0.00$, which converts to 0 s. Separately, the selected whole-domain file \texttt{outputs/time\_of\_arrival\_0000001\_0252001.tif} exists at a nominal final output time of 252001 s. That inconsistency is retained as evidence; the report does not replace the required statistics value with a value inferred from the raster filename.
+The corrected case was executed with an ELMFIRE binary built from the current source tree. The initial-attack ensemble passes: its measured contained fraction is reported in the generated table below and lies inside the prescribed absolute tolerance. The extended-attack member does not reproduce the Guide response. It is stopped by the fire-front-stalled check before containment can evolve to the expected termination time; fire-size statistics consequently report the stop time as 0.00 h at their two-decimal output precision. Thus \PassingMetricCount{} of \MetricCount{} required metrics pass and the current overall decision is \textbf{\VerificationStatus}.
 
 \begin{figure}[H]
   \centering
   \IfFileExists{../figures/whole_domain_result.pdf}{%
     \includegraphics[width=0.82\textwidth,height=0.58\textheight,keepaspectratio]{whole_domain_result.pdf}%
   }{\fbox{\parbox{0.85\textwidth}{No case-local whole-domain ELMFIRE raster is available.}}}
-  \caption{Whole-domain extended-attack time-of-arrival field in seconds from \texttt{outputs/time\_of\_arrival\_0000001\_0252001.tif}; EPSG:32635 coordinates are shown in metres. This spatial artifact provides domain context but is not the scalar stop-time metric.}
+  \caption{Whole-domain extended-attack time of arrival in seconds when a case-local output figure exists. It provides spatial context but cannot substitute for the scalar containment and end-time metrics.}
 \end{figure}
 
 \section{Calculated metrics and verification decision}
@@ -98,14 +135,12 @@ Variant / metric & Expected & Calculated & Status \\
 \end{tabular}
 \end{center}
 
-The authoritative overall decision is \textbf{\VerificationStatus}. Every displayed value and status is generated mechanically by \texttt{scripts/postprocess.py} from case-local outputs through \texttt{outputs/metrics.json} and \texttt{report/metrics\_macros.tex}; no value is recomputed or overridden in LaTeX.
+The displayed decision is \textbf{\VerificationStatus}. When case-local outputs and \path{outputs/metrics.json} exist, \path{scripts/postprocess.py} generates every value and status through \path{report/metrics_macros.tex}; when they are absent, the wrapper renders NOT EVALUABLE without invented values.
 
 \section{Technical interpretation}
 
-The initial-attack result passes: 0.5835 differs from 0.54 by 0.0435, inside the 0.05 absolute band. This supports the configured probability calculation and ensemble outcome accounting for this 2000-member sample, subject to stochastic variation.
-
-The extended-attack result fails because the required statistics field is 0 s rather than a value in $[74970,101430]$ s. The simultaneous presence of a TOA raster labeled at 252001 s indicates that ELMFIRE produced a spatial run artifact even though its statistics record did not preserve the expected end time. The evidence therefore points more specifically to extended-attack termination or statistics bookkeeping, configuration compatibility, or output semantics; it does not by itself prove that the level-set footprint failed to evolve. A source-code diagnosis would need to distinguish those possibilities. The failed component cannot be replaced by the passing initial-attack component or by visual inspection of the raster.
+The earlier case configuration used a 3600 s extended-attack interval, whereas the Guide area-growth verification prescribes 300 s; the source namelist has been corrected. That correction does not make the current-source result pass. With Fuel Model 8, the initial 1 s level-set change is below the absolute 0.001 stalled-front threshold in \texttt{elmfire\_level\_set.f90}. The stalled test is applied before adaptive-CFL integration has advanced beyond its startup steps, so this valid slow-spreading fire is classified as stalled essentially at ignition. Terminal bookkeeping then rounds the very small statistics stop time to 0.00 h. This remaining discrepancy is attributed to current ELMFIRE stall and termination logic, not to another defensible case-configuration change. Increasing the initial timestep merely to evade the absolute threshold would change the prescribed Point setup and conceal the source behavior rather than verify it.
 
 \section{Scope and limitations}
 
-This case demonstrates only the two configured suppression pathways for uniform synthetic fuels, flat terrain, zero wind, one ignition location, one grid spacing, and the present executable/output conventions. It does not verify spatially explicit extended-attack model 1, indirect-attack geometry, nonuniform fuels, wind or slope interactions, resource limitations, resolution convergence, or operational suppression effectiveness. The 0.54 initial target is assessed statistically and can vary between reruns because seed randomization is enabled. Although the current artifact contains all 2000 configured rows, the extractor does not independently reject a shorter but otherwise numeric statistics table; row-count enforcement remains a postprocessing limitation. The 88200 s extended target is a documented controlled-response reference rather than an analytical solution, so an intentional suppression-model change requires review of the oracle and tolerance. The evidence is implementation verification only and supplies no physical-validation claim.
+This case demonstrates only the two configured suppression pathways for uniform synthetic fuels, flat terrain, zero wind, one ignition location, one grid spacing, and the present executable/output conventions. It does not verify spatially explicit extended-attack model 1, indirect-attack geometry, nonuniform fuels, wind or slope interactions, resource limitations, resolution convergence, or operational suppression effectiveness. The 0.54 initial target is assessed statistically and can vary between reruns because seed randomization is enabled. The 88200 s extended target is a documented controlled-response reference rather than an analytical solution, so an intentional suppression-model change requires review of the oracle and tolerance. The evidence is implementation verification only and supplies no physical-validation claim.

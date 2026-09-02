@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import math
+import re
 from pathlib import Path
 
 import matplotlib
@@ -27,9 +28,24 @@ MIN_IR_BURNED_COVERAGE = 0.90
 
 
 def terminal_files(
-    directory: Path, expected_tstop_s: float
+    variant_root: Path, expected_tstop_s: float
 ) -> tuple[Path | None, Path | None, str | None]:
-    """Resolve final TOA and intensity rasters from ELMFIRE dump metadata."""
+    """Resolve regular or safely identifiable stalled-final ELMFIRE rasters."""
+    directory = variant_root / "outputs"
+    try:
+        config = (variant_root / "elmfire.data").read_text(encoding="utf-8")
+        timestep_values = re.findall(
+            r"(?mi)^\s*SIMULATION_DT\s*=\s*([0-9.eEdD+-]+)", config
+        )
+        met_step_values = re.findall(
+            r"(?mi)^\s*DT_METEOROLOGY\s*=\s*([0-9.eEdD+-]+)", config
+        )
+        if len(timestep_values) != 1 or len(met_step_values) != 1:
+            raise ValueError("time-control assignments are not unique")
+        timestep = float(timestep_values[0].replace("D", "E").replace("d", "e"))
+        met_step = float(met_step_values[0].replace("D", "E").replace("d", "e"))
+    except (OSError, ValueError) as exc:
+        return None, None, f"invalid time-control metadata ({exc})"
     manifests = sorted(directory.glob("dump_times_*.csv"))
     if len(manifests) != 1:
         return None, None, f"expected one dump_times CSV, found {len(manifests)}"
@@ -49,7 +65,17 @@ def terminal_files(
         final_time = float(final_rows[0]["time_seconds"])
     except (OSError, KeyError, TypeError, ValueError, csv.Error) as exc:
         return None, None, f"invalid dump-times metadata ({exc})"
-    if not math.isclose(final_time, expected_tstop_s, rel_tol=0.0, abs_tol=1.0e-6):
+    regular_terminal_dump = math.isclose(
+        final_time, expected_tstop_s, rel_tol=0.0, abs_tol=1.0e-6
+    )
+    stalled_terminal_dump = (
+        final_time > expected_tstop_s
+        and math.isclose(
+            final_time - met_step, expected_tstop_s,
+            rel_tol=0.0, abs_tol=max(timestep, 1.0e-6),
+        )
+    )
+    if not (regular_terminal_dump or stalled_terminal_dump):
         return None, None, (
             f"final dump is {final_time:g} s, expected {expected_tstop_s:g} s"
         )
@@ -63,8 +89,12 @@ def terminal_files(
         )
         return matches[0] if len(matches) == 1 else None
 
-    toa = one(f"time_of_arrival*_{stamp:07d}.tif")
-    intensity = one(f"ir_*_{stamp:07d}.tif")
+    if stalled_terminal_dump:
+        toa = one("time_of_arrival*_*.tif")
+        intensity = one("ir_*_*.tif")
+    else:
+        toa = one(f"time_of_arrival*_{stamp:07d}.tif")
+        intensity = one(f"ir_*_{stamp:07d}.tif")
     if toa is None or intensity is None:
         return None, None, "final TOA and reaction-intensity rasters are not unique"
     return toa, intensity, None
@@ -224,7 +254,7 @@ def main() -> None:
         output = variant_root / "outputs"
         front_path = variant_root / "inputs/phi.tif"
         toa_path, ir_path, terminal_issue = terminal_files(
-            output, tstop
+            variant_root, tstop
         )
         front_valid = front_contract(front_path)
         if not front_valid or terminal_issue is not None:

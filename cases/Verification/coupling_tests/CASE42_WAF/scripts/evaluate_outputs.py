@@ -33,6 +33,20 @@ def _terminal_outputs(
         if len(matches) != 1:
             raise ValueError("SIMULATION_TSTOP is not unique")
         tstop = float(matches[0].replace("D", "E").replace("d", "e"))
+        timestep_matches = re.findall(
+            r"(?mi)^\s*SIMULATION_DT\s*=\s*([0-9.eEdD+-]+)", text
+        )
+        met_step_matches = re.findall(
+            r"(?mi)^\s*DT_METEOROLOGY\s*=\s*([0-9.eEdD+-]+)", text
+        )
+        if len(timestep_matches) != 1 or len(met_step_matches) != 1:
+            raise ValueError("time-control assignments are not unique")
+        timestep = float(
+            timestep_matches[0].replace("D", "E").replace("d", "e")
+        )
+        met_step = float(
+            met_step_matches[0].replace("D", "E").replace("d", "e")
+        )
         manifests = sorted((variant_root / "outputs").glob("dump_times_*.csv"))
         if len(manifests) != 1:
             raise ValueError("dump-times manifest is not unique")
@@ -47,9 +61,17 @@ def _terminal_outputs(
         if len(final_rows) != 1:
             raise ValueError("final dump record is not unique")
         final_time = float(final_rows[0]["time_seconds"])
-        if toa_required and not math.isclose(
+        regular_terminal_dump = math.isclose(
             final_time, tstop, rel_tol=0.0, abs_tol=1.0e-3
-        ):
+        )
+        pre_jump_time = final_time - met_step
+        stalled_terminal_dump = (
+            final_time > tstop
+            and math.isclose(
+                pre_jump_time, tstop, rel_tol=0.0, abs_tol=max(timestep, 1.0e-3)
+            )
+        )
+        if toa_required and not (regular_terminal_dump or stalled_terminal_dump):
             raise ValueError("final dump did not reach SIMULATION_TSTOP")
     except (OSError, KeyError, TypeError, ValueError, csv.Error):
         return None, None, None, ["terminal_dump"]
@@ -65,9 +87,17 @@ def _terminal_outputs(
         )
         return paths[0] if len(paths) == 1 else None
 
-    spread = one(f"vs_*_{stamp:07d}.tif")
-    intensity = one(f"ir_*_{stamp:07d}.tif")
-    toa = one(f"time_of_arrival*_{stamp:07d}.tif")
+    if stalled_terminal_dump:
+        # The stalled-front branch advances T by DT_METEOROLOGY before its
+        # unconditional final dump; I7.7 filenames then contain asterisks.
+        # Accept only one uniquely named raster of each required type.
+        spread = one("vs_*_*.tif")
+        intensity = one("ir_*_*.tif")
+        toa = one("time_of_arrival*_*.tif")
+    else:
+        spread = one(f"vs_*_{stamp:07d}.tif")
+        intensity = one(f"ir_*_{stamp:07d}.tif")
+        toa = one(f"time_of_arrival*_{stamp:07d}.tif")
     unavailable = []
     if spread is None:
         unavailable.append("direct_ros")
@@ -382,6 +412,15 @@ def evaluate(case_dir: Path) -> dict[str, object]:
 
 
 def plot(case_dir: Path, results: dict[str, object]) -> None:
+    """Plot paired reference and ELMFIRE curves with unambiguous styling.
+
+    Color identifies the fuel model in both panels. The independent hand
+    calculation uses open diamonds connected by a solid line; ELMFIRE uses
+    filled circles connected by a dashed line. Each comparison pair therefore
+    shares color while remaining distinguishable in print and at close values.
+    """
+    from matplotlib.lines import Line2D
+
     rows = results.get("variant_results", [])
     if not rows:
         return
@@ -389,17 +428,54 @@ def plot(case_dir: Path, results: dict[str, object]) -> None:
     figure_dir.mkdir(parents=True, exist_ok=True)
     fig, axes = plt.subplots(1, 2, figsize=(10, 4.2))
     groups = sorted({str(row.get("group", "all")) for row in rows})
-    for group in groups:
+    colors = plt.get_cmap("tab10").colors
+    group_handles = []
+    for index, group in enumerate(groups):
+        color = colors[index % len(colors)]
         selected = [row for row in rows if str(row.get("group", "all")) == group]
         selected.sort(key=lambda row: float(row["x"]))
         x = [row["x"] for row in selected]
-        axes[0].plot(x, [row["expected_ros_m_min"] for row in selected], "-", label=f"{group} expected")
-        axes[0].plot(x, [row["measured_ros_m_min"] for row in selected], "o", label=f"{group} ELMFIRE")
-        axes[1].plot(x, [row["expected_ir_kw_m2"] for row in selected], "-")
-        axes[1].plot(x, [row["measured_ir_kw_m2"] for row in selected], "o")
+        expected_style = {
+            "color": color,
+            "marker": "D",
+            "linestyle": "-",
+            "linewidth": 1.4,
+            "markersize": 6,
+            "markerfacecolor": "none",
+            "markeredgewidth": 1.4,
+            "zorder": 3,
+        }
+        measured_style = {
+            "color": color,
+            "marker": "o",
+            "linestyle": "--",
+            "linewidth": 1.2,
+            "markersize": 4.5,
+            "zorder": 4,
+        }
+        axes[0].plot(x, [row["expected_ros_m_min"] for row in selected], **expected_style)
+        axes[0].plot(x, [row["measured_ros_m_min"] for row in selected], **measured_style)
+        axes[1].plot(x, [row["expected_ir_kw_m2"] for row in selected], **expected_style)
+        axes[1].plot(x, [row["measured_ir_kw_m2"] for row in selected], **measured_style)
+        group_handles.append(
+            Line2D([], [], color=color, marker="s", linestyle="none", label=group)
+        )
     axes[0].set(xlabel=results.get("x_label", "sweep value"), ylabel="ROS (m/min)")
     axes[1].set(xlabel=results.get("x_label", "sweep value"), ylabel="Reaction intensity (kW/m2)")
-    axes[0].legend(fontsize=7)
+    method_handles = [
+        Line2D([], [], color="black", marker="D", markerfacecolor="none",
+               markeredgewidth=1.4, linestyle="-", label="Hand calculation"),
+        Line2D([], [], color="black", marker="o", linestyle="--", label="ELMFIRE"),
+    ]
+    model_legend = axes[0].legend(
+        handles=group_handles, title="Fuel model", fontsize=7,
+        title_fontsize=8, loc="best"
+    )
+    axes[0].add_artist(model_legend)
+    axes[1].legend(
+        handles=method_handles, title="Value source", fontsize=7,
+        title_fontsize=8, loc="best"
+    )
     for axis in axes:
         axis.grid(alpha=0.25)
     fig.tight_layout()

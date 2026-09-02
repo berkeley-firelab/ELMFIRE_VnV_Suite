@@ -9,13 +9,64 @@ ELMFIRE implements the equivalent integer-percent interpolation between 30 and 1
 \section{Derivation of expected behavior}
 At 30\% moisture all live-herb load is cured; at 75\% half is cured; at 120\% and above none is transferred.  Above 120\%, curing is constant but live moisture damping continues to change, so ROS need not form a plateau.  The case-local oracle conserves total load, recomputes effective SAV and every dependent Rothermel coefficient, applies moisture damping, and applies ELMFIRE's selected wind limit at the target \SI{6}{mph} midflame wind.
 
+% BEGIN EXPLICIT METRIC DERIVATION
+For dynamic grass fuels, the cured fraction and load transfer are
+\[
+ f_c=\min\!\left(1,\max\!\left[0,\frac{120-M_{lh}}{90}\right]\right),
+ \quad w_{lh}^{*}=(1-f_c)w_{lh},\quad
+ w_{1h}^{*}=w_{1h}+f_cw_{lh}.
+\]
+For the generated GR2 variant at \(M_{lh}=75\) percent,
+\(f_c=(120-75)/90=0.5\).  With original
+\(w_{lh}=0.04591\) and \(w_{1h}=0.00459~\mathrm{lb\,ft^{-2}}\),
+\[
+ w_{lh}^{*}=0.5(0.04591)=0.022955,\qquad
+ w_{1h}^{*}=0.00459+0.5(0.04591)=0.027545.
+\]
+The weighted fuel calculation gives
+\(R_0=1.109830~\mathrm{ft\,min^{-1}}\),
+\(I_R=206.9424~\mathrm{kW\,m^{-2}}\), and
+\(\phi_w=31.095160\); therefore
+\[
+ R_{\mathrm{ref}}=0.3048(1.109830)(1+31.095160)
+ =10.857030~\mathrm{m\,min^{-1}}.
+\]
+Every GR2 and GR3 moisture variant repeats these equations.  Direct
+metrics use the maximum over variants of
+\(e_R=|R_{\max}-R_{\mathrm{ref}}|/
+\max(|R_{\mathrm{ref}}|,10^{-8})\) and the analogous \(e_I\), with limits
+0.02 and 0.01.  The TOA fit \(t=a+bx\) supplies
+\(R_{\mathrm{TOA}}=60/b\) and \(R^2=1-SSE/SST\), tested by
+\(\max e_{\mathrm{TOA}}\leq0.05\) and \(\min R^2\geq0.995\).
+% END EXPLICIT METRIC DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 Maximum relative errors are 0.02 for direct ROS and 0.01 for reaction intensity.  Variants predicted at or above \SI{0.10}{m.min^{-1}} also require TOA-derived ROS error at most 0.05 and minimum $R^2=0.995$; the most moisture-limited variants use direct fields because they cannot cross a multi-cell corridor within the practical duration cap.  Direct effective loads are not exposed by the normal executable, so their conservation is an oracle invariant and the implementation is observed through intensity and ROS.  All 20 variants are required; no qualitative trend alone can pass the case.
 
 \section{Simulation configuration and predicted outcome}
 
-The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every positive oracle ROS, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} are selected so the expected front advances 5\% of one cell per step (CFL 0.05, below the configured 0.2 limit). This keeps the PHI change above ELMFIRE's fixed stall scale even if the implementation produces only a small fraction of the reference speed. A zero-ROS variant retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The analytically selected stop time is rounded upward to a whole second because the current ELMFIRE time loop stores the duration as an integer; this preserves the intended duration and guarantees the terminal output dump. The evaluator always requires uniquely named rasters tied to the one final dump record. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
+The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every positive oracle ROS, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} use the whole-second value obtained by rounding the 5\%-of-cell target downward, with a one-second minimum; every generated value remains below the configured CFL limit of 0.2. The stop time is rounded upward to an exact integer multiple of that step. This avoids a shortened final step that can trigger ELMFIRE's stalled-front branch and corrupt the terminal timestamp. A zero-ROS variant retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The evaluator always requires uniquely named rasters tied to one final dump record. It accepts a stalled-final record only when subtracting the configured meteorology interval reconstructs the requested stop time within one configured timestep. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
 Live-herb moisture is 30, 45, 60, 75, 90, 100, 110, 120, 135, or 200\%.  Dead classes are fixed at 5\%, live woody moisture at 90\%, slope at zero, and target midflame wind at \SI{6}{mph}; the 20-ft input is back-calculated from each fuel's WAF.  Each homogeneous domain uses a finite ignition strip with a planar east face inside the analysis corridor and with lateral ends clear of the grid boundary.  Crown fire, spotting, buildings, and acceleration are excluded.  Strong nonlinear response is expected in the curing interval.
+
+\begin{center}\begin{tabular}{p{0.22\textwidth}p{0.24\textwidth}p{0.12\textwidth}p{0.32\textwidth}}\toprule
+Parameter & Configured value & Units & Role \\
+\midrule Domain/grid & 1400 m square; 10 & m/cell & Planar interior propagation \\
+Dynamic fuels & \FuelSet & code/name & Enables herbaceous load transfer \\
+Live-herb moisture & \LiveHerbSet & percent & Independent curing variable \\
+Wind/slope & fixed wind; 0 slope & --- & Holds directional forcing fixed \\
+Timing & generated whole-second step and exact-multiple stop & s & Terminal-evidence compatibility \\
+\bottomrule\end{tabular}\end{center}
+
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
 
 \section{Actual simulation results}
 The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} variants and reports \textbf{\VerificationStatus}.

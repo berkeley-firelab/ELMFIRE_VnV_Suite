@@ -7,6 +7,7 @@ ELMFIRE_BIN="${ELMFIRE_BIN:-elmfire}"
 
 mkdir -p "$CASE_DIR/logs" "$CASE_DIR/figures" "$CASE_DIR/outputs"
 "$PYTHON_BIN" "$CASE_DIR/scripts/generate_inputs.py"
+"$PYTHON_BIN" "$CASE_DIR/scripts/spatial_evidence.py"
 
 for config_path in "$CASE_DIR"/data/*/inputs/elmfire.data; do
   variant_dir="$(cd "$(dirname "$config_path")/.." && pwd)"

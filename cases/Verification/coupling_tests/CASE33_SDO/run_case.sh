@@ -6,6 +6,7 @@ ELMFIRE_BIN="${ELMFIRE_BIN:-elmfire}"
 mkdir -p "$CASE_DIR/logs/matplotlib" "$CASE_DIR/outputs" "$CASE_DIR/figures"
 export MPLCONFIGDIR="$CASE_DIR/logs/matplotlib"
 "$PYTHON_BIN" "$CASE_DIR/scripts/preprocess.py"
+"$PYTHON_BIN" "$CASE_DIR/scripts/spatial_evidence.py"
 for variant in flat slope_30; do
   echo "[INFO] CASE33_SDO: $variant"
   (cd "$CASE_DIR" && "$ELMFIRE_BIN" "variants/$variant/elmfire.data") \

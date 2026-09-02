@@ -10,6 +10,30 @@ ELMFIRE combines the no-wind spread rate with a slope factor before supplying a 
 
 The flat control has equal forcing in all azimuths and therefore equal horizontal and vertical extents. The \SlopeAngle{} variant changes only slope and aspect; it must differ from the control and its final footprint must be elongated. These are metamorphic consequences of the governing coupling and do not require duplication of ELMFIRE's internal slope formula.
 
+% BEGIN EXPLICIT METRIC DERIVATION
+For each finite arrival-time mask, the pixel extents are
+\(W=c_{\max}-c_{\min}+1\) and \(H=r_{\max}-r_{\min}+1\).
+The flat-control anisotropy is
+\[
+ A_f=\frac{|W_f-H_f|}{\max(W_f,H_f)},
+\]
+whose isotropic reference is zero and whose substituted test is
+\(A_f\leq0.05\).  For the generated uniform 30-degree slope, the
+directional-shape metric is
+\[
+ L_s=\frac{\max(W_s,H_s)}{\min(W_s,H_s)}\geq1.10.
+\]
+The independent forcing-response metric uses the common finite mask
+\(V\):
+\[
+ E_s=\frac{|V|^{-1}\sum_{i\in V}|T_{s,i}-T_{f,i}|}
+ {\max[P_{90}(T_{s,i}:i\in V),1~\mathrm{s}]}\geq0.05.
+\]
+Thus the three reference statements are, respectively, zero flat
+anisotropy, at least 10 percent slope elongation, and at least 5 percent
+normalized difference from the flat run.
+% END EXPLICIT METRIC DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 
 Flat-control extent anisotropy must not exceed 0.05. The slope footprint's major/minor extent ratio must be at least 1.10. Normalized mean absolute arrival-time difference between slope and flat variants must be at least 0.05. The first metric detects grid bias, while the latter two show that slope is both active and directional.
@@ -17,6 +41,26 @@ Flat-control extent anisotropy must not exceed 0.05. The slope footprint's major
 \section{Simulation configuration and predicted outcome}
 
 Both variants use a 2000 m square domain at \CellSize{}, Fuel Model 10, 3/5/6 percent dead-fuel moisture, zero wind, and a central point ignition. The slope variant uses 30 degrees and aspect 270 degrees; the control uses zero slope. The slope result is predicted to be anisotropic and measurably different from the circular control.
+
+\begin{center}\begin{tabular}{p{0.22\textwidth}p{0.22\textwidth}p{0.12\textwidth}p{0.34\textwidth}}\toprule
+Parameter & Configured value & Units & Role \\
+\midrule Domain/grid & 2000 m square; 5 & m/cell & Resolves directional footprint \\
+Fuel/moisture & FM10; 3/5/6 & --- / percent & Fixed surface response \\
+Time control & step 1, maximum 5; stop 7200 & s & Common exact comparison time \\
+Control & slope 0; wind 0 & degrees / mph & Rotational baseline \\
+Test & slope 30; aspect 270 & degrees & Activates directional slope coupling \\
+\bottomrule\end{tabular}\end{center}
+
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
 
 \section{Actual simulation results}
 

@@ -39,7 +39,7 @@ Derive the expectation for the configured experiment, not just the general model
 
 Show enough intermediate reasoning that the expected value, profile, ordering, trend, or state can be reproduced. Identify approximations and distinguish exact expectations from numerical estimates. If the reference depends on run-derived quantities, explain how those quantities enter the reference without making the simulation output its own circular standard.
 
-Do not rely on unexplained phrases such as “the thesis value,” “Equation 3.11,” or “the expected curve.” Restate and derive the material needed by this case, then cite the external source for provenance.
+Do not rely on unexplained phrases such as “the thesis value,” “Equation 3.11,” or “the expected curve.” Restate and derive the material needed by this case, then cite the external source for provenance. When a supplied guide or publication contains the originating case, preserve scientifically relevant discussion, equations, and visualization intent where they remain correct, but allocate them to the required sections rather than copying the source chronology. Clearly label historical reference expectations and figures, current generated configuration, and current ELMFIRE results as distinct evidence classes. Generated inputs control configuration claims; explain any conflict with the reference explicitly.
 
 ## 4. Verification metrics and acceptance criteria
 
@@ -65,13 +65,13 @@ State the complete Boolean rule for the overall decision. A metric must not be c
 
 ## 5. Simulation configuration and predicted outcome
 
-Document enough information to reproduce the experiment: domain and coordinate system, physical and buffer cells, grid resolution, timestep, initialization or ignition, fuels, terrain, moisture, weather, relevant model selectors, coupled or disabled processes, variants, duration, and output cadence.
+Document enough information to reproduce the experiment: domain and coordinate system, physical and buffer cells, grid resolution, timestep, initialization or ignition, fuels, terrain, moisture, weather, relevant model selectors, coupled or disabled processes, variants, duration, and output cadence. When terminal evidence is required, state how `SIMULATION_DT`, `SIMULATION_DTMAX`, and `SIMULATION_TSTOP` were aligned and identify any justified exception.
 
-Use a table with columns for parameter, configured value, units, and role in isolating the behavior. Include a whole-domain configuration figure when nonuniform or localized fields control the test. Before showing actual output, state the predicted qualitative appearance and quantitative values of every result that will be used in the decision.
+Use a table with columns for parameter, configured value, units, and role in isolating the behavior. Every spatial case must include at least one whole-domain prepared-input figure before any actual-result figure, even when the inputs are uniform. Generate it mechanically from the current case-local preprocessing artifacts and show the initial PHI or ignition geometry together with a scientifically controlling fuel, terrain, moisture, weather, canopy, structure, or other field. For sweeps, identify the representative generated variant or visualize the varying input. Put coordinates, physical units or categories, variant identity, and source artifact in the figure or caption. A schematic, hand-redrawn field, reference image, or expected solution cannot substitute for this input evidence. Before showing actual output, state the predicted qualitative appearance and quantitative values of every result that will be used in the decision.
 
 ## 6. Actual simulation results
 
-Present only results read from actual case-local artifacts. Record the executable or source revision when available, selected output files, completed and required variants, and incomplete or failed runs.
+Present only results read from actual case-local artifacts. Record the executable or source revision when available, selected output files, completed and required variants, and incomplete or failed runs. If a stalled-final compatibility path selected terminal evidence, report the meteorology-interval reconstruction test, reconstructed pre-jump time, whether the stall was near-stop or independently expected no-propagation, and the uniquely selected artifacts; do not present the overrun timestamp as the nominal stop time.
 
 For a completed spatial case, include at least one representative whole-domain result before or beside derived profiles, convergence curves, tables, or scalar summaries. Every figure must identify the data source, reference where applicable, physical units, variant, output time or ensemble statistic, and acceptance limits. Do not manufacture results, substitute a synthetic curve for missing output, or show only a cropped region when domain behavior matters.
 

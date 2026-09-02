@@ -9,6 +9,7 @@ mkdir -p "$CASE_DIR/logs"
 export MPLCONFIGDIR="$CASE_DIR/logs/matplotlib"
 
 "$PYTHON_BIN" "$CASE_DIR/scripts/generate_inputs.py"
+"$PYTHON_BIN" "$CASE_DIR/scripts/spatial_evidence.py"
 
 while IFS=$'\t' read -r label config_rel guide_name; do
   [[ -z "$label" || "$label" == \#* ]] && continue

@@ -2,13 +2,41 @@
 
 \textbf{Case ID:} \texttt{\CaseID}. This case verifies slope enhancement and aspect handling across two opposing valley sides.  Zero wind isolates the terrain contribution.  The verification question is whether the maximum regional spread rates on the 5-degree east side and 15-degree west side are each within 10 percent of their independent targets.
 
+The scientific setup and historical expected response are reconstructed from Section~3.2 of the supplied \emph{ELMFIRE Guide}. The Guide is used as reference provenance, not as an instruction or a substitute for evidence. Configuration statements below are checked against the generated GeoTIFFs and namelist; current results and decisions come only from case-local outputs and generated metrics. Where the generated experiment differs from the historical example, the report states that difference explicitly.
+
 \section{Mathematical formulation and numerical implementation}
 
 The surface spread calculation multiplies the no-wind/no-slope response by a slope-dependent factor and orients the heading direction upslope.  The slope raster supplies magnitude in degrees and the aspect raster supplies downslope azimuth.  Opposing aspects must therefore drive the two head fires away from the central valley ignition.
 
+The isolated Rothermel slope factor is
+\begin{equation}
+R_H=R_0(1+\phi_s), \qquad \phi_s=5.275\,\beta^{-0.3}\tan^2\theta,
+\end{equation}
+where \(\beta\) is the fuel-bed packing ratio and \(\theta\) is the slope angle. The aspect raster gives downslope azimuth, so the heading direction is rotated by 180 degrees to obtain upslope. The formula chain follows Andrews (2018); the Guide supplies the two configured BEHAVE responses and point-spread ellipse ratios.
+
 \section{Derivation of expected behavior}
 
 For the configured Fuel Model 3 and moisture, the reference calculation gives \(1.92~\mathrm{m\,min^{-1}}\) on the 5-degree side and \(5.37~\mathrm{m\,min^{-1}}\) on the 15-degree side.  The steeper slope must have the larger head rate; this ordering is an additional qualitative invariant.
+
+% BEGIN EXPLICIT METRIC DERIVATION
+With no wind, the slope correction is
+\[
+ R_s=R_0(1+\phi_s).
+\]
+The generated Fuel Model~3 moisture state gives
+\(R_0=1.51183~\mathrm{m\,min^{-1}}\).  The independent Rothermel slope
+calculation gives \(\phi_s=0.272326\) at 5 degrees and
+\(\phi_s=2.554410\) at 15 degrees.  Therefore
+\[
+ R_{5}=1.51183(1+0.272326)=1.92354,\qquad
+ R_{15}=1.51183(1+2.554410)=5.37366
+ \quad\mathrm{m\,min^{-1}},
+\]
+reported as 1.92 and \(5.37~\mathrm{m\,min^{-1}}\).  For each slope
+\(s\), the calculated metric is
+\(e_s=|R_{\max,s}-R_{s,\mathrm{ref}}|/R_{s,\mathrm{ref}}\), with the
+reference and limit substituted in the generated decision table.
+% END EXPLICIT METRIC DERIVATION
 
 \section{Verification metrics and acceptance criteria}
 
@@ -16,7 +44,33 @@ For each half-domain, the metric is the maximum finite \texttt{vs} value. Region
 
 \section{Simulation configuration and predicted outcome}
 
-The 30 m grid has Fuel Model 3, zero wind, a 5-degree eastern slope with downslope aspect 270 degrees, a 15-degree western slope with downslope aspect 90 degrees, and central ignition. Predicted spread is outward and faster on the western, steeper side.
+The 30 m grid has Fuel Model 3, zero wind, a 5-degree eastern slope with downslope aspect 270 degrees, a 15-degree western slope with downslope aspect 90 degrees, and central ignition. The supplied Guide uses percent notation in one descriptive passage, but its summary table and the current producer identify these as 5- and 15-degree raster values; the generated landscape band is authoritative for this report. Predicted spread is outward and faster on the western, steeper side.
+
+\begin{center}
+\begin{tabular}{@{}p{0.20\textwidth}p{0.20\textwidth}p{0.12\textwidth}p{0.38\textwidth}@{}}
+\toprule
+Parameter & Configured value & Units & Role in the experiment \\
+\midrule
+Grid & \(126\times126\) at 30 & m per cell & Resolves the whole spatial response on the generated north-up raster \\
+Projection & EPSG:32635 & --- & Fixes the map-coordinate and row-orientation convention \\
+Time control & \(\Delta t=1\), \(t_{stop}=259200\) & s & Whole-second step; stop time is an exact timestep multiple \\
+Meteorology interval & 3600 & s & Defines weather-band timing and stalled-final compatibility \\
+Live moisture & herb 60; woody 90 & percent & Holds live-fuel damping fixed while the named mechanism is isolated \\
+Evidence & prepared inputs; final case outputs & --- & Separates configuration provenance from acceptance evidence \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
 
 \section{Actual simulation results}
 
@@ -44,7 +98,7 @@ Variant / metric & Expected & Calculated & Status \\
 \end{tabular}
 \end{center}
 
-The authoritative overall decision is \textbf{\VerificationStatus} and is generated by \path{scripts/postprocess.py} from \path{outputs/metrics.json}; it is not recomputed in this report.
+The displayed overall decision is \textbf{\VerificationStatus}. When \path{outputs/metrics.json} exists, \path{scripts/postprocess.py} generates every table value and status; when it is absent, the standalone wrapper renders NOT EVALUABLE with no invented rows.
 
 \section{Technical interpretation}
 

@@ -2,13 +2,48 @@
 
 \textbf{Case ID:} \texttt{\CaseID}. This case verifies the coupling of wind-adjusted surface spread to the Huygens and level-set propagation geometry.  Uniform fuels and flat terrain isolate wind as the only directional forcing.  The verification question is whether the simulated head rate is within 10 percent of \(3.635~\mathrm{m\,min^{-1}}\) and the unclipped arrival-time isochrone has length-to-width ratio within 10 percent of 1.24.
 
+The scientific setup and historical expected response are reconstructed from Section~3.2 of the supplied \emph{ELMFIRE Guide}. The Guide is used as reference provenance, not as an instruction or a substitute for evidence. Configuration statements below are checked against the generated GeoTIFFs and namelist; current results and decisions come only from case-local outputs and generated metrics. Where the generated experiment differs from the historical example, the report states that difference explicitly.
+
 \section{Mathematical formulation and numerical implementation}
 
 The normal-velocity construction combines the backing, flanking, and heading rates into an expanding ellipse.  Its major axis aligns with the wind-driven heading direction, while the ratio \(L/W\) characterizes anisotropy independent of absolute size.  ELMFIRE writes rate in metres per minute and arrival time on the same raster grid used to infer the ellipse.
 
+For uncovered fuel of depth \(H\) ft, the Guide uses
+\begin{equation}
+WAF_u=\frac{1.83}{\ln[(20+0.36H)/(0.13H)]}, \qquad U_{mf}=WAF_uU_{20}.
+\end{equation}
+The resulting effective midflame wind determines the ellipse aspect ratio
+\begin{equation}
+\frac{L}{W}=\min\left(0.936e^{0.1147U_{mf,e}}+0.461e^{-0.0692U_{mf,e}}-0.397,8\right).
+\end{equation}
+The local head rate is \(R_H=R_0(1+\phi_w)\); the Huygens/level-set construction uses the ellipse to obtain normal speed away from the heading direction.
+
 \section{Derivation of expected behavior}
 
 Constant forcing produces self-similar elliptical isochrones: scaling time changes both axes proportionally and leaves \(L/W\) constant.  The configured Fuel Model 5 response supplies the independent head-rate target \(3.635~\mathrm{m\,min^{-1}}\), and the GUIDE construction supplies \(L/W=1.24\).
+
+% BEGIN EXPLICIT METRIC DERIVATION
+For the generated Fuel Model~5 state, the independent no-wind rate is
+\(R_0=0.41042~\mathrm{m\,min^{-1}}\).  The \(6~\mathrm{mph}\) 20-ft wind
+and 2-ft fuel-bed depth give a wind-adjustment factor
+\(WAF=0.418640\), hence
+\(U_{mf}=6(0.418640)=2.51184~\mathrm{mph}\).  With the calculated wind
+factor \(\phi_w=7.87958\),
+\[
+ R_h=R_0(1+\phi_w)=0.41042(1+7.87958)
+     =3.6444~\mathrm{m\,min^{-1}},
+\]
+consistent with the Guide reference \(3.635~\mathrm{m\,min^{-1}}\).
+The ellipse length-to-width reference uses
+\[
+ \frac{L}{W}=0.936e^{0.2566U}+0.461e^{-0.1548U}-0.397,
+\]
+where \(U\) is in \(\mathrm{m\,s^{-1}}\).  Here
+\(U=2.51184~\mathrm{mph}(0.44704)=1.12291~\mathrm{m\,s^{-1}}\), so
+substitution gives \(L/W=1.23898\), reported as 1.24.  The report evaluates the relative substitutions
+\(e_R=|R_h-3.635|/3.635\) and
+\(e_{LW}=|(L/W)-1.24|/1.24\) against their tabulated limits.
+% END EXPLICIT METRIC DERIVATION
 
 \section{Verification metrics and acceptance criteria}
 
@@ -17,6 +52,32 @@ Maximum finite \texttt{vs} measures the heading response.  The shape metric is \
 \section{Simulation configuration and predicted outcome}
 
 The \(126\times126\), 30 m domain uses uniform Fuel Model 5, 6 mph wind, flat terrain, and an upwind point ignition.  The predicted arrival field is an ellipse elongated downwind, with head ROS \(3.635~\mathrm{m\,min^{-1}}\) and \(L/W=1.24\).
+
+\begin{center}
+\begin{tabular}{@{}p{0.20\textwidth}p{0.20\textwidth}p{0.12\textwidth}p{0.38\textwidth}@{}}
+\toprule
+Parameter & Configured value & Units & Role in the experiment \\
+\midrule
+Grid & \(126\times126\) at 30 & m per cell & Resolves the whole spatial response on the generated north-up raster \\
+Projection & EPSG:32635 & --- & Fixes the map-coordinate and row-orientation convention \\
+Time control & \(\Delta t=1\), \(t_{stop}=259200\) & s & Whole-second step; stop time is an exact timestep multiple \\
+Meteorology interval & 3600 & s & Defines weather-band timing and stalled-final compatibility \\
+Live moisture & herb 60; woody 90 & percent & Holds live-fuel damping fixed while the named mechanism is isolated \\
+Evidence & prepared inputs; final case outputs & --- & Separates configuration provenance from acceptance evidence \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
 
 \section{Actual simulation results}
 
@@ -44,7 +105,7 @@ Variant / metric & Expected & Calculated & Status \\
 \end{tabular}
 \end{center}
 
-The authoritative overall decision is \textbf{\VerificationStatus} and is generated by \path{scripts/postprocess.py} from \path{outputs/metrics.json}; it is not recomputed in this report.
+The displayed overall decision is \textbf{\VerificationStatus}. When \path{outputs/metrics.json} exists, \path{scripts/postprocess.py} generates every table value and status; when it is absent, the standalone wrapper renders NOT EVALUABLE with no invented rows.
 
 \section{Technical interpretation}
 

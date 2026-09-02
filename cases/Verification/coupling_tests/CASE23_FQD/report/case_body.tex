@@ -2,13 +2,43 @@
 
 \textbf{Case ID:} \texttt{\CaseID}. This case verifies raster lookup and fire-behavior coupling when a propagating front crosses four fuel-model regions.  Flat terrain and zero wind isolate fuel identity.  The verification question is whether every quadrant's maximum spread rate is within 10 percent of its fuel-specific reference.
 
+The scientific setup and historical expected response are reconstructed from Section~3.2 of the supplied \emph{ELMFIRE Guide}. The Guide is used as reference provenance, not as an instruction or a substitute for evidence. Configuration statements below are checked against the generated GeoTIFFs and namelist; current results and decisions come only from case-local outputs and generated metrics. Where the generated experiment differs from the historical example, the report states that difference explicitly.
+
 \section{Mathematical formulation and numerical implementation}
 
 The level-set normal speed is evaluated from the fuel model at each active cell.  Because the environmental forcing is uniform, changes in \(V_n\) across the domain should follow only changes in the \texttt{fbfm} raster.  Correct row orientation and quadrant masking are therefore part of the test.
 
+At each active cell the fuel code selects a complete Rothermel parameter row, and the local no-wind/no-slope rate is
+\begin{equation}
+R_0(x,y)=\frac{I_R(x,y)\,\xi(x,y)}{\rho_b(x,y)\,\epsilon(x,y)\,Q_{ig}(x,y)}.
+\end{equation}
+Thus the raster lookup changes the full nonlinear fuel response, not a post-hoc scalar multiplier. The formulation follows Andrews (2018); the Guide supplies the four BEHAVE reference values.
+
 \section{Derivation of expected behavior}
 
-The independent regional targets are \(0.080\), \(0.472\), \(1.492\), and \(0.871~\mathrm{m\,min^{-1}}\) for Fuel Models 8, 7, 4, and 2 in the northwest, northeast, southwest, and southeast quadrants, respectively.  These values also predict a visibly noncircular front after it enters all four regions.
+The independent regional targets are \(0.080\), \(0.472\), \(1.492\), and \(0.871~\mathrm{m\,min^{-1}}\) for Fuel Models 8, 7, 4, and 2 in the northwest, northeast, southwest, and southeast quadrants, respectively.  These values also predict a visibly noncircular front after it enters all four regions. The Guide historically reported ELMFIRE rates of 0.080, 0.551, 1.974, and 0.872 m/min for FB8, FB7, FB4, and FB2, noting discrepancies for FB7 and FB4. Those historical outputs are preserved here as context only; the generated metric table below is the current evidence and is never replaced by those values.
+
+% BEGIN EXPLICIT METRIC DERIVATION
+All four references use the no-wind/no-slope Rothermel equation
+\(R_0=I_R\xi/(\rho_b\epsilon Q_{ig})\) with
+\(Q_{ig}=250+1116M_f\) and the generated moisture vector
+\((0.06,0.07,0.08,0.60,0.90)\).  Substitution of each generated standard
+fuel model gives
+\[
+\begin{array}{c|cc}
+\text{fuel model}&I_R~(\mathrm{kW\,m^{-2}})&R_0~(\mathrm{m\,min^{-1}})\\
+\hline
+8&175.566&0.079552\\
+7&406.479&0.470579\\
+4&2272.300&1.493256\\
+2&669.483&0.871756
+\end{array}
+\]
+and hence the report references \(0.080,\ 0.472,\ 1.492,\) and
+\(0.871~\mathrm{m\,min^{-1}}\), respectively.  For each fuel model,
+\(e_R=|R_{\max}-R_{\mathrm{ref}}|/R_{\mathrm{ref}}\); the table substitutes
+the corresponding row above and the prescribed relative-error limit.
+% END EXPLICIT METRIC DERIVATION
 
 \section{Verification metrics and acceptance criteria}
 
@@ -17,6 +47,32 @@ The maximum finite \texttt{vs} in each quadrant is compared with its correspondi
 \section{Simulation configuration and predicted outcome}
 
 Four equal quadrants on a \(126\times126\), 30 m grid contain Fuel Models 8, 7, 4, and 2. Terrain is flat, wind is zero, moisture is uniform, and ignition is central. The fastest extension is predicted in Fuel Model 4 and the slowest in Fuel Model 8.
+
+\begin{center}
+\begin{tabular}{@{}p{0.20\textwidth}p{0.20\textwidth}p{0.12\textwidth}p{0.38\textwidth}@{}}
+\toprule
+Parameter & Configured value & Units & Role in the experiment \\
+\midrule
+Grid & \(126\times126\) at 30 & m per cell & Resolves the whole spatial response on the generated north-up raster \\
+Projection & EPSG:32635 & --- & Fixes the map-coordinate and row-orientation convention \\
+Time control & \(\Delta t=1\), \(t_{stop}=259200\) & s & Whole-second step; stop time is an exact timestep multiple \\
+Meteorology interval & 3600 & s & Defines weather-band timing and stalled-final compatibility \\
+Live moisture & herb 60; woody 90 & percent & Holds live-fuel damping fixed while the named mechanism is isolated \\
+Evidence & prepared inputs; final case outputs & --- & Separates configuration provenance from acceptance evidence \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
 
 \section{Actual simulation results}
 
@@ -44,7 +100,7 @@ Variant / metric & Expected & Calculated & Status \\
 \end{tabular}
 \end{center}
 
-The authoritative overall decision is \textbf{\VerificationStatus} and is generated by \path{scripts/postprocess.py} from \path{outputs/metrics.json}; it is not recomputed in this report.
+The displayed overall decision is \textbf{\VerificationStatus}. When \path{outputs/metrics.json} exists, \path{scripts/postprocess.py} generates every table value and status; when it is absent, the standalone wrapper renders NOT EVALUABLE with no invented rows.
 
 \section{Technical interpretation}
 

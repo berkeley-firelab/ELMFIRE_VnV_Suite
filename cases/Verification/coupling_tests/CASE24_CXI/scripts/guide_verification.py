@@ -31,12 +31,16 @@ Usage:
 """
 
 import argparse
+import math
 import os
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Callable, Optional
+
+from rothermel_reference import calculate, read_fuel_models, wind_adjustment_factor
 
 import numpy as np
 
@@ -223,6 +227,29 @@ def L(**overrides):
 # ---------------------------------------------------------------------------
 # The verification cases (targets from guide Chapter 3)
 # ---------------------------------------------------------------------------
+def complex_interaction_target():
+    """Derive the domain-maximum head ROS from the dominant SW condition."""
+    fuel_path = os.path.normpath(
+        os.path.join(HERE, "..", "data", "inputs", "fuel_models.csv")
+    )
+    fuel = read_fuel_models(Path(fuel_path))[4]
+    waf = wind_adjustment_factor(0.0, 0.0, fuel.depth_ft)
+    base = calculate(
+        fuel, m1=0.06, m10=0.07, m100=0.08, mlh=0.60, mlw=0.90
+    )
+    slope = calculate(
+        fuel, m1=0.06, m10=0.07, m100=0.08, mlh=0.60, mlw=0.90,
+        slope_degrees=15.0,
+    )
+    wind = calculate(
+        fuel, m1=0.06, m10=0.07, m100=0.08, mlh=0.60, mlw=0.90,
+        midflame_wind_ft_min=5.0 * waf * 5280.0 / 60.0,
+    )
+    vector_factor = math.hypot(slope["slope_factor"], wind["wind_factor"])
+    head_ros = base["ros0_ft_min"] * (1.0 + vector_factor) * 0.3048
+    return Target("head ROS", head_ros, "m/min")
+
+
 CASES = [
     Case(
         name="Point",
@@ -330,10 +357,12 @@ CASES = [
         layers=L(fbfm={"NW": 8, "NE": 7, "SW": 4, "SE": 2},
                  ws=5.0, m1=6.0, m10=7.0, m100=8.0,
                  slp={"E": 5, "W": 15}, asp={"E": 270, "W": 90}),
-        targets=[],
-        metric="qualitative_ros",
-        quantitative=False,
-        notes="No analytical solution; reported for qualitative review only.",
+        targets=[complex_interaction_target()],
+        metric="max_ros",
+        quantitative=True,
+        notes=("Domain-maximum head spread is derived independently "
+               "from the tracked fuel table. For the dominant southwest region, the southward wind vector is "
+               "orthogonal to each east/west upslope vector."),
     ),
     Case(
         name="Firebrands",

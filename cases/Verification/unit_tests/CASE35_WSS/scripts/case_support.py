@@ -189,6 +189,16 @@ def make_planar_variant(
     write_raster(inputs / "fbfm40.tif", fuel_model, "int16")
 
     timestep_s, timestep_max_s = timestep_for_ros(expected_ros_m_min)
+    if expected_ros_m_min > ZERO_ROS_EPS:
+        # ELMFIRE replaces DT with DT_METEOROLOGY when it detects a stalled
+        # front. A shortened fractional final step can trigger that branch and
+        # corrupt the terminal timestamp. Use a conservative whole-second step
+        # and make TSTOP its exact integer multiple.
+        timestep_s = max(1.0, float(math.floor(timestep_s)))
+        timestep_max_s = timestep_s
+        tstop_seconds = timestep_s * math.ceil(tstop_seconds / timestep_s)
+    else:
+        tstop_seconds = float(math.ceil(tstop_seconds))
     replacements = {
         "FUELS_AND_TOPOGRAPHY_DIRECTORY": f"'./variants/{variant_id}/inputs'",
         "WEATHER_DIRECTORY": f"'./variants/{variant_id}/inputs'",
@@ -199,9 +209,7 @@ def make_planar_variant(
         "LW_MOISTURE_CONTENT": live_woody_percent,
         "SIMULATION_DT": round(timestep_s, 6),
         "SIMULATION_DTMAX": round(timestep_max_s, 6),
-        # The current ELMFIRE time loop stores TSTOP in an integer duration.
-        # Round upward so the loop reaches the requested terminal output dump.
-        "SIMULATION_TSTOP": float(math.ceil(tstop_seconds)),
+        "SIMULATION_TSTOP": float(tstop_seconds),
     }
     config = base_namelist
     for key, value in replacements.items():

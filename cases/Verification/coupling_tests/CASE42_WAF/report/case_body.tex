@@ -7,13 +7,66 @@ ELMFIRE calculates $U_{mf}=WAF\,U_{20}$.  Without canopy it uses a logarithmic f
 \section{Derivation of expected behavior}
 For fixed \WindTwenty{} and fuel model 2, reaction intensity is invariant because canopy affects wind adjustment but not the configured surface fuel or moisture.  ROS differences are completely predicted by the independently calculated WAF and Rothermel wind factor.  The zero-canopy variant selects the unsheltered formula; canopy combinations exercise transition and sheltered branches.
 
+% BEGIN EXPLICIT METRIC DERIVATION
+The unsheltered adjustment for fuel-bed depth \(d\) (ft) is
+\[
+ WAF_u=\frac{1.36}{\ln[(20+0.36d)/(0.13d)]}
+       \left[\ln(1.36/0.13)-1\right].
+\]
+For canopy cover \(C\), height \(H\) (ft), and \(s=0.3333C\), the
+sheltered value is
+\[
+ WAF_s=\frac{1}{\ln[(20+0.36H)/(0.13H)]}
+       \frac{0.555}{\sqrt{sH}}.
+\]
+The generated blend uses \(WAF=\min(WAF_s,WAF_u)\) when \(s\geq0.05\);
+otherwise \(f_u=1-20s\) and
+\(WAF=f_uWAF_u+(1-f_u)\min(WAF_s,WAF_u)\).
+For the zero-canopy Fuel Model~2 control, \(WAF_u=0.362674\), so the
+\(10~\mathrm{mph}\) 20-ft wind gives \(U_{mf}=3.626740~\mathrm{mph}\),
+\(\phi_w=8.146356\), and
+\(R=0.8237955(1+8.146356)=7.534727~\mathrm{m\,min^{-1}}\).
+For \(C=0.10\), \(H=15/0.3048=49.2126~\mathrm{ft}\),
+\(s=0.03333\), \(WAF_s=0.244254\), and \(f_u=0.3334\); hence
+\(WAF=0.3334(0.362674)+0.6666(0.244254)=0.283735\),
+\(U_{mf}=2.837354~\mathrm{mph}\), \(\phi_w=5.197957\), and
+\(R=0.8237955(1+5.197957)=5.105849~\mathrm{m\,min^{-1}}\).
+All variants retain \(I_R=675.184~\mathrm{kW\,m^{-2}}\).
+Variant relative errors use
+\(|q_{\max}-q_{\mathrm{ref}}|/\max(|q_{\mathrm{ref}}|,10^{-8})\).
+From \(t=a+bx\), \(R_{\mathrm{TOA}}=60/b\) and
+\(R^2=1-SSE/SST\).  The aggregate substitutions are
+\(\max e_R\leq0.03\), \(\max e_I\leq0.01\),
+\(\max e_{\mathrm{TOA}}\leq0.06\), and \(\min R^2\geq0.995\).
+% END EXPLICIT METRIC DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 Maximum direct-ROS relative error is 0.03, reaction-intensity error is 0.01, and TOA-derived ROS error is 0.06; TOA regression requires $R^2\ge0.995$.  Constant reaction intensity is retained as a control that detects unintended crown or canopy-fuel coupling.  All ten variants are required and missing fields give NOT EVALUABLE.
 
 \section{Simulation configuration and predicted outcome}
 
-The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every variant, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} are fixed at 5 s unless the configured 0.2 CFL limit requires a smaller value. Across this sweep the resulting oracle CFL spans 0.011--0.063; this avoids a discrete-front resonance observed when every variant was tuned to the same fractional-cell advance and remains well above ELMFIRE's 0.001 normalized-PHI stall threshold. A zero-ROS variant also uses the 5 s step and is evaluated from direct fields without requiring TOA propagation. The evaluator always requires uniquely named rasters tied to the one final dump record. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
+The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every variant, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} use a conservative whole-second value no greater than the 5 s nominal step or the configured 0.2 CFL limit. The stop time is rounded upward to an exact integer multiple of that step. This avoids both discrete-front resonance and a shortened final step that can trigger ELMFIRE's stalled-front timestamp defect. A zero-ROS variant retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The evaluator requires uniquely named rasters tied to one final dump record and accepts a stalled-final record only when subtracting the configured meteorology interval reconstructs the requested stop time within one configured timestep. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
 Canopy cover is 0, 10, 30, or 60\%; canopy heights are 5, 15, and \SI{30}{m} where applicable.  The raster stores cover in percent and height times ten, matching explicit namelist flags.  Fuel model 2, dead moisture 5/7/9\%, live moisture 90\%, and zero slope are fixed.  A finite west-to-east ignition strip has a planar east face in the interior analysis corridor and ends inside the lateral boundaries.  Crown fire is disabled even though canopy inputs are present.  ROS should vary only through WAF while $I_R$ remains fixed.
+
+\begin{center}\begin{tabular}{p{0.22\textwidth}p{0.24\textwidth}p{0.12\textwidth}p{0.32\textwidth}}\toprule
+Parameter & Configured value & Units & Role \\
+\midrule Domain/grid & 1400 m square; 10 & m/cell & Planar interior propagation \\
+Fuel / 20-ft wind & FM2 / \WindTwenty & code / mph & Fixed surface forcing \\
+Canopy cover & 0, 10, 30, 60 & percent & WAF branch and blend sweep \\
+Canopy height & 0, 5, 15, 30 & m & Sheltered-profile sweep \\
+Timing & generated whole-second step and exact-multiple stop & s & Terminal-evidence compatibility \\
+\bottomrule\end{tabular}\end{center}
+
+Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{../figures/input_configuration.pdf}{%
+    \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
+  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
+  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  \label{fig:input-configuration}
+\end{figure}
 
 \section{Actual simulation results}
 The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} variants and reports \textbf{\VerificationStatus}.

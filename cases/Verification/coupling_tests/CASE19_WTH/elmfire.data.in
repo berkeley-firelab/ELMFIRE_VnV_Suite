@@ -8,7 +8,7 @@ CH_FILENAME                    = 'ch'
 DEM_FILENAME                   = 'dem'
 FBFM_FILENAME                  = 'new_fbfm40'
 SLP_FILENAME                   = 'slp'
-ADJ_FILENAME                   = 'adj'
+ADJ_FILENAME                   = 'isolated_adj'
 PHI_FILENAME                   = 'new_phi'
 DT_METEOROLOGY                 = 3600.0
 WEATHER_DIRECTORY              = './data/inputs'
@@ -47,8 +47,8 @@ DUMP_TOTAL_RAD_RECEIVED = .TRUE.
 /
 
 &TIME_CONTROL
-SIMULATION_DT=0.745712155108128
-SIMULATION_DTMAX=15
+SIMULATION_DT=1.0
+SIMULATION_DTMAX=10.0
 TARGET_CFL   = 0.45
 SIMULATION_TSTOP = 5000.0
 /
@@ -63,9 +63,9 @@ WIND_DIRECTION_FLUCTUATION_INTENSITY = 0
 WIND_SPEED_FLUCTUATION_INTENSITY     = 0
 RANDOMIZE_RANDOM_SEED                = .FALSE.
 NUM_IGNITIONS = 1
-X_IGN(1)=200
-Y_IGN(1)=200
-T_IGN(1)=0.0
+X_IGN(1)=210.0
+Y_IGN(1)=190.0
+T_IGN(1)=5001.0
 /
 
 &WUI
@@ -77,6 +77,7 @@ BLDG_FUEL_MODEL_CONSTANT              = 14
 BLDG_SPREAD_MODEL_TYPE                = 2
 USE_BLDG_SPREAD_MODEL                 = .TRUE.
 USE_CONSTANT_BLDG_SPREAD_MODEL_PARAMS = .TRUE.
+HRR_ELLIPSE_ADJ                       = 0.5
 /
 
 &MISCELLANEOUS

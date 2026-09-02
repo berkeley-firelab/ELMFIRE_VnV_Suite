@@ -14,7 +14,7 @@ CRS = "EPSG:32610"
 NODATA = -9999.0
 DOMAIN_SIZE_M = 256.0
 RESOLUTIONS = [128, 256, 512, 1024]
-IGNITION_RADIUS_M = 5.0
+IGNITION_RADIUS_M = 20.0
 SPREAD_ADJUSTMENT = 1.0
 
 FLOAT_FIELDS = {
@@ -63,7 +63,11 @@ def write_inputs(inputs_dir: Path, *, resolution: int, domain_size_m: float,
         x = xmin + (np.arange(resolution) + 0.5) * cell_size
         y = ymax - (np.arange(resolution) + 0.5) * cell_size
         xx, yy = np.meshgrid(x, y)
-        phi[np.hypot(xx, yy) <= ignition_radius_m] = -1.0
+        # Initialize the level set as a resolved signed-distance field. A
+        # discontinuous +/-1 mask changes its effective radius with dx and
+        # contaminates the measured convergence order.
+        signed_distance = np.hypot(xx, yy) - ignition_radius_m
+        phi = np.clip(signed_distance / cell_size, -1.0, 1.0).astype(np.float32)
     write_raster(inputs_dir / "phi.tif", phi, transform=transform, dtype="float32")
 
 
@@ -84,6 +88,8 @@ def main() -> None:
 
     for resolution in RESOLUTIONS:
         variant_dir = data_dir / str(resolution)
+        if variant_dir.exists():
+            shutil.rmtree(variant_dir)
         inputs_dir = variant_dir / "inputs"
         (variant_dir / "outputs").mkdir(parents=True, exist_ok=True)
         (variant_dir / "scratch").mkdir(parents=True, exist_ok=True)

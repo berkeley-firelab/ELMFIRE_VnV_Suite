@@ -33,6 +33,20 @@ def _terminal_outputs(
         if len(matches) != 1:
             raise ValueError("SIMULATION_TSTOP is not unique")
         tstop = float(matches[0].replace("D", "E").replace("d", "e"))
+        timestep_matches = re.findall(
+            r"(?mi)^\s*SIMULATION_DT\s*=\s*([0-9.eEdD+-]+)", text
+        )
+        met_step_matches = re.findall(
+            r"(?mi)^\s*DT_METEOROLOGY\s*=\s*([0-9.eEdD+-]+)", text
+        )
+        if len(timestep_matches) != 1 or len(met_step_matches) != 1:
+            raise ValueError("time-control assignments are not unique")
+        timestep = float(
+            timestep_matches[0].replace("D", "E").replace("d", "e")
+        )
+        met_step = float(
+            met_step_matches[0].replace("D", "E").replace("d", "e")
+        )
         manifests = sorted((variant_root / "outputs").glob("dump_times_*.csv"))
         if len(manifests) != 1:
             raise ValueError("dump-times manifest is not unique")
@@ -47,9 +61,17 @@ def _terminal_outputs(
         if len(final_rows) != 1:
             raise ValueError("final dump record is not unique")
         final_time = float(final_rows[0]["time_seconds"])
-        if toa_required and not math.isclose(
+        regular_terminal_dump = math.isclose(
             final_time, tstop, rel_tol=0.0, abs_tol=1.0e-3
-        ):
+        )
+        pre_jump_time = final_time - met_step
+        stalled_terminal_dump = (
+            final_time > tstop
+            and math.isclose(
+                pre_jump_time, tstop, rel_tol=0.0, abs_tol=max(timestep, 1.0e-3)
+            )
+        )
+        if toa_required and not (regular_terminal_dump or stalled_terminal_dump):
             raise ValueError("final dump did not reach SIMULATION_TSTOP")
     except (OSError, KeyError, TypeError, ValueError, csv.Error):
         return None, None, None, ["terminal_dump"]
@@ -65,9 +87,17 @@ def _terminal_outputs(
         )
         return paths[0] if len(paths) == 1 else None
 
-    spread = one(f"vs_*_{stamp:07d}.tif")
-    intensity = one(f"ir_*_{stamp:07d}.tif")
-    toa = one(f"time_of_arrival*_{stamp:07d}.tif")
+    if stalled_terminal_dump:
+        # The stalled-front branch advances T by DT_METEOROLOGY before its
+        # unconditional final dump; I7.7 filenames then contain asterisks.
+        # Accept only one uniquely named raster of each required type.
+        spread = one("vs_*_*.tif")
+        intensity = one("ir_*_*.tif")
+        toa = one("time_of_arrival*_*.tif")
+    else:
+        spread = one(f"vs_*_{stamp:07d}.tif")
+        intensity = one(f"ir_*_{stamp:07d}.tif")
+        toa = one(f"time_of_arrival*_{stamp:07d}.tif")
     unavailable = []
     if spread is None:
         unavailable.append("direct_ros")

@@ -48,9 +48,9 @@ reports: verification-report validation-report
 # Backward-compatible aggregate-report target.
 main: reports
 
-# Remove regenerable case outputs, figures, logs, verification variants,
-# report builds, Slurm files, and ELMFIRE scratch artifacts while preserving
-# source inputs, variant definitions, and report text.
+# Remove simulation rasters, logs, verification variants, Slurm files, LaTeX
+# auxiliaries, and ELMFIRE scratch artifacts. Preserve compiled reports and all
+# report-build inputs, including figures, result JSON, and generated TeX.
 clean:
 	@python3 ./tools/clean_artifacts.py --apply
 

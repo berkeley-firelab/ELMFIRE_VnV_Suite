@@ -17,7 +17,10 @@ from rothermel_reference import calculate, read_fuel_models, wind_adjustment_fac
 CASE_DIR = Path(__file__).resolve().parents[1]
 FUEL_CODE = 2
 SLOPE_PERCENT = 50.0
-SLOPE_DEGREES = math.degrees(math.atan(SLOPE_PERCENT / 100.0))
+# ELMFIRE uses NINT(SLP) to index its slope-factor and surface-projection
+# lookup tables. Generate that effective integer-degree condition explicitly.
+REQUESTED_SLOPE_DEGREES = math.degrees(math.atan(SLOPE_PERCENT / 100.0))
+SLOPE_DEGREES = float(math.floor(REQUESTED_SLOPE_DEGREES + 0.5))
 TARGET_MIDFLAME_MPH = 4.0
 RELATIVE_ANGLES = (0.0, 45.0, 90.0, 135.0, 180.0)
 INITIAL_RADIUS_M = 30.0
@@ -80,6 +83,13 @@ def main() -> None:
         write_raster(inputs / "fbfm40.tif", FUEL_CODE, "int16")
         config = base
         timestep_s, timestep_max_s = timestep_for_ros(head_ros_m_min)
+        # Keep the fixed 1800 s experiment duration while choosing the largest
+        # conservative whole-second step that divides it exactly. This avoids
+        # ELMFIRE.s shortened final-step stalled-front timestamp defect.
+        timestep_s = max(1.0, float(math.floor(timestep_s)))
+        while 1800 % int(timestep_s) != 0:
+            timestep_s -= 1.0
+        timestep_max_s = timestep_s
         replacements = {
             "FUELS_AND_TOPOGRAPHY_DIRECTORY": f"'./variants/{variant_id}/inputs'",
             "WEATHER_DIRECTORY": f"'./variants/{variant_id}/inputs'",
@@ -103,6 +113,9 @@ def main() -> None:
             "reference": {"phi_s": phi_s, "phi_w": phi_w, "phi_magnitude": phi_magnitude}})
     write_expected(CASE_DIR, {"case_id": "CASE40_WSD", "x_label": "wind-to-upslope angle (degrees)",
         "initial_radius_m": INITIAL_RADIUS_M,
+        "requested_slope_percent": SLOPE_PERCENT,
+        "requested_slope_degrees": REQUESTED_SLOPE_DEGREES,
+        "effective_slope_percent": 100.0 * math.tan(math.radians(SLOPE_DEGREES)),
         "slope_degrees": SLOPE_DEGREES,
         "simulation_tstop_s": 1800.0,
         "tolerances": {"direction_degrees": 5.0, "head_ros_relative_error": 0.05,
