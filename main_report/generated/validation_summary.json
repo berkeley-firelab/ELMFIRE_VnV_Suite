@@ -1,0 +1,77 @@
+{
+  "schema_version": 3,
+  "suite": "validation",
+  "aggregate_environment": {
+    "Captured at (UTC)": "2026-09-02T17:16:45+00:00",
+    "Repository revision": "6621fd3b869c",
+    "Repository state": "dirty",
+    "Host platform": "Linux-7.0.12-linuxkit-aarch64-with-glibc2.35",
+    "Python runtime": "CPython 3.10.12 (/usr/bin/python3)",
+    "Conda environment": "not active",
+    "ELMFIRE command": "elmfire",
+    "ELMFIRE resolved path": "/elmfire/elmfire/build/linux/bin/elmfire",
+    "ELMFIRE version declaration": "not declared",
+    "ELMFIRE executable SHA-256": "c225b2e00349aa98128285b3d3ff9b2031d0e20944cd9f1c5ee96595d199a920",
+    "MPI launcher": "mpirun (Open MPI) 4.1.2",
+    "Slurm allocation": "not a Slurm build job",
+    "Loaded modules": "not recorded",
+    "Python packages": "NumPy 1.26.4; Matplotlib 3.8.4; PyYAML 6.0.3; Rasterio 1.4.4; GDAL 3.4.1; Pandas 2.2.2; GeoPandas 1.1.4; Shapely 2.1.2"
+  },
+  "case_count": 3,
+  "decision_counts": {
+    "NOT EVALUABLE": 3
+  },
+  "cases": [
+    {
+      "case_id": "camp_fire",
+      "title": "2018 Camp Fire landscape reconstruction",
+      "category": "landscape_scale",
+      "elmfire_command": "elmfire",
+      "elmfire_config": "elmfire.data.in",
+      "mpi_ranks": "51",
+      "namelist_schema": "1",
+      "relative_directory": "cases/Validation/landscape_scale/camp_fire",
+      "report_pdf": "cases/Validation/landscape_scale/camp_fire/report/case_report.pdf",
+      "report_available": false,
+      "metrics_file": "cases/Validation/landscape_scale/camp_fire/outputs/metrics.json",
+      "metrics_available": false,
+      "raw_status": "missing metrics.json",
+      "decision": "NOT EVALUABLE",
+      "detail": "No case-local outputs/metrics.json is available."
+    },
+    {
+      "case_id": "thomas_fire",
+      "title": "2017 Thomas Fire landscape reconstruction",
+      "category": "landscape_scale",
+      "elmfire_command": "elmfire",
+      "elmfire_config": "elmfire.data.in",
+      "mpi_ranks": "51",
+      "namelist_schema": "1",
+      "relative_directory": "cases/Validation/landscape_scale/thomas_fire",
+      "report_pdf": "cases/Validation/landscape_scale/thomas_fire/report/case_report.pdf",
+      "report_available": false,
+      "metrics_file": "cases/Validation/landscape_scale/thomas_fire/outputs/metrics.json",
+      "metrics_available": false,
+      "raw_status": "missing metrics.json",
+      "decision": "NOT EVALUABLE",
+      "detail": "No case-local outputs/metrics.json is available."
+    },
+    {
+      "case_id": "tubbs_fire",
+      "title": "2017 Tubbs Fire landscape reconstruction",
+      "category": "landscape_scale",
+      "elmfire_command": "elmfire",
+      "elmfire_config": "elmfire.data.in",
+      "mpi_ranks": "51",
+      "namelist_schema": "1",
+      "relative_directory": "cases/Validation/landscape_scale/tubbs_fire",
+      "report_pdf": "cases/Validation/landscape_scale/tubbs_fire/report/case_report.pdf",
+      "report_available": false,
+      "metrics_file": "cases/Validation/landscape_scale/tubbs_fire/outputs/metrics.json",
+      "metrics_available": false,
+      "raw_status": "missing metrics.json",
+      "decision": "NOT EVALUABLE",
+      "detail": "No case-local outputs/metrics.json is available."
+    }
+  ]
+}
