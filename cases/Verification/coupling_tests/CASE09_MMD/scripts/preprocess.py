@@ -121,13 +121,13 @@ def write_input_stack(input_dir, nx, ny, dx, buffer_cells, wind_mph):
         write_tif(input_dir / f"{name}.tif", array, dx, buffer_cells, dtype)
 
 
-def configure_namelist(base_text, variant, dx, dt, generation_rate):
+def configure_namelist(base_text, variant, dx, dt, simulation_tstop_s, generation_rate):
     """Make all tested model selectors explicit in one variant namelist."""
     values = {
-        "SIMULATION_DT": f"{dt:.8g}",
-        "SIMULATION_DTMAX": f"{dt:.8g}",
+        "SIMULATION_DT": f"{dt:.17g}",
+        "SIMULATION_DTMAX": f"{dt:.17g}",
         "TARGET_CFL": f"{TARGET_CFL:.8g}",
-        "SIMULATION_TSTOP": f"{float(variant['tstop_s']):.8g}",
+        "SIMULATION_TSTOP": f"{simulation_tstop_s:.17g}",
         "DTDUMP": f"{OUTPUT_INTERVAL_S:.8g}",
         "SEED": str(MONTE_CARLO_SEED),
         "GENERATION_MODEL": "'PER-MW'",
@@ -171,7 +171,13 @@ def preprocess(case_dir):
             "Physical dimensions must be integral multiples of CELL_SIZE_M")
     nx = physical_nx + 2 * buffer_cells
     ny = physical_ny + 2 * buffer_cells
-    dt = TARGET_CFL * dx / wind_mps
+    nominal_dt = TARGET_CFL * dx / wind_mps
+    requested_stops_s = [int(round(float(item["tstop_s"]))) for item in case["variants"]]
+    common_duration_s = requested_stops_s[0]
+    for value in requested_stops_s[1:]:
+        common_duration_s = math.gcd(common_duration_s, value)
+    duration_steps = int(math.ceil(common_duration_s / nominal_dt - 1.0e-12))
+    dt = common_duration_s / duration_steps
 
     # ELMFIRE multiplies this normalized rate by FLIN*cell_size/1000, which is
     # the cell heat-release rate in MW. The normalized 33.3 value therefore
@@ -183,8 +189,10 @@ def preprocess(case_dir):
         "case_id": case["id"],
         "generated_by": "scripts/preprocess.py",
         "dx_m": dx,
+        "nominal_dt_s": nominal_dt,
         "dt_s": dt,
-        "target_cfl": TARGET_CFL,
+        "requested_target_cfl": TARGET_CFL,
+        "target_cfl": wind_mps * dt / dx,
         "physical_length_m": length,
         "physical_width_m": width,
         "nx_with_halo": nx,
@@ -198,6 +206,9 @@ def preprocess(case_dir):
     }
 
     for variant in case["variants"]:
+        requested_tstop_s = float(variant["tstop_s"])
+        step_count = int(math.ceil(requested_tstop_s / dt - 1.0e-12))
+        simulation_tstop_s = step_count * dt
         variant_dir = case_dir / "variants" / variant["name"]
         for subdir in (
             "data/inputs",
@@ -219,10 +230,15 @@ def preprocess(case_dir):
             if not source.is_file():
                 raise FileNotFoundError(f"Required model table is missing: {source}")
             shutil.copyfile(source, variant_dir / "data/misc" / filename)
-        namelist = configure_namelist(base_text, variant, dx, dt, generation_rate)
+        namelist = configure_namelist(
+            base_text, variant, dx, dt, simulation_tstop_s, generation_rate
+        )
         (variant_dir / "elmfire.data.in").write_text(namelist, encoding="utf-8")
         manifest["variants"].append({
             **variant,
+            "requested_tstop_s": requested_tstop_s,
+            "simulation_tstop_s": simulation_tstop_s,
+            "step_count": step_count,
             "directory": str(Path("variants") / variant["name"]),
             "namelist": "elmfire.data.in",
             "outputs": "outputs",

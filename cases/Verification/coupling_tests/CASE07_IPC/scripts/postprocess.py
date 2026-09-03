@@ -267,15 +267,27 @@ def main():
             (g for g in groups if g["dx_m"] == dx),
             key=lambda g: g["pign"])
         for left, right in zip(dx_groups[:-1], dx_groups[1:]):
-            difference = right["mean_normalized_ros"] - left["mean_normalized_ros"]
-            pooled_uncertainty = math.hypot(
-                left["ci95_halfwidth"], right["ci95_halfwidth"])
-            passed = difference >= -pooled_uncertainty
+            available = all(
+                value is not None
+                for value in (
+                    left["mean_normalized_ros"], right["mean_normalized_ros"],
+                    left["ci95_halfwidth"], right["ci95_halfwidth"],
+                )
+            )
+            if available:
+                difference = right["mean_normalized_ros"] - left["mean_normalized_ros"]
+                pooled_uncertainty = math.hypot(
+                    left["ci95_halfwidth"], right["ci95_halfwidth"])
+                passed = difference >= -pooled_uncertainty
+            else:
+                difference = math.nan
+                pooled_uncertainty = math.nan
+                passed = False
             monotone = monotone and passed
             monotonicity_checks.append({
                 "dx_m": dx, "pign_low": left["pign"], "pign_high": right["pign"],
-                "mean_difference": difference,
-                "pooled_ci95_halfwidth": pooled_uncertainty, "passed": passed,
+                "mean_difference": finite_json(difference),
+                "pooled_ci95_halfwidth": finite_json(pooled_uncertainty), "passed": passed,
             })
 
     spread_checks = []

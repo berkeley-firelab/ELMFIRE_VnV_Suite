@@ -92,13 +92,22 @@ def main():
     metrics = {
         'case_id': 'CASE06_F2D',
         'status': 'incomplete',
-        'verification_passed': False,
+        'verification_passed': 'not_evaluated',
         'required_times_s': TARGET_TIMES_S,
         'maximum_time_mismatch_s': MAX_TIME_MISMATCH_S,
         'maximum_nesting_violation_fraction': MAX_NESTING_VIOLATION_FRACTION,
         'minimum_front_advance_per_interval_m': MIN_FRONT_ADVANCE_PER_INTERVAL_M,
         'minimum_final_crosswind_span_m': MIN_FINAL_CROSSWIND_SPAN_M,
-        'minimum_firebrand_excess_advance_m': MIN_FIREBRAND_EXCESS_ADVANCE_M}
+        'minimum_firebrand_excess_advance_m': MIN_FIREBRAND_EXCESS_ADVANCE_M,
+        'maximum_observed_nesting_violation_fraction': 'not computed',
+        'interval_front_advances_m': 'not computed',
+        'final_crosswind_span_m': 'not computed',
+        'firebrand_excess_advance_m': 'not computed',
+        'ember_ignition_cells': 'not computed',
+        'nesting_passed': 'NOT EVALUABLE',
+        'front_progression_passed': 'NOT EVALUABLE',
+        'two_dimensional_growth_passed': 'NOT EVALUABLE',
+        'firebrand_driven_advance_passed': 'NOT EVALUABLE'}
     times = dump_map(out)
     candidates = []
     for p in sorted(out.glob('phi_*_d*.tif')):

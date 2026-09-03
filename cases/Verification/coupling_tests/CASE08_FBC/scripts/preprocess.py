@@ -7,6 +7,7 @@ variants/manifest.json. It does not run ELMFIRE. Arrays use [row, column], rows
 increase southward, and physical quantities are SI unless documented otherwise.
 """
 import json
+import math
 import shutil
 from pathlib import Path
 
@@ -100,6 +101,12 @@ def main():
     wind_mps = wind_mph * WIND_MPH_TO_MPS
     cfl = float(case["wind_cfl"])
     tstop = float(case["evaluation_time_s"])
+    requested_stops_s = [int(round(tstop))] + [
+        int(round(float(value))) for value in case["history_times_s"]
+    ]
+    common_duration_s = requested_stops_s[0]
+    for value in requested_stops_s[1:]:
+        common_duration_s = math.gcd(common_duration_s, value)
     variants_dir = CASE_DIR / "variants"
     variants_dir.mkdir(exist_ok=True)
     manifest = []
@@ -117,7 +124,18 @@ def main():
         ny = physical_ny + 2 * BUFFER_CELLS
         # delayed-ignition baseline uses temporal CFL 0.5 based on the 0.71 m/s
         # surface front.
-        dt = cfl * dx / float(case["surface_ros_mps"])
+        nominal_dt = cfl * dx / float(case["surface_ros_mps"])
+        whole_second_divisors = [
+            value for value in range(1, int(math.floor(nominal_dt)) + 1)
+            if common_duration_s % value == 0
+        ]
+        if whole_second_divisors:
+            dt = float(max(whole_second_divisors))
+        else:
+            duration_steps = int(math.ceil(
+                common_duration_s / nominal_dt - 1.0e-12
+            ))
+            dt = common_duration_s / duration_steps
         # The paired runs at the evaluation time determine pass/fail.  Auxiliary
         # consumption-on stop-time runs provide true active-stock samples because
         # ELMFIRE writes EMBER_FLUX only at a run's final dump.  Its transient
@@ -131,6 +149,9 @@ def main():
             for stop_time in case["history_times_s"]
         )
         for role, enabled, stop_time in variant_specs:
+            requested_stop_time_s = stop_time
+            step_count = int(round(requested_stop_time_s / dt))
+            simulation_tstop_s = step_count * dt
             state = "on" if enabled else "off"
             if role == "paired":
                 name = f"dx{token(dx)}_consumption_{state}"
@@ -154,19 +175,19 @@ def main():
 
             cfg = template
             cfg = replace_once(cfg, f"SIMULATION_DT={BASE_DT_S}",
-                               f"SIMULATION_DT={dt:.8g}", "time step")
+                               f"SIMULATION_DT={dt:.17g}", "time step")
             # Cap adaptive stepping at the designed CFL; otherwise the comparison
             # would mix consumption error with resolution-dependent time stepping.
             cfg = replace_once(cfg, f"SIMULATION_DTMAX={BASE_DTMAX_S}",
-                               f"SIMULATION_DTMAX={dt:.8g}", "maximum time step")
+                               f"SIMULATION_DTMAX={dt:.17g}", "maximum time step")
             cfg = replace_once(cfg, f"SIMULATION_TSTOP={BASE_TSTOP_S}",
-                               f"SIMULATION_TSTOP={stop_time:g}", "stop time")
+                               f"SIMULATION_TSTOP={simulation_tstop_s:.17g}", "stop time")
             # Request only the final dump.  A history run's final EMBER_FLUX is
             # the active stock at its predeclared sample time.
             cfg = replace_once(
                 cfg,
                 f"DTDUMP={BASE_DTDUMP_S}",
-                f"DTDUMP={stop_time:g}",
+                f"DTDUMP={simulation_tstop_s:.17g}",
                 "dump time")
             # SPOTTING multiplies the per-MW rate by pixel fire power FLIN*dy.
             # Dividing by dy keeps the represented 1 m strip source invariant.
@@ -190,12 +211,17 @@ def main():
                 "consumption_enabled": bool(enabled), "seed": seed,
                 "nx": nx, "ny": ny, "buffer_cells": BUFFER_CELLS,
                 "physical_length_m": length, "physical_width_m": width,
-                "dt_s": dt, "dtmax_s": dt, "surface_cfl": cfl,
+                "nominal_dt_s": nominal_dt,
+                "dt_s": dt, "dtmax_s": dt,
+                "requested_surface_cfl": cfl,
+                "surface_cfl": float(case["surface_ros_mps"]) * dt / dx,
                 "wind_speed_mph": wind_mph, "wind_speed_mps": wind_mps,
                 "base_gr_1m_pcs_per_s_per_mw": BASE_GR_PER_MW_VEGE,
                 "configured_gr_pcs_per_s_per_mw": gr_per_mw,
-                "evaluation_time_s": stop_time,
-                "output_dump_interval_s": stop_time,
+                "requested_evaluation_time_s": requested_stop_time_s,
+                "evaluation_time_s": simulation_tstop_s,
+                "output_dump_interval_s": simulation_tstop_s,
+                "step_count": step_count,
                 "transient_ember_flux": False,
                 "expected_outputs": ["final active ember_flux", "time_of_arrival"],
             })

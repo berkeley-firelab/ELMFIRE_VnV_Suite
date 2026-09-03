@@ -4,8 +4,10 @@ from osgeo import gdal
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 from pathlib import Path
+import csv
 import json
 import math
+import re
 
 import matplotlib
 matplotlib.use("Agg")
@@ -29,26 +31,110 @@ def read_raster(path):
     return array
 
 
-def current_outputs(case_dir, item):
-    """Return the final TOA only when inputs, termination, and stop time match."""
+def unique_time_control(config, key):
+    """Parse one finite positive time-control scalar from a generated namelist."""
+    matches = re.findall(
+        rf"(?mi)^\s*{re.escape(key)}\s*=\s*([0-9.eEdD+-]+)", config
+    )
+    if len(matches) != 1:
+        raise ValueError(f"{key} is not unique")
+    value = float(matches[0].replace("D", "E").replace("d", "e"))
+    if not math.isfinite(value) or value <= 0.0:
+        raise ValueError(f"{key} is not finite and positive")
+    return value
+
+
+def current_outputs(case_dir, item, expected_no_propagation=False):
+    """Select one terminal TOA through the strict regular or stalled path."""
     variant = case_dir / item["working_directory"]
+    evidence = {
+        "selection_path": None,
+        "reason": None,
+        "final_time_s": None,
+        "pre_jump_time_s": None,
+        "timestep_grid_residual_s": None,
+        "expected_no_propagation": bool(expected_no_propagation),
+    }
     marker = variant / "logs" / "completed_input_fingerprint.txt"
     stdout = variant / "logs" / "elmfire.stdout"
     if not marker.exists() or marker.read_text().strip() != item["input_fingerprint"]:
-        return None
+        evidence["reason"] = "missing or mismatched input fingerprint"
+        return None, evidence
     if not stdout.exists() or "End of simulation reached successfully" not in stdout.read_text(errors="ignore"):
-        return None
-    files = sorted((variant / "outputs").glob("time_of_arrival*.tif"))
-    if not files:
-        return None
-    selected = files[-1]
+        evidence["reason"] = "successful termination record is absent"
+        return None, evidence
     try:
-        encoded_tstop = int(selected.stem.rsplit("_", 1)[1])
-    except (IndexError, ValueError):
-        return None
-    if abs(encoded_tstop - float(item["simulation_tstop_s"])) > 1.0:
-        return None
-    return selected
+        config_path = variant / Path(item.get("config", "elmfire.data.in")).name
+        config = config_path.read_text(encoding="utf-8")
+        tstop = unique_time_control(config, "SIMULATION_TSTOP")
+        timestep = unique_time_control(config, "SIMULATION_DT")
+        met_step = unique_time_control(config, "DT_METEOROLOGY")
+        control_tolerance = max(1.0e-6, 1.0e-9 * tstop)
+        if not math.isclose(
+            tstop, float(item["simulation_tstop_s"]), rel_tol=0.0,
+            abs_tol=control_tolerance
+        ):
+            raise ValueError("manifest and namelist stop times disagree")
+        if not math.isclose(
+            timestep, float(item["simulation_dt_s"]), rel_tol=0.0,
+            abs_tol=max(1.0e-12, 1.0e-9 * timestep)
+        ):
+            raise ValueError("manifest and namelist timesteps disagree")
+        if abs(tstop - round(tstop / timestep) * timestep) > control_tolerance:
+            raise ValueError("configured stop is not an exact timestep multiple")
+        ledgers = sorted((variant / "outputs").glob("dump_times_*.csv"))
+        if len(ledgers) != 1:
+            raise ValueError(f"expected one dump-times CSV, found {len(ledgers)}")
+        with ledgers[0].open(newline="", encoding="utf-8") as stream:
+            rows = list(csv.DictReader(stream))
+        final_rows = [
+            row for row in rows
+            if str(row.get("is_final_dump", "")).strip().upper()
+            in {"T", "TRUE", "1", "Y", "YES"}
+        ]
+        if len(final_rows) != 1:
+            raise ValueError(f"expected one final dump record, found {len(final_rows)}")
+        final_time = float(final_rows[0]["time_seconds"])
+        evidence["final_time_s"] = final_time
+        tolerance = max(1.0e-3, 1.0e-6 * tstop)
+        regular = math.isclose(final_time, tstop, rel_tol=0.0, abs_tol=tolerance)
+        pre_jump = final_time - met_step
+        grid_residual = abs(pre_jump - round(pre_jump / timestep) * timestep)
+        if final_time > tstop:
+            evidence["pre_jump_time_s"] = pre_jump
+            evidence["timestep_grid_residual_s"] = grid_residual
+        stalled = (
+            final_time > tstop
+            and math.isfinite(pre_jump)
+            and -tolerance <= pre_jump <= tstop + tolerance
+            and grid_residual <= tolerance
+            and (
+                tstop - pre_jump <= timestep + tolerance
+                or expected_no_propagation
+            )
+        )
+        if not (regular or stalled):
+            raise ValueError(
+                "terminal record is neither a regular final dump nor a "
+                "compatible timestep-aligned stalled final dump"
+            )
+        stamp = int(math.floor(final_time + 0.5))
+        if stalled:
+            matches = sorted((variant / "outputs").glob("time_of_arrival*_*.tif"))
+            evidence["selection_path"] = "stalled-final compatibility"
+        else:
+            matches = sorted(
+                (variant / "outputs").glob(f"time_of_arrival*_{stamp:07d}.tif")
+            )
+            evidence["selection_path"] = "regular terminal dump"
+        matches = [path for path in matches if "_transient_" not in path.name]
+        if len(matches) != 1:
+            raise ValueError(f"expected one terminal TOA raster, found {len(matches)}")
+        evidence["reason"] = "accepted"
+        return matches[0], evidence
+    except (OSError, KeyError, TypeError, ValueError, csv.Error) as exc:
+        evidence["reason"] = str(exc)
+        return None, evidence
 
 
 def mean_ros(case_dir, case, item, toa_path):
@@ -128,7 +214,7 @@ def geometry_metrics(case, manifest):
     return rows
 
 
-def write_figure(case_dir, case, manifest, ros_by_dx):
+def write_figure(case_dir, case, manifest, ros_by_dx, terminal_evidence_by_dx):
     """Create the geometry/ROS figure using the 10-m run as its anchor.
 
     The 10-m grid exactly represents both the 10-m structure and 10-m gap, so
@@ -170,10 +256,21 @@ def write_figure(case_dir, case, manifest, ros_by_dx):
     else:
         ax.text(0.5, 0.55, "ELMFIRE sweep not run", transform=ax.transAxes,
                 ha="center", va="center", fontsize=13)
-    missing = [dx for dx in dx_values if ros_by_dx.get(dx) is None]
-    if missing:
-        ax.scatter(missing, np.zeros(len(missing)), marker="x", color="#c00000",
-                   label="ROS unavailable: fewer than 3 ignited columns")
+    no_fit = [
+        dx for dx in dx_values
+        if ros_by_dx.get(dx) is None
+        and terminal_evidence_by_dx.get(dx, {}).get("reason") == "accepted"
+    ]
+    rejected = [
+        dx for dx in dx_values
+        if terminal_evidence_by_dx.get(dx, {}).get("reason") != "accepted"
+    ]
+    if no_fit:
+        ax.scatter(no_fit, np.zeros(len(no_fit)), marker="x", color="#c00000",
+                   label="Accepted output: fewer than 3 ignited columns")
+    if rejected:
+        ax.scatter(rejected, np.zeros(len(rejected)), marker="^", color="#e68600",
+                   label="Terminal evidence rejected")
     reference_ros = ros_by_dx.get(10.0)
     if reference_ros is not None:
         ax.axhline(reference_ros, color="k", ls="--",
@@ -190,7 +287,7 @@ def write_figure(case_dir, case, manifest, ros_by_dx):
     plt.close(fig)
 
 
-def write_macros(case_dir, status, rows, completed, requested):
+def write_macros(case_dir, status, rows, completed, requested, dx10_reference=None):
     """Serialize calculated values and statuses into report-local LaTeX macros."""
     def tex(value):
         """Escape special comparison and percent symbols used in generated LaTeX table rows."""
@@ -205,7 +302,7 @@ def write_macros(case_dir, status, rows, completed, requested):
     lines = [f"\\def\\OverallStatus{{{status}}}",
              f"\\def\\CompletedVariantCount{{{completed}}}",
              f"\\def\\RequestedVariantCount{{{requested}}}",
-             f"\\def\\DxTenReferenceROS{{{calculated.get('10-m ELMFIRE ROS anchor', 'N/A')}}}",
+             f"\\def\\DxTenReferenceROS{{{dx10_reference:.6g}}}" if dx10_reference is not None else "\\def\\DxTenReferenceROS{N/A}",
              f"\\def\\ROSEvaluableFraction{{{calculated.get('ROS-evaluable resolution fraction', 'N/A')}}}",
              f"\\def\\ROSMeshCV{{{calculated.get('ROS mesh-dependence CV', 'N/A')}}}",
              f"\\def\\ROSMaximumDeviation{{{calculated.get('Maximum ROS deviation from 10-m anchor', 'N/A')}}}",
@@ -226,19 +323,31 @@ def main():
     ros_by_dx = {}
     toa_file_by_dx = {}
     ignited_columns_by_dx = {}
+    terminal_evidence_by_dx = {}
     completed = []
+    expected_no_propagation = {
+        float(value) for value in case.get("reference_no_propagation_dx_m", [])
+    }
     for item in manifest:
-        toa = current_outputs(case_dir, item)
-        value, points = mean_ros(case_dir, case, item, toa) if toa else (None, [])
         dx = float(item["dx_m"])
+        toa, terminal_evidence = current_outputs(
+            case_dir, item, dx in expected_no_propagation
+        )
+        value, points = mean_ros(case_dir, case, item, toa) if toa else (None, [])
         ros_by_dx[dx] = value
         toa_file_by_dx[dx] = toa.name if toa else None
         ignited_columns_by_dx[dx] = len(points)
+        terminal_evidence_by_dx[dx] = terminal_evidence
         if toa:
             completed.append(item["name"])
+    executed = [
+        item["name"] for item in manifest
+        if terminal_evidence_by_dx[float(item["dx_m"])]["final_time_s"] is not None
+    ]
+    rejected = [item["name"] for item in manifest if item["name"] not in completed]
     completion_note = (
         "" if len(completed) == len(manifest)
-        else "The long sweep has not produced every current-fingerprint output."
+        else "Every process may have exited, but strict terminal evidence was not accepted for every variant."
     )
     rows.append(metric("Current-fingerprint run completeness", f"{len(manifest)} variants",
                        f"{len(completed)}/{len(manifest)}", len(completed) == len(manifest),
@@ -304,7 +413,9 @@ def main():
     payload = {
         "case_id": case["id"],
         "overall_status": status, "completed_variants": completed,
-        "unrun_variants": [item["name"] for item in manifest if item["name"] not in completed],
+        "executed_variants": executed,
+        "terminal_evidence_rejected_variants": rejected,
+        "unrun_variants": [item["name"] for item in manifest if item["name"] not in executed],
         "metrics": rows,
         "geometry_status": "PASS" if all(row["status"] == "PASS" for row in rows[:5]) else "FAIL",
         "runtime_metric_count": len(runtime_rows),
@@ -315,14 +426,17 @@ def main():
         "selected_toa_file_by_dx": {
             str(key): value for key, value in sorted(toa_file_by_dx.items())
         },
+        "terminal_evidence_by_dx": {
+            str(key): value for key, value in sorted(terminal_evidence_by_dx.items())
+        },
         "ignited_structure_columns_by_dx": {
             str(key): value for key, value in sorted(ignited_columns_by_dx.items())
         },
         "ros_m_s_by_dx": {str(key): value for key, value in sorted(ros_by_dx.items())},
     }
     (case_dir / "outputs" / "metrics.json").write_text(json.dumps(payload, indent=2) + "\n")
-    write_figure(case_dir, case, manifest, ros_by_dx)
-    write_macros(case_dir, status, rows, len(completed), len(manifest))
+    write_figure(case_dir, case, manifest, ros_by_dx, terminal_evidence_by_dx)
+    write_macros(case_dir, status, rows, len(completed), len(manifest), ros_by_dx.get(10.0))
     print(
         f"[OK] postprocessed {len(completed)}/{len(manifest)} variants; status: {status}")
 

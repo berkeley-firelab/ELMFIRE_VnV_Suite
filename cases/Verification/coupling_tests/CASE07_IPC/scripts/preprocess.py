@@ -9,6 +9,7 @@ co-registered GeoTIFF inputs and ``variants/manifest.json``; it does not run
 ELMFIRE. Physical quantities use SI units unless the namelist says otherwise.
 """
 import json
+import math
 import shutil
 from pathlib import Path
 
@@ -137,7 +138,11 @@ def main():
             raise ValueError(f"physical width is not divisible by dx={dx:g} m")
         nx = physical_nx + 2 * BUFFER_CELLS
         ny = physical_ny + 2 * BUFFER_CELLS
-        dt = cfl * dx / WIND_SPEED_MPS
+        nominal_dt = cfl * dx / WIND_SPEED_MPS
+        requested_tstop_s = float(case["tstop"])
+        step_count = int(math.ceil(requested_tstop_s / nominal_dt - 1.0e-12))
+        dt = requested_tstop_s / step_count
+        simulation_tstop_s = step_count * dt
 
         for member in range(1, members + 1):
             # A member has the same seed across dx/PIGN, permitting paired
@@ -161,18 +166,18 @@ def main():
 
             cfg = base_input
             cfg = replace_once(cfg, f"SIMULATION_DT={BASE_SIMULATION_DT_S}",
-                               f"SIMULATION_DT={dt:.8g}", "time step")
+                               f"SIMULATION_DT={dt:.17g}", "time step")
             # With surface spread disabled, ELMFIREs level-set CFL controller sees
             # negligible velocity and otherwise expands DT to SIMULATION_DTMAX.
             # Capping DTMAX at the wind-CFL step preserves cfl = u_wind*dt/dx.
             cfg = replace_once(cfg, f"SIMULATION_DTMAX={BASE_SIMULATION_DTMAX_S}",
-                               f"SIMULATION_DTMAX={dt:.8g}", "maximum time step")
+                               f"SIMULATION_DTMAX={dt:.17g}", "maximum time step")
             cfg = replace_once(cfg, f"TARGET_CFL={BASE_TARGET_CFL}",
                                f"TARGET_CFL={min(cfl, 0.95):.6g}", "target CFL")
             cfg = replace_once(
                 cfg,
                 f"SIMULATION_TSTOP={BASE_SIMULATION_TSTOP_S}",
-                f"SIMULATION_TSTOP={float(case['tstop']):g}",
+                f"SIMULATION_TSTOP={simulation_tstop_s:.17g}",
                 "stop time")
             cfg = set_fixed_pign(cfg, pign)
             cfg = replace_once(cfg, f"SEED={BASE_RANDOM_SEED}", f"SEED={seed}", "seed")
@@ -183,12 +188,16 @@ def main():
                 "working_directory": str(vdir.relative_to(CASE_DIR)),
                 "config": "elmfire.data.in",
                 "dx": dx, "pign": pign, "member": member, "seed": seed,
-                "cfl": cfl, "dt_s": dt, "dtmax_s": dt, "nx": nx, "ny": ny,
+                "requested_cfl": cfl,
+                "cfl": WIND_SPEED_MPS * dt / dx,
+                "nominal_dt_s": nominal_dt, "dt_s": dt, "dtmax_s": dt, "nx": nx, "ny": ny,
                 "buffer_cells": BUFFER_CELLS,
                 "physical_length_m": physical_length_m,
                 "physical_width_m": physical_width_m,
                 "wind_speed_mps": WIND_SPEED_MPS,
-                "tstop_s": float(case["tstop"]),
+                "requested_tstop_s": requested_tstop_s,
+                "tstop_s": simulation_tstop_s,
+                "step_count": step_count,
             })
 
     # ensemble-convergence case also requires direct statistics of the sampled SFT waiting time.
@@ -203,7 +212,11 @@ def main():
     physical_ny = round(physical_width_m / dx)
     nx = physical_nx + 2 * BUFFER_CELLS
     ny = physical_ny + 2 * BUFFER_CELLS
-    dt = cfl * dx / WIND_SPEED_MPS
+    nominal_dt = cfl * dx / WIND_SPEED_MPS
+    requested_tstop_s = float(case["tstop"])
+    step_count = int(math.ceil(requested_tstop_s / nominal_dt - 1.0e-12))
+    dt = requested_tstop_s / step_count
+    simulation_tstop_s = step_count * dt
     for member in range(1, int(delay["members"]) + 1):
         seed = base_seed + 1000 + member - 1
         vname = f"sft_dx{token(dx)}_pign{token(pign)}_r{member:02d}"
@@ -218,16 +231,16 @@ def main():
 
         cfg = base_input
         cfg = replace_once(cfg, f"SIMULATION_DT={BASE_SIMULATION_DT_S}",
-                           f"SIMULATION_DT={dt:.8g}", "time step")
+                           f"SIMULATION_DT={dt:.17g}", "time step")
         cfg = replace_once(cfg, f"SIMULATION_DTMAX={BASE_SIMULATION_DTMAX_S}",
-                           f"SIMULATION_DTMAX={dt:.8g}", "maximum time step")
+                           f"SIMULATION_DTMAX={dt:.17g}", "maximum time step")
         cfg = replace_once(cfg, f"TARGET_CFL={BASE_TARGET_CFL}",
                            f"TARGET_CFL={min(cfl, 0.95):.6g}", "target CFL")
         cfg = replace_once(cfg, f"SIMULATION_TSTOP={BASE_SIMULATION_TSTOP_S}",
-                           f"SIMULATION_TSTOP={float(case['tstop']):g}", "stop time")
+                           f"SIMULATION_TSTOP={simulation_tstop_s:.17g}", "stop time")
         cfg = set_fixed_pign(cfg, pign)
         cfg = replace_once(cfg, f"SEED={BASE_RANDOM_SEED}", f"SEED={seed}", "seed")
-        cfg = replace_once(cfg, "DTDUMP=20.0", f"DTDUMP={dt:.8g}", "dump interval")
+        cfg = replace_once(cfg, "DTDUMP=20.0", f"DTDUMP={dt:.17g}", "dump interval")
         cfg = replace_once(cfg, "DUMP_EMBER_FLUX_TRANSIENT=.FALSE.",
                            "DUMP_EMBER_FLUX_TRANSIENT=.TRUE.", "transient ember flux")
         cfg = replace_once(cfg, "DUMP_EMBER_IGNITION=.FALSE.",
@@ -238,12 +251,16 @@ def main():
             "working_directory": str(vdir.relative_to(CASE_DIR)),
             "config": "elmfire.data.in",
             "dx": dx, "pign": pign, "member": member, "seed": seed,
-            "cfl": cfl, "dt_s": dt, "dtmax_s": dt, "nx": nx, "ny": ny,
+            "requested_cfl": cfl,
+            "cfl": WIND_SPEED_MPS * dt / dx,
+            "nominal_dt_s": nominal_dt, "dt_s": dt, "dtmax_s": dt, "nx": nx, "ny": ny,
             "buffer_cells": BUFFER_CELLS,
             "physical_length_m": physical_length_m,
             "physical_width_m": physical_width_m,
             "wind_speed_mps": WIND_SPEED_MPS,
-            "tstop_s": float(case["tstop"]),
+            "requested_tstop_s": requested_tstop_s,
+            "tstop_s": simulation_tstop_s,
+            "step_count": step_count,
             "tau_s": float(delay["tau_s"]),
             "transient_dump_interval_s": dt,
         })

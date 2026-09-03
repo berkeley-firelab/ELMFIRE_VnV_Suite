@@ -46,6 +46,44 @@ increments.
 \section{Derivation of expected behavior}
 Increasing separation moves targets into lower-probability transport tails, while increasing generation raises deposited load. Wind produces competing reach and ignition-cooling effects, so the critical generation boundary should rise at both low and high wind speeds.
 
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+The design count follows directly from the generated parameter products:
+\[
+ 12\ \text{separations}\times10\ GR=120,\qquad
+ 15\ \text{winds}\times10\ GR=150,\qquad
+ N_{\mathrm{design}}=120+150=270.
+\]
+The two baseline-equivalent coordinates remain distinct members of their
+respective response families.  At the design-fire plateau, a physical
+structure has \(HRR_{\max}=400(100)=40~\mathrm{MW}\); consequently the tested
+generation range corresponds to
+\[
+ \dot N_{\max}=GR(40)=200,\ 400,\ldots,2000~\mathrm{pcs\,s^{-1}}.
+\]
+With \(\Delta x=2.5~\mathrm{m}\) and \(CFL=0.5\), the generated level-set
+step is \(0.5(2.5)/[U_{\mathrm{mph}}(0.44704)]\): it is
+0.069904 s at 40 mph, 0.279617 s at 10 mph, and 0.018641 s at 150 mph.
+
+For each coordinate, \(GR_c\) is selected from
+\(\{5,10,\ldots,50\}\); if no point propagates, the rank-only sentinel is the
+next design level, 55.  Thus a one-level wind-edge excess is
+\(55-50=5~\mathrm{pcs\,MW^{-1}\,s^{-1}}\), exactly the acceptance
+increment.  The moderate set is 30--120 mph and the edge set is
+\(\{10,20,130,140,150\}\) mph.  The explicit wind metrics are
+\[
+ \overline{GR}_{c,\mathrm{edge}}
+ -\operatorname{median}(GR_{c,\mathrm{moderate}})\geq5,\qquad
+ \frac{\overline{ROS}_{\mathrm{moderate}}}
+      {\overline{ROS}_{\mathrm{edge}}}\geq1.10.
+\]
+The separation expectation is strong positive rank association of \(d\) with
+\(GR_c\), negative rank association of \(d\) with ROS, and positive rank
+association of GR with ROS.  These become
+\(\rho\geq0.85\), median \(\rho\leq-0.50\), and median
+\(\rho\geq0.70\), respectively, with the independent response-scale ceiling
+\(\max ROS\leq0.08~\mathrm{m\,s^{-1}}\).
+% END EXPLICIT EXPECTED-RESULT DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 
 For a coordinate value \(z\), define the critical generation rate
@@ -143,7 +181,7 @@ first structure column instead of selecting only the lower-left structure.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Representative prepared two-dimensional structure lattice and first-column
 initial ignition mask for the capability-gated parametric design.}
 \label{fig:input-configuration}
@@ -219,7 +257,7 @@ ELMFIRE result.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{parametric_response_maps.pdf}
+\EvidenceFigure[width=\linewidth]{parametric_response_maps.pdf}
 \caption{Parametric-response verification layout. The upper panels reproduce the
 coordinate systems of the two parametric reference maps; the lower panels are
 reserved for the corresponding ROS curves. In the current capability-gated

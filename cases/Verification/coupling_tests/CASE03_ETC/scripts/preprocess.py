@@ -121,12 +121,17 @@ def main() -> None:
                 shutil.copy2(source, variant_dir / "data" / "misc" / filename)
 
             dt = wind_cfl * dx / WIND_SPEED_MPS
+            step_count = int(math.ceil(SIMULATION_TSTOP_S / dt - 1.0e-12))
+            simulation_tstop_s = step_count * dt
             configured_gr = AREAL_GR_PCS_M2_S
-            config = replace_assignment(template, "SIMULATION_DT", f"{dt:.10g}")
-            config = replace_assignment(config, "SIMULATION_DTMAX", f"{dt:.10g}")
+            config = replace_assignment(template, "SIMULATION_DT", f"{dt:.17g}")
+            config = replace_assignment(config, "SIMULATION_DTMAX", f"{dt:.17g}")
             config = replace_assignment(
                 config, "TARGET_CFL", f"{min(wind_cfl, 0.95):.6g}")
             config = replace_assignment(config, "EMBER_GR", f"{configured_gr:.12g}")
+            config = replace_assignment(
+                config, "SIMULATION_TSTOP", f"{simulation_tstop_s:.17g}"
+            )
             (variant_dir / "elmfire.data.in").write_text(config, encoding="utf-8")
             manifest.append({
                 "name": name,
@@ -135,7 +140,9 @@ def main() -> None:
                 "dx_m": dx,
                 "wind_cfl": wind_cfl,
                 "simulation_dt_s": dt,
-                "simulation_tstop_s": SIMULATION_TSTOP_S,
+                "requested_tstop_s": SIMULATION_TSTOP_S,
+                "simulation_tstop_s": simulation_tstop_s,
+                "step_count": step_count,
                 "nx": nx, "ny": ny,
                 "physical_nx": physical_nx, "physical_ny": physical_ny,
                 "physical_length_m": DOMAIN_LENGTH_M,

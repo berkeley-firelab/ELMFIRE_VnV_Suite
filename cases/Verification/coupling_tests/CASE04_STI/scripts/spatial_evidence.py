@@ -77,13 +77,13 @@ def add_aligned_colorbar(figure, axis, mappable, orientation="auto", **kwargs):
     """Attach a readable colorbar matched to the rendered map dimensions."""
     if orientation == "auto":
         orientation = "horizontal" if axis.get_data_ratio() < 0.42 else "vertical"
-    divider = make_axes_locatable(axis)
     if orientation == "horizontal":
-        colorbar_axis = divider.append_axes("bottom", size=0.16, pad=0.58)
+        fraction, pad = 0.08, 0.24
     else:
-        colorbar_axis = divider.append_axes("right", size=0.16, pad=0.10)
+        fraction, pad = 0.046, 0.04
     colorbar = figure.colorbar(
-        mappable, cax=colorbar_axis, orientation=orientation, **kwargs)
+        mappable, ax=axis, orientation=orientation,
+        fraction=fraction, pad=pad, **kwargs)
     colorbar.ax.tick_params(labelsize=8)
     colorbar.ax.xaxis.label.set_size(9)
     colorbar.ax.yaxis.label.set_size(9)
@@ -118,7 +118,14 @@ def _find_input(input_dir, names):
 def _plot_configuration(case_dir, run_root, preferred_variant):
     """Plot whole-domain fuel/structure layout and initial ignition geometry."""
     input_dir = run_root / "data" / "inputs"
-    if not input_dir.is_dir():
+    has_plot_inputs = (
+        (input_dir / "new_phi.tif").is_file()
+        and any(
+            (input_dir / name).is_file()
+            for name in ("structure_fraction.tif", "structure_id.tif", "new_fbfm40.tif")
+        )
+    )
+    if not has_plot_inputs:
         candidates = sorted(case_dir.rglob("data/inputs/new_phi.tif"))
         if preferred_variant:
             preferred = [p for p in candidates if preferred_variant in p.parts]

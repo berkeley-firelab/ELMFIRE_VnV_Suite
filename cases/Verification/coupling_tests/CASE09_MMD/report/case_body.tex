@@ -99,6 +99,36 @@ near \SI{170}{\second}, at least one firebrand-ignited cell, a leading edge
 ahead of $U_s t$, and a mean spread rate greater than $U_s$ over the common
 analysis interval. These are the qualitative features expected from mixed-mode spread.
 
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+The lead condition can also be solved for the minimum useful spotting
+distance:
+\[
+ X_{\mathrm{crit}}=
+ \frac{t_{\mathrm{ign,large}}}{1/U_s-1/U_w},\qquad
+ \frac{1}{0.577}-\frac{1}{6.71}=1.584071~\mathrm{s\,m^{-1}}.
+\]
+For the surface-dominated 300-s delay,
+\(X_{\mathrm{crit}}=300/1.584071=189.39~\mathrm{m}\), which exceeds the
+configured \(X_{\max}=150~\mathrm{m}\); even the longest deposit cannot lead.
+For the mixed 150-s delay,
+\(X_{\mathrm{crit}}=94.69~\mathrm{m}<150~\mathrm{m}\), so the tail
+\(94.69<X\leq150~\mathrm{m}\) can mature ahead of the surface front.
+At \(X=150~\mathrm{m}\),
+\[
+ t_f=150/6.71=22.3547~\mathrm{s},\quad
+ t_s=150/0.577=259.9653~\mathrm{s},\quad
+ t_s-t_f=237.6106~\mathrm{s}.
+\]
+Thus the mixed earliest full-spot scale is
+\(22.3547+150=172.3547~\mathrm{s}\), whereas the
+surface-dominated optimistic scale is
+\(22.3547+300=322.3547~\mathrm{s}>t_s\).
+These substitutions yield the explicit reference signatures used by the
+metrics: zero surface-dominated ember ignitions, positive mixed-mode ember
+ignitions, mixed \(ROS/U_s\geq1.10\), at least 20 m edge and paired-TOA
+advantages, and onset in the 120--220 s interval around 172.35 s.
+% END EXPLICIT EXPECTED-RESULT DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 
 The postprocessor excludes the two-cell halo and operates on the centre-row
@@ -187,7 +217,7 @@ ignition or firebrand-emission source explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Whole-domain prepared input configuration for the representative variant.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
@@ -206,7 +236,7 @@ Parameter & Value & Verification role \\
 Physical domain & $300\times100$ m & one-dimensional centre transect \\
 Raster domain & $34\times14$ cells & includes two-cell halo \\
 Cell size & \SI{10}{\metre} & controlled baseline resolution \\
-Time step / target CFL & \SI{0.745}{\second} / 0.5 & wind-transport stability \\
+Time step / wind CFL & \SI{0.742574}{\second} / 0.4979 & common exact-duration divisor \\
 Fuel and terrain & FBFM 102, flat & homogeneous surface spread \\
 Wind & \SI{6.71}{\metre\per\second} toward $+x$ & firebrand transport \\
 Ignition geometry & full crosswind line at $x=\SI{5}{\metre}$ & 1-D behavior \\
@@ -238,7 +268,7 @@ mixed-mode variant & SIMPLE & \SI{0}{\second} & \SI{150}{\second} & mixed-mode a
 constant wind; places a line ignition across every physical crosswind row; and
 writes explicit model selectors and ignition parameters into each local
 \path{elmfire.data.in}. The halo is present numerically but is excluded from
-all reported quantities.
+all reported quantities. The nominal 0.5-wind-CFL step is 0.745645~s. Because the controlled stops are 300 and 450~s, their greatest common duration is 150~s; preprocessing selects \(N=\lceil150/0.745645\rceil=202\) and the common \(\Delta t=150/202=0.742574\)~s. Both stops are therefore exact timestep multiples and the actual wind CFL remains below 0.5.
 
 \path{run_case.sh} uses the executable configured in \path{ELMFIRE_BIN}, prepares both variants, runs them sequentially in isolated directories, records their logs, postprocesses final rasters, writes \path{outputs/metrics.json}, and compiles the report.
 
@@ -251,7 +281,7 @@ the two-cell numerical buffer.  The domain map complements the spread-rate summa
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
 \caption{Whole-domain time-of-arrival field from the representative completed ELMFIRE run.  This
 domain-scale result supplements, rather than replaces, the higher-level verification
 profiles, convergence plots, ensemble statistics, and calculated acceptance metrics below.}
@@ -267,7 +297,7 @@ outputs; black curves are the Rothermel surface-spread references.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.66\textheight,keepaspectratio]{../figures/surface_dominated_reference.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.66\textheight,keepaspectratio]{../figures/surface_dominated_reference.pdf}
 \caption{Long-delay surface-dominated variant. The leading edge remains close
 to the surface-spread characteristic despite continued firebrand deposition.}
 \label{fig:surface-dominated-reference}
@@ -275,7 +305,7 @@ to the surface-spread characteristic despite continued firebrand deposition.}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.66\textheight,keepaspectratio]{../figures/mixed_mode_reference.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.66\textheight,keepaspectratio]{../figures/mixed_mode_reference.pdf}
 \caption{Finite-delay mixed-mode variant. Departure from the surface-only
 arrival, trajectory, and ROS references identifies firebrand-induced advance.}
 \label{fig:mixed-mode-reference}
@@ -287,7 +317,7 @@ easier to identify.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.66\textheight,keepaspectratio]{../figures/mixed_mode_delay_effect.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.66\textheight,keepaspectratio]{../figures/mixed_mode_delay_effect.pdf}
 \caption{Paired ELMFIRE comparison of the long-delay surface-dominated and
 finite-delay mixed-mode regimes. Accumulation is crosswind averaged; the other
 panels use the centre-row arrival-time field.}
@@ -326,6 +356,8 @@ Overall decision & all components pass & \Metric{verificationpassed} & \Metric{s
 \end{table}
 
 \section{Technical interpretation}
+
+The current paired execution passes every component. The surface-dominated mean ROS is \Metric{surfacedominatedmeanrosmps}~m/s with no ember-ignited cells. The mixed-mode mean ROS is \Metric{mixedmodemeanrosmps}~m/s (\Metric{mixedmoderosratiotosurface} times the surface reference), with \Metric{mixedmodeemberignitioncells} ember-ignited cells, a \Metric{mixedmodeleadingedgegainm}-m leading-edge gain, acceleration onset at \Metric{mixedmodeaccelerationonsets}~s, and a median TOA lead of \Metric{pairedmediantoaleads}~s.
 
 A pass demonstrates two complementary properties: delayed firebrand states do
 not spuriously outrun the surface solver in the surface-dominated limiting

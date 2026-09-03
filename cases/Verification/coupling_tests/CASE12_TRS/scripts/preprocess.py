@@ -292,10 +292,13 @@ def write_variant(case_dir, template, case, spec, feature_available):
 
     wind_m_s = float(case["wind_speed_mph"]) * 0.44704
     dt = float(spec["cfl"]) * dx / wind_m_s
+    requested_tstop = float(spec["tstop_s"])
+    step_count = int(math.ceil(requested_tstop / dt - 1.0e-12))
+    aligned_tstop = step_count * dt
     config_text = template
     replacements = {
-        "@DT@": f"{dt:.8g}",
-        "@TSTOP@": f"{float(spec['tstop_s']):.8g}",
+        "@DT@": f"{dt:.17g}",
+        "@TSTOP@": f"{aligned_tstop:.17g}",
         "@NUM_IGNITIONS@": str(num_ignitions),
         "@IGNITION_COORDINATES@": ignition_text,
     }
@@ -325,7 +328,9 @@ def write_variant(case_dir, template, case, spec, feature_available):
         "requested_physical_width_m": requested_width,
         "n_structures_x": n_structures_x,
         "buffer_cells": BUFFER_CELLS, "center_row": center_row,
-        "simulation_dt_s": dt, "num_ignitions": num_ignitions,
+        "simulation_dt_s": dt, "tstop_s": aligned_tstop,
+        "requested_tstop_s": requested_tstop, "step_count": step_count,
+        "num_ignitions": num_ignitions,
         "source_structure_count": source_structure_count,
         "source_cell_count": int(source_mask.sum()),
         "building_cell_count": int(building_mask.sum()),

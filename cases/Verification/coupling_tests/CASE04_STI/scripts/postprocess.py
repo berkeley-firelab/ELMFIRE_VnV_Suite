@@ -224,6 +224,26 @@ def main():
         name = variant["name"]
         root = CASE_DIR / variant["path"]
         out = root / "outputs"
+        if not any(out.glob("*.tif")):
+            complete = False
+            results[name] = {
+                "phi_dump_count": "not computed",
+                "scheduled_phi_dump_count": "not computed",
+                "phi_observable_front_count": "not computed",
+                "phi_dump_completeness_passed": "NOT EVALUABLE",
+                "toa_mean_relative_error": "not computed",
+                "toa_passed": "NOT EVALUABLE",
+                "leading_edge_normalized_rmse": "not computed",
+                "leading_edge_passed": "NOT EVALUABLE",
+                "mean_ros_relative_error": "not computed",
+                "mean_ros_passed": "NOT EVALUABLE",
+                "ember_ignition_state_consistency_passed": "NOT EVALUABLE",
+                "accumulation_relative_error": "not computed",
+                "accumulation_passed": "NOT EVALUABLE",
+                "total_accumulated_firebrands_domain_pcs": "not computed",
+                "active_deposition_rows": "not computed",
+            }
+            continue
         toa_file = exactly_one_final(out, "time_of_arrival")
         ignition_file = exactly_one_final(out, "ember_ignition")
         toa, gt, shape = read_raster(toa_file)
@@ -368,21 +388,25 @@ def main():
         profiles[name] = (x, sim, reference, times, leading, expected_leading)
     components = [complete]
     for name, item in results.items():
-        components += [item["phi_dump_completeness_passed"],
-                       item["toa_passed"],
-                       item["leading_edge_passed"],
-                       item["mean_ros_passed"],
-                       item["ember_ignition_state_consistency_passed"]]
-        components.append(item["accumulation_passed"])
+        components += [item["phi_dump_completeness_passed"] is True,
+                       item["toa_passed"] is True,
+                       item["leading_edge_passed"] is True,
+                       item["mean_ros_passed"] is True,
+                       item["ember_ignition_state_consistency_passed"] is True]
+        components.append(item["accumulation_passed"] is True)
     passed = bool(all(components))
+    required_variant_count = len(manifest["required_variants"])
+    evaluated_variant_count = sum(
+        "selected_toa_file" in item for item in results.values())
+    evaluation_complete = complete and evaluated_variant_count == required_variant_count
     metrics = {
         "case_id": config["id"],
-        "status": "pass" if passed else "fail",
-        "verification_passed": passed,
-        "required_variants": len(
-            manifest["required_variants"]),
-        "evaluated_variants": len(results),
-        "output_completeness_passed": complete,
+        "status": (("pass" if passed else "fail")
+                   if evaluation_complete else "insufficient_output"),
+        "verification_passed": (passed if evaluation_complete else "not_evaluated"),
+        "required_variants": required_variant_count,
+        "evaluated_variants": evaluated_variant_count,
+        "output_completeness_passed": evaluation_complete,
         "limits": limits,
         "expected_accumulation_pcs": expected_accumulation,
         "variants": results}
@@ -395,10 +419,10 @@ def main():
     (outputs / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
     flat = {
         "status": metrics["status"],
-        "verificationpassed": passed,
-        "requiredvariants": 2,
-        "evaluatedvariants": len(results),
-        "outputcompletenesspassed": complete}
+        "verificationpassed": metrics["verification_passed"],
+        "requiredvariants": metrics["required_variants"],
+        "evaluatedvariants": metrics["evaluated_variants"],
+        "outputcompletenesspassed": metrics["output_completeness_passed"]}
     for name, item in results.items():
         prefix = "transport" if name == "transport_impulse" else "wildland"
         for key, value in item.items():
@@ -408,7 +432,10 @@ def main():
         rf"\expandafter\def\csname metric@{key}\endcsname{{{latex_value(value)}}}" for key,
         value in flat.items()]
     (report / "metrics_macros.tex").write_text("\n".join(lines) + "\n")
-    write_reference_figure(profiles, figures)
+    if all(name in profiles for name in (
+            "transport_impulse", "wildland_no_delay",
+            "transport_impulse_accumulation", "wildland_no_delay_accumulation")):
+        write_reference_figure(profiles, figures)
     # fig, axes = plt.subplots(2, 2, figsize=(10, 7.5), constrained_layout=True)
     # for name, color in (("transport_impulse", "#1f77b4"),
     #                     ("wildland_no_delay", "#d62728")):

@@ -63,6 +63,33 @@ where $F$ is the lognormal cumulative distribution. The analytical count in
 cell $i$ is $N_i=100P_i$. The postprocessor reproduces this cell-integrated
 reference and compares it directly with the final \texttt{ember\_flux} raster.
 
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+The two time integrations can be reproduced explicitly.  For
+\(\Delta t=0.13~\mathrm{s}\), 76 complete steps cover
+\(76(0.13)=9.88~\mathrm{s}\) and the final overlap is
+\(10-9.88=0.12~\mathrm{s}\), so
+\[
+ N_{\mathrm{fine}}=10[76(0.13)+0.12]=100.
+\]
+For the \(\Delta t=12.7~\mathrm{s}\) member, the first step spans the complete
+source interval and
+\[
+ \Delta t_{\mathrm{active}}=\min(12.7,10)-\max(0,0)=10~\mathrm{s},
+ \qquad N_{\mathrm{coarse}}=10(10)=100.
+\]
+For the spatial reference, \(z_{0.99}=2.3263479\) gives
+\[
+ x_{0.99}=\exp[2.18+1.23(2.3263479)]=154.6876~\mathrm{m},
+ \qquad K=\operatorname{NINT}(154.6876/10)=15.
+\]
+The retained CDF mass is
+\(F(150)-F(10^{-6})=0.9893135\).  Substitution in the cell formula gives
+\(N_1=54.5524\), \(N_2=20.8937\), \(N_3=9.4216\) particles, with all 15
+bins summing to 100 after normalization.  Hence the exact metric references
+are \(E_N=0\) and \(E_{L_1}=0\); the numerical tests substitute
+\(E_N\leq0.005\) and \(E_{L_1}\leq0.01\) for both timesteps.
+% END EXPLICIT EXPECTED-RESULT DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 
 The integrated reference count is
@@ -121,7 +148,7 @@ ignition or firebrand-emission source explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Whole-domain prepared input configuration for the representative variant.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
@@ -129,7 +156,7 @@ fuel or structure layout, and initial ignition/source geometry are identified in
 \end{figure}
 
 The preprocessor creates two variants with $\Delta t=0.13$~s and
-$\Delta t=12.7$~s. Both use a 10~m grid and the same 500~m by 60~m physical
+$\Delta t=12.7$~s. Because timestep variation is the quantity under test, both fractional values are retained. The requested 120-s stop is rounded upward to an exact multiple: 924 steps give 120.12~s for the 0.13-s member, and 10 steps give 127.0~s for the 12.7-s member. The dump interval is set to the same aligned stop, while the verified 10-s source duration is unchanged. Both use a 10~m grid and the same 500~m by 60~m physical
 domain. This gives 50 by 6 usable cells and a 54 by 10 raster after two numerical buffer cells are added outside all four sides. A single
 ignition is placed in the first usable column and the middle usable row.
 
@@ -164,7 +191,7 @@ the two-cell numerical buffer.  Firebrand counts are normalized by the cell leng
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
 \caption{Whole-domain accumulated firebrand density from the representative completed ELMFIRE run.  This
 domain-scale result supplements, rather than replaces, the higher-level verification
 profiles, convergence plots, ensemble statistics, and calculated acceptance metrics below.}
@@ -179,7 +206,7 @@ that timestep exceeds the complete 10~s source duration.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{../figures/generation_residence_time.pdf}
+  \EvidenceFigure[width=\textwidth,height=0.62\textheight,keepaspectratio]{../figures/generation_residence_time.pdf}
   \caption{Accumulated firebrands per downwind cell for the 0.13 and 12.7~s
   timestep variants. Blue bars are ELMFIRE output and the red curve is the
   cell-integrated, truncated-lognormal reference for 100 generated firebrands.}
@@ -192,7 +219,7 @@ that timestep exceeds the complete 10~s source duration.
 
 % \begin{figure}[H]
 %   \centering
-%   \includegraphics[width=0.78\textwidth,height=0.42\textheight,keepaspectratio]{../figures/generation_residence_time_errors.pdf}
+%   \EvidenceFigure[width=0.78\textwidth,height=0.42\textheight,keepaspectratio]{../figures/generation_residence_time_errors.pdf}
 %   \caption{Integrated-count and normalized profile errors for both timesteps,
 %   with their separately predeclared acceptance limits.}
 %   \label{fig:generation-duration-errors}

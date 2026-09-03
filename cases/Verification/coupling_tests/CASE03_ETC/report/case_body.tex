@@ -16,6 +16,38 @@ This sweep reconstructs the wind-CFL convergence experiment~\cite{Qin2025}. \tex
 \section{Derivation of expected behavior}
 With surface spread disabled and direct ignition enabled, the transported ember field is the sole propagation mechanism. Uniform advection therefore gives the analytical leading-edge trajectory $x_{LE}(t)=u_{wind}t$ and the normalized propagation rate $ROS/u_{wind}=1$. Grid and wind-CFL refinement should reduce numerical transport error without changing this limiting value.
 
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+The generated timestep is not an independent free parameter:
+\[
+ \Delta t=CFL_w\frac{\Delta x}{6.71}.
+\]
+For the five required CFL values \(\{0.2,0.4,0.5,0.6,0.8\}\), the generated
+timesteps are
+\[
+\begin{array}{c|ccccc}
+\Delta x~(\mathrm{m})\backslash CFL_w&0.2&0.4&0.5&0.6&0.8\\\hline
+5&0.149031&0.298063&0.372578&0.447094&0.596125\\
+10&0.298063&0.596125&0.745156&0.894188&1.192250\\
+20&0.596125&1.192250&1.490313&1.788376&2.384501\\
+30&0.894188&1.788376&2.235469&2.682563&3.576751
+\end{array}
+\quad\mathrm{s}.
+\]
+These \(4\times5=20\) members form the acceptance set.  Uniform advection over
+the 300--1500 m comparison interval predicts
+\[
+ \Delta t_{\mathrm{ref}}=\frac{1500-300}{6.71}=178.8376~\mathrm{s},
+ \qquad \overline{ROS}_{\mathrm{ref}}
+ =\frac{1200}{178.8376}=6.71~\mathrm{m\,s^{-1}}.
+\]
+At the 260-s stop the characteristic displacement is
+\(6.71(260)=1744.6~\mathrm{m}\), plus the generated half-cell initial
+coordinate where absolute position is needed.  Thus every required variant
+has the exact normalized reference
+\(\overline{ROS}/U=1\) and \(E_U=|1-1|=0\); the implemented allowance is
+\(E_U\leq0.10\).
+% END EXPLICIT EXPECTED-RESULT DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 ELMFIRE writes the level-set field \(\phi\) after every solver time step.
 For every dump, the postprocessor reads the physical centerline, locates all
@@ -93,7 +125,7 @@ ignition or firebrand-emission source explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Whole-domain prepared input configuration for the representative variant.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
@@ -129,7 +161,7 @@ time step is prescribed by
 \begin{equation}
   \Delta t=CFL_{wind}\frac{\Delta x}{u_{wind}}.
 \end{equation}
-All variants retain the same physical domain; only the number of active and
+Because timestep variation is the verification variable, these fractional values are not rounded. For each member preprocessing uses \(N=\lceil260/\Delta t\rceil\) and writes \(t_{stop}=N\Delta t\), recording the requested 260~s, aligned stop, and integer step count in the manifest. All variants retain the same physical domain; only the number of active and
 buffer cells changes.
 
 \section{Actual simulation results}
@@ -140,7 +172,7 @@ the two-cell numerical buffer.  The zero contour identifies the transported fron
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
 \caption{Whole-domain transported level-set field from the representative completed ELMFIRE run.  This
 domain-scale result supplements, rather than replaces, the higher-level verification
 profiles, convergence plots, ensemble statistics, and calculated acceptance metrics below.}
@@ -152,7 +184,7 @@ and grid-resolution sweep in the reference coordinate system. Each point is
 the normalized speed calculated from a complete transient level-set history.
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.95\linewidth,height=0.45\textheight,keepaspectratio]{../figures/eulerian_transport_convergence.pdf}
+  \EvidenceFigure[width=0.95\linewidth,height=0.45\textheight,keepaspectratio]{../figures/eulerian_transport_convergence.pdf}
   \caption{Time-averaged Eulerian firebrand-driven spread speed normalized by
   the uniform wind speed as a function of wind-based CFL number. The shaded
   region marks the CFL range subject to the 10\% acceptance criterion.}
@@ -181,7 +213,7 @@ Panel (b) assembles those independently extracted locations into
 $x_{LE}(t)$.  The gray interval is the prescribed \SIrange{300}{1500}{m}
 comparison window expressed in time.  The dashed least-squares line is a
 trajectory-linearity diagnostic; its slope is
-\SI{\Metric{representativefitslope}}{m.s^{-1}}, but it is not the reported
+\Metric{representativefitslope}\,\si{m.s^{-1}}, but it is not the reported
 acceptance metric.
 
 Panels (c) and (d) show how that metric is calculated.  Panel (c) displays
@@ -196,14 +228,14 @@ different duration, the average is explicitly time weighted:
  =\frac{x_{LE}(t_N)-x_{LE}(t_0)}{t_N-t_0}.
 \end{equation}
 The representative result is
-$\overline{ROS}=\SI{\Metric{representativemeanros}}{m.s^{-1}}$, or
+$\overline{ROS}=\Metric{representativemeanros}\,\si{m.s^{-1}}$, or
 $\overline{ROS}/u_{wind}=\Metric{representativenormalizedros}$.  Thus the
 oscillatory instantaneous values caused by cell-by-cell front motion are not
 mistaken for the effective transport speed.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{../figures/representative\_front_extraction.pdf}
+  \EvidenceFigure[width=\linewidth,height=0.72\textheight,keepaspectratio]{../figures/representative\_front_extraction.pdf}
   \caption{Detailed extraction for the representative $\Delta x=\SI{10}{m}$,
   $CFL_{wind}=0.5$ simulation.  (a) Linear interpolation of centerline
   $\phi=0$ crossings; (b) resulting leading-edge trajectory and diagnostic
@@ -236,11 +268,14 @@ Acceptance CFL limit & \Metric{acceptancecflmax} \\
 \section{Technical interpretation}
 The expanded sweep fails its aggregate criterion because the
 $\Delta x=\SI{30}{m}$, $CFL_{wind}=0.5$ member gives
-$ROS/u_{wind}=\Metric{coarsecflofiveNormalizedros}$, corresponding to a
+\[
+  ROS/u_{wind}=\Metric{coarsecflofiveNormalizedros}
+\]
+corresponding to a
 relative error of \Metric{coarsecflofiveRelativeerror}.  This is slightly
 larger than the allowed 0.10.  The $\Delta x=\SI{10}{m}$ representative case
 remains within tolerance and is used above to explain the extraction
-procedure.
+procedure. All 28 current-fingerprint variants completed and the generated controls match the declared wind, grid, and CFL sweep. The isolated coarse-grid excess is therefore a numerical transport/level-set discrepancy in the current source behavior, not an incomplete run or an admissible configuration correction.
 
 \section{Scope and limitations}
 From this case directory, configure \texttt{ELMFIRE\_BIN} and run \texttt{./run\_case.sh}. The runner preprocesses the manifest, executes every variant sequentially with isolated outputs and logs, postprocesses the results, and compiles the standalone report.

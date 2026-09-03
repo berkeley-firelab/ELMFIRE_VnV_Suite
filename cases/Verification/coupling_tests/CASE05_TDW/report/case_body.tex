@@ -38,6 +38,38 @@ time. Grid crossing makes the discrete instantaneous ROS alternate between zero
 and approximately $\Delta x/\Delta t$. For the reference-aligned diagnostic, a centred
 nine-point average should recover the smooth reference $u(x_{\rm LE}(t),t)$.
 
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+The maximum prescribed speed used to select the generated solver step is
+\(u_{\max}=6.71+3.355=10.065~\mathrm{m\,s^{-1}}\), so
+\[
+ \Delta t=0.5(10)/10.065=0.496771~\mathrm{s}.
+\]
+Independent RK4 integration with the stated 0.005-s substep and
+\(x(0)=5~\mathrm{m}\) gives
+\[
+\begin{array}{c|rrrrr}
+t~(\mathrm{s})&0&30&60&90&120\\\hline
+x_{\mathrm{ref}}~(\mathrm{m})&
+5.000&192.328&377.023&566.967&752.389
+\end{array}
+\]
+from the generated analytical wind, not from ELMFIRE output.  Although
+\(\sin(2\pi t/60)=0\) makes the instantaneous reference velocity
+\(6.71~\mathrm{m\,s^{-1}}\) at these particular reporting times, the
+integrated position retains the intervening space--time oscillations; for
+example the 120-s displacement is \(752.389-5=747.389~\mathrm{m}\), not a
+constant-wind substitution.
+
+For matched sample \(i\), the explicit references are
+\(e_{x,i}=x_{\mathrm{ELM},i}-x_{\mathrm{ref},i}=0\) and
+\(e_{u,i}=\overline{ROS}_{\mathrm{ELM},i}
+-u(x_{\mathrm{ref},i},t_i)=0\).  Hence the ideal metric values are
+\(\operatorname{mean}|e_x|=0\), \(\max|e_x|=0\),
+\(\operatorname{mean}|e_u|=0\), and coverage \(=1\); the substituted
+allowances are 10 m, 20 m, \(2~\mathrm{m\,s^{-1}}\), and 0.90,
+respectively.
+% END EXPLICIT EXPECTED-RESULT DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 For all finite samples, the postprocessor calculates mean and maximum absolute
 position error, the mean absolute error of the nine-point running-average ROS,
@@ -102,7 +134,7 @@ ignition or firebrand-emission source explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Whole-domain prepared input configuration for the representative variant.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
@@ -141,7 +173,7 @@ the two-cell numerical buffer.  The field provides the spatial counterpart to th
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
 \caption{Whole-domain time-of-arrival field from the representative completed ELMFIRE run.  This
 domain-scale result supplements, rather than replaces, the higher-level verification
 profiles, convergence plots, ensemble statistics, and calculated acceptance metrics below.}
@@ -156,7 +188,7 @@ integrating the prescribed leading-edge ODE.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth,height=0.42\textheight,keepaspectratio]
+\EvidenceFigure[width=\textwidth,height=0.42\textheight,keepaspectratio]
  {../figures/time_dependent_wind_transport.pdf}
 \caption{Time-dependent-wind transport comparison. Left: ELMFIRE and ODE
 leading-edge position. Right: ODE reference, grid-scale instantaneous ROS, and
@@ -170,7 +202,7 @@ single mean value.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.94\textwidth,height=0.40\textheight,keepaspectratio]{../figures/time_dependent_wind_errors.pdf}
+\EvidenceFigure[width=0.94\textwidth,height=0.40\textheight,keepaspectratio]{../figures/time_dependent_wind_errors.pdf}
 \caption{Absolute leading-edge-position and running-ROS errors through the
 simulation. Horizontal lines identify the applicable acceptance limits.}
 \label{fig:time-dependent-errors}
@@ -196,7 +228,7 @@ The decision read directly from \texttt{outputs/metrics.json} is
 \Metric{verificationpassed}).
 
 \section{Technical interpretation}
-The executed case is a genuine failed verification. The ELMFIRE leading edge reaches only \Metric{finalsimulatedpositionm} m at 120 s, whereas the ODE reference reaches \Metric{finalreferencepositionm} m. The position MAE is \Metric{positionmaem} m, so the discrepancy is much larger than the expected one-cell representation error. The TOA sequence advances plausibly at early time but develops long gaps after approximately 215 m. Input inspection confirms 121 wind bands spanning 3.355--10.065 m s and the deterministic source-selection percentage is explicit. The remaining evidence therefore points to the current handling of time-indexed wind along recursive Eulerian ember trackers or their source activation history, rather than to a constant-wind input or coordinate-comparison error. Instantaneous ROS remains intentionally grid-quantized; its nine-point mean is the smooth acceptance observable.
+The current execution passes all four predeclared checks. The ELMFIRE leading edge reaches \Metric{finalsimulatedpositionm}~m at 120~s, compared with the ODE reference value \Metric{finalreferencepositionm}~m. The position MAE is \Metric{positionmaem}~m, the maximum position error is \Metric{positionmaxerrorm}~m, the nine-point running-ROS MAE is \Metric{runningrosmaemps}~m/s, and the time-coverage fraction is \Metric{timecoveragefraction}; each lies within its declared limit. Input inspection confirms 121 one-second wind bands spanning the prescribed forcing history and an explicit deterministic source-selection percentage. The agreement therefore verifies the configured time-indexed-wind transport observable at the stated spatial and temporal resolution. Instantaneous ROS remains grid-quantized, which is why the smoother nine-point mean is the acceptance observable.
 
 \section{Scope and limitations}
 This is deterministic code verification of the Eulerian algorithm. It does not

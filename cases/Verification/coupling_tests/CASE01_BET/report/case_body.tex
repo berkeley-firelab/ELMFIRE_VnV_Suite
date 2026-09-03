@@ -94,6 +94,40 @@ $N''_{\mathrm{ref}}=\Metric{meansimulationreferencedensitypcsm2}$~pcs/m$^2$.
 The per-variant values and selected raster cells are retained in
 \texttt{../outputs/metrics.json}.
 
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+The generated numerical substitutions make the cancellation visible.  With
+\(CFL_w=0.5\) and \(U=6.71~\mathrm{m\,s^{-1}}\),
+\[
+\begin{array}{c|ccc}
+\Delta x~(\mathrm{m})&5&10&30\\\hline
+\Delta t_{\rm generated}~(\mathrm{s})&0.372578&0.745156&2.000000\\
+GR_{\mathrm{ELM}}=33.3/\Delta x&6.66&3.33&1.11\\
+GR_{\mathrm{ELM}}\Delta y&33.3&33.3&33.3
+\end{array}
+\]
+in \(\mathrm{pcs\,s^{-1}\,MW^{-1}}\) for the last two rows. The 5- and 10-m CFL steps divide the requested 500-s duration exactly. At 30~m, the nominal CFL step is 2.235469~s; preprocessing selects the conservative whole-second divisor 2~s, giving 250 steps and preserving the 500-s stop while keeping \(CFL_w=0.4473<0.5\). Thus the
+source-scaling reference is exactly 33.3 in all three variants, and its
+relative error is
+\[
+ e_{GR}=\max_i\frac{|GR_i\Delta y_i-33.3|}{33.3},
+ \qquad e_{GR,\mathrm{ref}}=0.
+\]
+The run-derived FLIN and VS values enter only as controlled fire-behavior
+normalizers; the ember-flux field being tested does not determine them.  With
+\(0.3048/60=0.00508\),
+\[
+ N''_{\mathrm{ref}}
+ =33.3\frac{FLIN/1000}{VS(0.00508)}
+ =6.555118\,\frac{FLIN~[\mathrm{kW\,m^{-1}}]}
+                   {VS~[\mathrm{ft\,min^{-1}}]}
+ \quad\mathrm{pcs\,m^{-2}}.
+\]
+For each generated mesh the expected far-field error is therefore zero, and
+the substituted decision requires
+\(\operatorname{mean}_{150<x\leq200}|N''-N''_{\mathrm{ref}}|/
+N''_{\mathrm{ref}}\leq0.05\).
+% END EXPLICIT EXPECTED-RESULT DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 
 For each resolution, the centre-row accumulated count \(N_i\) is converted to
@@ -163,7 +197,7 @@ ignition or firebrand-emission source explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Whole-domain prepared input configuration for the representative variant.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
@@ -205,7 +239,7 @@ the two-cell numerical buffer.  Firebrand counts are normalized by the cell leng
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
 \caption{Whole-domain accumulated firebrand density from the representative completed ELMFIRE run.  This
 domain-scale result supplements, rather than replaces, the higher-level verification
 profiles, convergence plots, ensemble statistics, and calculated acceptance metrics below.}
@@ -220,7 +254,7 @@ line uses the FLIN and spread rate extracted from that same variant.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.68\textheight,keepaspectratio]{../figures/emission_time_resolution.pdf}
+  \EvidenceFigure[width=\textwidth,height=0.68\textheight,keepaspectratio]{../figures/emission_time_resolution.pdf}
   \caption{Accumulated firebrand density for the 5, 10, and 30~m grids. The
   dashed red line in each panel is the run-derived reference. The two-cell
   numerical halo is excluded from every profile.}
@@ -234,7 +268,7 @@ line uses the FLIN and spread rate extracted from that same variant.
 
 % \begin{figure}[H]
 %   \centering
-%   \includegraphics[width=0.78\textwidth,height=0.42\textheight,keepaspectratio]{../figures/emission_time_error.pdf}
+%   \EvidenceFigure[width=0.78\textwidth,height=0.42\textheight,keepaspectratio]{../figures/emission_time_error.pdf}
 %   \caption{Far-field mean and maximum relative density errors versus grid
 %   spacing. The dotted horizontal line is the predeclared mean-error limit.}
 %   \label{fig:biomass-emission-error}

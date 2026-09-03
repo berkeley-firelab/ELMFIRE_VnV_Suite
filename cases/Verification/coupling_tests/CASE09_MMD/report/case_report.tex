@@ -29,6 +29,18 @@
 \providecommand{\CompletedVariantCount}{0}
 \providecommand{\RequestedVariantCount}{0}
 
+% Missing generated figures are explicit evidence gaps, never silent omissions.
+\newcommand{\EvidenceFigure}[2][]{%
+  \IfFileExists{#2}{\includegraphics[#1]{#2}}{%
+    \IfFileExists{../figures/#2}{\includegraphics[#1]{#2}}{%
+      \fbox{\parbox{0.88\linewidth}{\centering
+        \textbf{Generated evidence unavailable}\\[0.4em]
+        The required figure is absent because its simulation outputs are not
+        available. The associated comparison remains \textbf{NOT EVALUABLE}.}}%
+    }%
+  }%
+}
+
 \title{Case \CaseNumber: \CaseTitle}
 \author{ELMFIRE Spotting Verification Guide}
 \date{\today}

@@ -76,6 +76,43 @@ $\tau_{\rm ember}=6$~s, giving 600~pcs~m$^{-2}$ under the represented-strip
 normalization. The PER-MW reference is calculated from co-located final FLIN
 and VS. The 155--195~m interval contains cells with complete upstream support.
 
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+The wind-CFL upper-bound step is
+\[
+ \Delta t_{\max}=0.5(10)/6.71=0.745156~\mathrm{s}.
+\]
+To retain the requested 100-s stop as an exact multiple, preprocessing selects \(N=\lceil100/0.745156\rceil=135\) and \(\Delta t=100/135=0.740741\)~s. The resulting wind CFL is 0.4970, below the declared 0.5 bound.
+With \(x_0=5~\mathrm{m}\), representative exact TOA substitutions in the
+declared plateau interval are
+\[
+ t_{\mathrm{ref}}(155)=\frac{155-5}{6.71}=22.3547~\mathrm{s},\qquad
+ t_{\mathrm{ref}}(195)=\frac{195-5}{6.71}=28.3159~\mathrm{s}.
+\]
+Likewise \(x_{\mathrm{LE,ref}}(50)=5+6.71(50)=340.5~\mathrm{m}\), and the
+front reaches the 500-m boundary after
+\((500-5)/6.71=73.7705~\mathrm{s}\).  These substitutions give exact
+reference values of zero for TOA relative error, leading-edge NRMSE, and ROS
+relative error before raster quantization.
+
+For the PER-AREA member, the complete-support density is
+\[
+ n''_{\infty}=GR\,\Delta x\,\tau_{\mathrm{ember}}/(1~\mathrm{m})
+ =10(10)(6)=600~\mathrm{pcs\,m^{-2}}.
+\]
+For the PER-MW member, the reference evaluated at each co-located FLIN/VS
+cell is
+\[
+ n''_{\mathrm{ref}}
+ =33.3\frac{FLIN/1000}{VS(0.3048/60)}
+ =6.555118\frac{FLIN}{VS}~\mathrm{pcs\,m^{-2}},
+\]
+with FLIN in \(\mathrm{kW\,m^{-1}}\) and VS in
+\(\mathrm{ft\,min^{-1}}\).  The historical nominal substitution gives
+1497.2 particles; current acceptance uses the generated co-located fields
+rather than that rounded historical value.  Both plateau references therefore
+have expected relative error zero and are tested with a 0.10 allowance.
+% END EXPLICIT EXPECTED-RESULT DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 For valid centre-row cells, define $e_i=|t_i-t_{\rm ref,i}|/t_{\rm ref,i}$.
 Each variant requires at least two cells, $\bar e\le0.10$, and
@@ -149,7 +186,7 @@ ignition or firebrand-emission source explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Whole-domain prepared input configuration for the representative variant.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
@@ -161,7 +198,7 @@ fuel or structure layout, and initial ignition/source geometry are identified in
 \toprule Parameter & Configured value & Units & Verification role\\ \midrule
 Domain & $500\times100$ & m & common physical extent\\
 Grid and halo & $10$; two cells/side & m & prescribed resolution; excluded halo\\
-Time step & $0.5\Delta x/U=0.745$ & s & wind CFL 0.5\\
+Time step & $100/135=0.740741$ & s & wind CFL $0.4970<0.5$\\
 Wind & $6.71$, from $270^\circ$ & m/s & constant transport velocity\\
 Fuel/terrain & FBFM 102; flat & -- & uniform wildland control\\
 Transport variant & PER-AREA; surface off; 100 s & -- & isolates transport-impulse variant transport\\
@@ -189,7 +226,7 @@ the two-cell numerical buffer.  Firebrand counts are normalized by the cell leng
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
 \caption{Whole-domain accumulated firebrand density from the representative completed ELMFIRE run.  This
 domain-scale result supplements, rather than replaces, the higher-level verification
 profiles, convergence plots, ensemble statistics, and calculated acceptance metrics below.}
@@ -205,7 +242,7 @@ time, leading-edge position, and instantaneous leading-edge rate of spread.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.68\textheight,keepaspectratio]{../figures/steady_transport_reference.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.68\textheight,keepaspectratio]{../figures/steady_transport_reference.pdf}
 \caption{Steady-transport and immediate-ignition observables from actual
 ELMFIRE outputs. Solid colored curves identify the two controlled variants;
 black or color-matched reference curves show the derived analytical behavior.}

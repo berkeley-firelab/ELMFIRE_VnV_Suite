@@ -34,7 +34,7 @@ The dump spacing $\Delta t$ is retained as the temporal-censoring resolution.
 
 For the response sweep,
 \begin{equation}
- CFL_w=\frac{u_w\Delta t}{\Delta x}=0.5,
+ CFL_w=\frac{u_w\Delta t}{\Delta x}\leq0.5,
  \qquad r_m=\frac{R_m}{u_w},
  \label{eq:ros}
 \end{equation}
@@ -53,8 +53,43 @@ uncertainty to the deposition interval.
 At $P=0$, the ignition hazard is zero, and no spotting-driven front should
 propagate. Increasing $P$ increases $F(t)$ for every $t>0$ and therefore cannot
 reduce population-mean ROS. At $P=1$, ignition is immediate in the continuous
-model and $\overline r$ should approach one. Because physical extent and
-$CFL_w$ are fixed, the four resolution curves should nearly coincide.
+model and $\overline r$ should approach one. Because physical extent is fixed and the generated
+$CFL_w$ values remain conservatively bounded near 0.5, the four resolution curves should nearly coincide.
+
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+For the delay member, \(P=0.9\) and \(\tau=10~\mathrm{s}\), hence
+\[
+ F(5)=1-0.1^{0.5}=0.683772,\qquad
+ F(10)=1-0.1=0.9,\qquad
+ F(20)=1-0.1^2=0.99.
+\]
+Solving \(F(q_{0.9})=0.9\) gives
+\(0.1^{q_{0.9}/10}=0.1\) and therefore
+\(q_{0.9}=10~\mathrm{s}\) exactly.  With
+\(U=15(0.44704)=6.7056~\mathrm{m\,s^{-1}}\), preprocessing first computes
+the \(CFL_w=0.5\) upper bounds, then reduces each step to divide 240~s
+exactly.  The actual generated steps and corresponding per-step ignition
+probabilities are
+\[
+\begin{array}{c|rrrr}
+\Delta x~(\mathrm{m})&5&10&20&30\\\hline
+\Delta t~(\mathrm{s})&0.372671&0.745342&1.490683&2.222222\\
+1-0.1^{\Delta t/10}&0.082232&0.157702&0.290534&0.400516
+\end{array}
+\]
+For each resolution the conservative CFL-derived timestep defines the probability transformation and cross-resolution control. Preprocessing selects \(N=\lceil240/\Delta t_{CFL}\rceil\), writes the conservative divisor \(\Delta t=240/N\), and keeps \(t_{stop}=240\)~s exactly; the manifest records nominal and actual CFL values plus the integer step count. This shows why the step probability changes while the continuous delay CDF
+does not.
+
+The response design contains
+\(4\) resolutions \(\times5\) probabilities \(\times10\) paired seeds
+\(=200\) required runs, plus 10 delay members.  The exact limiting references
+are \(R/U=0\) at \(P=0\), monotone nondecrease with \(P\), and \(R/U\to1\)
+at \(P=1\).  Numerically these become a maximum cross-resolution range of
+0.10, a \(P=1\) floor of 0.90, and adjacent decreases no larger than their
+pooled 95-percent confidence half-width.  The delay substitution is
+\(|\widehat q_{0.9}-10|\leq1~\mathrm{s}\), with at least 1000 samples and
+bootstrap half-width at most 1 s.
+% END EXPLICIT EXPECTED-RESULT DERIVATION
 
 \section{Verification metrics and acceptance criteria}
 For every response group with $N=10$, the postprocessor calculates the mean,
@@ -133,7 +168,7 @@ ignition or firebrand-emission source explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Whole-domain prepared input configuration for the representative variant.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
@@ -151,8 +186,8 @@ Buffer & 2 cells per side & cells & Excluded numerical halo \\
 Response grids & 5, 10, 20, 30 & m & Resolution comparison \\
 Delay grid & 10 & m & delay-ensemble spatial baseline \\
 Wind & 15 (6.7056) & mph (m/s) & Uniform transport \\
-Wind CFL & 0.5 & -- & Fixed $\Delta t/\Delta x$ \\
-Stop time & 240 & s & Common observation window \\
+Wind CFL & $\leq0.5$ & -- & stable near-fixed $\Delta t/\Delta x$ \\
+Stop time & 240 & s & exact timestep multiple \\
 Response probabilities & 0, 0.25, 0.50, 0.75, 1 & -- & probability-response design \\
 Delay model & $P=0.9$, $\tau=10$ & --, s & delay-distribution design \\
 Ensembles & $20\times10$ response; 10 delay & runs & Sampling statistics \\
@@ -177,7 +212,7 @@ the two-cell numerical buffer.  This representative ensemble member supplies spa
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
 \caption{Whole-domain ember-ignition field from the representative completed ELMFIRE run.  This
 domain-scale result supplements, rather than replaces, the higher-level verification
 profiles, convergence plots, ensemble statistics, and calculated acceptance metrics below.}
@@ -192,7 +227,7 @@ from actual arrival-time, ember-ignition, dump-time, and transient-flux outputs.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.82\textwidth,height=0.46\textheight,keepaspectratio]{../figures/sft_delay_distribution.pdf}
+\EvidenceFigure[width=0.82\textwidth,height=0.46\textheight,keepaspectratio]{../figures/sft_delay_distribution.pdf}
 \caption{Probability density of sampled SFT ignition delays. The solid red line
 is the prescribed 90th percentile and the dashed black line is the observed
 pooled 90th percentile.}
@@ -205,7 +240,7 @@ spatial resolution.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.94\textwidth,height=0.55\textheight,keepaspectratio]{../figures/ignition_probability_convergence.pdf}
+\EvidenceFigure[width=0.94\textwidth,height=0.55\textheight,keepaspectratio]{../figures/ignition_probability_convergence.pdf}
 \caption{Ensemble-mean normalized leading-edge ROS versus
 $P_{\mathrm{ign,small}}$. Error bars are 95\% confidence intervals and faint
 points are independently seeded ELMFIRE members.}
@@ -218,7 +253,7 @@ members are added.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.82\textwidth,height=0.46\textheight,keepaspectratio]{../figures/sft_delay_ensemble_convergence.pdf}
+\EvidenceFigure[width=0.82\textwidth,height=0.46\textheight,keepaspectratio]{../figures/sft_delay_ensemble_convergence.pdf}
 \caption{Cumulative convergence of the pooled ELMFIRE 90th-percentile SFT
 delay. The dashed line is the model expectation, blue shading is the bootstrap
 95\% interval, and the green band is the $\pm1$~s acceptance interval.}
@@ -250,16 +285,7 @@ Overall status & all components pass & \textbf{\Metric{status}} \\
 The machine-readable overall decision is \textbf{\Metric{verificationpassed}}.
 
 \section{Technical interpretation}
-The response ensemble currently has \Metric{evaluatedmembers}/\Metric{requiredmembers}
-usable members. Its maximum cross-resolution spread is
-\Metric{maxcrossresolutionmeanspread}, so that component can be distinguished
-from the stochastic-delay check. The dedicated delay ensemble currently has
-\Metric{evaluatedsftmembers}/\Metric{requiredsftmembers} usable members and
-\Metric{sftdelaysamples} admitted delays. Therefore the merged case status is
-\textbf{\Metric{status}} until every required component is evaluable and passes.
-This separation prevents a plausible ROS curve from masking an incorrect SFT
-waiting-time distribution, and prevents a correct quantile from masking
-grid-sensitive propagation.
+All \Metric{evaluatedmembers}/\Metric{requiredmembers} response members and \Metric{evaluatedsftmembers}/\Metric{requiredsftmembers} dedicated delay members are usable. The maximum cross-resolution response spread is \Metric{maxcrossresolutionmeanspread}, exceeding the 0.10 limit, although the minimum unit-probability mean passes. The \Metric{sftdelaysamples} admitted SFT samples give a 90th-percentile delay of \Metric{sftobservedquantiles}~s; its \Metric{sftquantileabsoluteerrors}-s absolute error exceeds the 1-s limit, while the bootstrap half-width passes. Thus the result is a genuine \textbf{\Metric{status}}, not an incomplete evaluation. The generated probability, seed, timestep, and ensemble controls are internally consistent. The source updates probability as \(1-(1-P)^{\Delta t/\tau})\) and advances a newly deposited cell through its staged ignition state on later invocations; the observed extra-step delay and grid dependence therefore identify current source timing/discretization behavior rather than a case-configuration defect.
 
 \section{Scope and limitations}
 The case verifies one SIMPLE SFT time scale, one delay probability, one uniform

@@ -7,6 +7,7 @@ it does not run ELMFIRE. Raster indices include a two-cell numerical halo.
 """
 from pathlib import Path
 import json
+import math
 import re
 import shutil
 import numpy as np
@@ -109,13 +110,17 @@ def main():
         raise ValueError("physical dimensions must be integer multiples of cell size")
     nx = physical_nx + 2 * BUFFER_CELLS
     ny = physical_ny + 2 * BUFFER_CELLS
-    dt = TRANSPORT_CFL * dx / WIND_SPEED_MPS
+    nominal_dt = TRANSPORT_CFL * dx / WIND_SPEED_MPS
     template = (CASE_DIR / "elmfire.data.in").read_text()
     variants_root = CASE_DIR / "variants"
     variants_root.mkdir(exist_ok=True)
     manifest = {"case_id": config["id"], "required_variants": [], "variants": []}
     for definition in config["variants"]:
         name = definition["name"]
+        requested_tstop_s = float(definition["tstop_s"])
+        step_count = int(math.ceil(requested_tstop_s / nominal_dt - 1.0e-12))
+        dt = requested_tstop_s / step_count
+        simulation_tstop_s = step_count * dt
         root = variants_root / name
         inputs = root / "data" / "inputs"
         misc = root / "data" / "misc"
@@ -133,10 +138,10 @@ def main():
             "OUTPUTS_DIRECTORY": "'./outputs'",
             "MISCELLANEOUS_INPUTS_DIRECTORY": "'./data/misc'",
             "SCRATCH": "'./logs/scratch'",
-            "SIMULATION_DT": f"{dt:.10g}",
-            "SIMULATION_DTMAX": f"{dt:.10g}",
+            "SIMULATION_DT": f"{dt:.17g}",
+            "SIMULATION_DTMAX": f"{dt:.17g}",
             "TARGET_CFL": f"{TRANSPORT_CFL:.8g}",
-            "SIMULATION_TSTOP": f"{definition['tstop_s']:.8g}",
+            "SIMULATION_TSTOP": f"{simulation_tstop_s:.17g}",
             # "DTDUMP": f"{DUMP_INTERVAL_TRANSPORT_S if name == 'transport_impulse' else DUMP_INTERVAL_WILDLAND_S:.8g}",
             "X_IGN(1)": f"{IGNITION_X_M:.8g}",
             "Y_IGN(1)": f"{0.5 * width:.8g}",
@@ -183,7 +188,13 @@ def main():
             "physical_length_m": length,
             "physical_width_m": width,
             "buffer_cells": BUFFER_CELLS,
+            "nominal_simulation_dt_s": nominal_dt,
             "simulation_dt_s": dt,
+            "requested_transport_cfl": TRANSPORT_CFL,
+            "transport_cfl": WIND_SPEED_MPS * dt / dx,
+            "requested_tstop_s": requested_tstop_s,
+            "simulation_tstop_s": simulation_tstop_s,
+            "step_count": step_count,
             "wind_speed_mps": WIND_SPEED_MPS,
             "effective_ember_gr_per_mw_1m": EMBER_GR_PER_MW_1M if name != "transport_impulse" else None}
         manifest["required_variants"].append(name)

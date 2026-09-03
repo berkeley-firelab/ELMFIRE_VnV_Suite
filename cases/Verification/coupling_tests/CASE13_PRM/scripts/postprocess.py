@@ -39,10 +39,9 @@ def read_raster(path):
 
 def add_horizontal_colorbar(figure, axis, image, label, ticks=None):
     """Place a full-width readable colorbar below a short map panel."""
-    divider = make_axes_locatable(axis)
-    colorbar_axis = divider.append_axes("bottom", size=0.16, pad=0.55)
     colorbar = figure.colorbar(
-        image, cax=colorbar_axis, orientation="horizontal", ticks=ticks
+        image, ax=axis, orientation="horizontal", fraction=0.08, pad=0.24,
+        ticks=ticks,
     )
     colorbar.set_label(label, fontsize=9)
     colorbar.ax.tick_params(labelsize=8)

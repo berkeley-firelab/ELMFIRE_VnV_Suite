@@ -70,6 +70,41 @@ interpolated to the 1~m cell centers. Their normalized integral error is
 Consistent refinement requires \(E_{30}\ge E_{10}\ge E_5\), with
 \(E_5\le0.15\).
 
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+For a cell whose calculated lifetime is \(T_n=\max(t_{fb,live,n},10)\),
+Equation~\ref{eq:decay} gives the explicit retained fraction
+\[
+ \frac{N''_{n+1}}{N''_n}=1-\frac{\Delta t_n}{T_n},\qquad
+ \frac{N''_m}{N''_0}=\prod_{n=0}^{m-1}
+ \left(1-\frac{\Delta t_n}{T_n}\right).
+\]
+This is the reference update that the consumption-on run must execute; the
+consumption-off reference has every factor equal to one.  The published
+statement that more than 96 percent is consumed is converted without further
+fitting to
+\[
+ 1-f_{\mathrm{ret}}\geq0.96
+ \quad\Longleftrightarrow\quad
+ f_{\mathrm{ret}}=\frac{A_{\mathrm{on}}}{A_{\mathrm{off}}}\leq0.04.
+\]
+The nominal surface-CFL upper bounds are \(0.5\Delta x/0.71\). To keep every requested 10-s-multiple observation time exact, preprocessing selects the largest divisor no greater than that bound, preferring whole seconds when feasible:
+\[
+ \Delta t=\{0.666667,\ 2,\ 5,\ 10\}~\mathrm{s}
+\]
+for \(\Delta x=\{1,5,10,30\}\) m. Thus all 260-s paired stops and 50--500-s history stops are exact timestep multiples, and every actual surface CFL remains below 0.5. The intended lifetime is recalculated
+locally from \(v_a\) and
+\(\psi=0.2N''/10^4\), so no constant lifetime is invented for the report.
+
+For the paired control, the exact expected TOA difference is zero and the
+active-stock lower bound is zero particles.  The convergence reference is the
+generated 1-m profile:
+\(E_1=0\), with expected refinement ordering
+\(E_{30}\geq E_{10}\geq E_5\geq E_1\).
+The decision substitutes \(E_5\leq0.15\), paired TOA difference
+\(\leq10~\mathrm{s}\), and minimum active count
+\(\geq-10^{-6}\), in addition to the 0.04 retained-fraction limit.
+% END EXPLICIT EXPECTED-RESULT DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 All 48 manifest variants are required: eight paired 260-s metric runs and 40
 consumption-on stop-time runs (four resolutions at ten sample times). Exactly
@@ -144,7 +179,7 @@ ignition or firebrand-emission source explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Whole-domain prepared input configuration for the representative variant.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
@@ -163,7 +198,7 @@ Cell sizes & 1, 5, 10, 30 m & active-stock convergence sweep \\
 Numerical halo & 2 cells per side & excluded from all metrics \\
 Metric evaluation time & 260 s & paired consumption-on/off comparison \\
 History sample times & 50--500 s in 50-s increments & final active-stock samples for the temporal curve \\
-Temporal CFL & 0.5 based on 0.71 m/s & delayed-ignition baseline time refinement \\
+Temporal CFL & at most 0.5 based on 0.71 m/s & conservative exact-duration divisors \\
 Wind & 15 mph from 270 degrees & uniform downwind forcing \\
 Generation & PER-MW, $33.3/\Delta y$ pcs/s/MW & delayed-ignition baseline vegetation source \\
 Transport/accumulation & EMPIRICAL/EULERIAN & active-stock implementation \\
@@ -189,7 +224,7 @@ the two-cell numerical buffer.  Counts are divided by physical cell area, giving
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
 \caption{Whole-domain accumulated firebrand density from the representative completed ELMFIRE run.  This
 domain-scale result supplements, rather than replaces, the higher-level verification
 profiles, convergence plots, ensemble statistics, and calculated acceptance metrics below.}
@@ -207,7 +242,7 @@ leading-edge ROS.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.66\textheight,keepaspectratio]{../figures/firebrand_consumption_state.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.66\textheight,keepaspectratio]{../figures/firebrand_consumption_state.pdf}
 \caption{Consumption-on state at 1~m resolution. The top row gives the active
 firebrand and arrival-time profiles; the bottom row gives the reconstructed
 leading-edge trajectory and ROS with surface-spread references.}
@@ -220,7 +255,7 @@ location nearest 200~m; the right panel selects the dump nearest 250~s.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.43\textheight,keepaspectratio]{../figures/firebrand_consumption_convergence.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.43\textheight,keepaspectratio]{../figures/firebrand_consumption_convergence.pdf}
 \caption{Consumption-model resolution sweep. Left: active-firebrand history
 near 200~m. Right: active-firebrand spatial profile near 250~s. Every curve is
 read from a predeclared stop-time run's final ELMFIRE raster.}
@@ -232,7 +267,7 @@ the consumption-on/off effect and the 4\% retention criterion explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.43\textheight,keepaspectratio]{../figures/firebrand_consumption_verification.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.43\textheight,keepaspectratio]{../figures/firebrand_consumption_verification.pdf}
 \caption{Paired consumption diagnostic. Left: consumption-on profiles by
 resolution. Center: paired 1~m profiles. Right: retained active fraction with
 the 4\% acceptance limit.}
@@ -262,8 +297,8 @@ Overall decision & all pass & \Metric{verificationpassed} & \textbf{\Metric{stat
 \section{Technical interpretation}
 All four measured retained fractions are exactly 1.0, so enabling consumption
 does not change the active deposited population. The maximum paired TOA
-difference is 0~s, while the normalized profile errors are 0.0326, 0.0846, and
-0.3417 at 5, 10, and 30~m, respectively. The source-normalized profiles therefore
+difference is 0~s, while the normalized profile errors are 0.0363, 0.0778, and
+0.3511 at 5, 10, and 30~m, respectively. The source-normalized profiles therefore
 converge monotonically and the paired dynamics remain controlled, but the primary
 consumption metric fails decisively. Given the audited \(10^9\)~s minimum
 lifetime, this is a source-code implementation defect rather than insufficient
@@ -274,7 +309,7 @@ why TOA appears here solely as a controlled invariance check.
 This test verifies active-stock decay in one flat, uniform delayed-ignition baseline-like
 configuration. It does not validate the empirical heat-flux correlation, pile
 clustering, subgrid redistribution, or the 10~s lifetime against experiments.
-The 10~s dump cadence now provides the active-stock history near 200~m and
+The 50~s sequence of independently stopped runs provides the active-stock history near 200~m and
 the spatial profile near 250~s directly from ELMFIRE rasters. The experiment
 still does not resolve within-cell firebrand clustering or validate the lifetime
 correlation against measurements.

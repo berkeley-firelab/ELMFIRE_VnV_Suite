@@ -180,6 +180,16 @@ def main() -> None:
         "minimum_time_coverage_fraction": MIN_TIME_COVERAGE_FRACTION,
         "running_average_points": RUNNING_WINDOW_POINTS,
         "sample_dt_s": SAMPLE_DT_S,
+        "position_mae_m": "not computed",
+        "position_max_error_m": "not computed",
+        "running_ros_mae_mps": "not computed",
+        "time_coverage_fraction": 0.0,
+        "position_mae_passed": "NOT EVALUABLE",
+        "position_max_error_passed": "NOT EVALUABLE",
+        "running_ros_mae_passed": "NOT EVALUABLE",
+        "time_coverage_passed": "NOT EVALUABLE",
+        "final_simulated_position_m": "not computed",
+        "final_reference_position_m": float(x_ref[-1]),
     }
     toa_files = sorted(OUTPUT_DIR.glob("time_of_arrival_*_*.tif"))
     if not toa_files:

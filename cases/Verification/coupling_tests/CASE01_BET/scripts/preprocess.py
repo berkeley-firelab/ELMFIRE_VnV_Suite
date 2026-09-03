@@ -28,6 +28,7 @@ WIND_SPEED_MPH = 15.0
 WIND_SPEED_MPS = 6.71
 WIND_DIRECTION_DEG = 270.0
 WIND_CFL = 0.5
+SIMULATION_TSTOP_S = 500.0
 UNIT_WIDTH_EMBER_GR_PER_MW_S = 33.3
 NODATA = -9999.0
 PROJECTION_EPSG = 32610
@@ -121,9 +122,22 @@ def main() -> None:
                 raise FileNotFoundError(f"Required case-local input is missing: {source}")
             shutil.copy2(source, variant_dir / "data/misc" / filename)
 
-        dt = WIND_CFL * dx / WIND_SPEED_MPS
-        config = replace_assignment(template, "SIMULATION_DT", f"{dt:.8f}")
-        config = replace_assignment(config, "SIMULATION_DTMAX", f"{dt:.8f}")
+        nominal_dt = WIND_CFL * dx / WIND_SPEED_MPS
+        whole_second_divisors = [
+            value for value in range(1, int(math.floor(nominal_dt)) + 1)
+            if math.isclose(SIMULATION_TSTOP_S / value,
+                            round(SIMULATION_TSTOP_S / value))
+        ]
+        if whole_second_divisors:
+            dt = float(max(whole_second_divisors))
+        else:
+            step_count = int(math.ceil(SIMULATION_TSTOP_S / nominal_dt - 1.0e-12))
+            dt = SIMULATION_TSTOP_S / step_count
+        step_count = int(round(SIMULATION_TSTOP_S / dt))
+        simulation_tstop_s = step_count * dt
+        config = replace_assignment(template, "SIMULATION_DT", f"{dt:.17g}")
+        config = replace_assignment(config, "SIMULATION_DTMAX", f"{dt:.17g}")
+        config = replace_assignment(config, "SIMULATION_TSTOP", f"{simulation_tstop_s:.17g}")
         config = replace_assignment(config, "TARGET_CFL", f"{WIND_CFL:g}")
         configured_ember_gr = UNIT_WIDTH_EMBER_GR_PER_MW_S / dx
         config = replace_assignment(
@@ -143,8 +157,14 @@ def main() -> None:
             "unit_width_ember_gr_per_mw_s": UNIT_WIDTH_EMBER_GR_PER_MW_S,
             "configured_ember_gr_per_mw_s": configured_ember_gr,
             "generation_scaling": "configured rate = unit-width rate / dx",
-            "wind_speed_mps": WIND_SPEED_MPS, "wind_cfl": WIND_CFL,
+            "wind_speed_mps": WIND_SPEED_MPS,
+            "requested_wind_cfl": WIND_CFL,
+            "wind_cfl": WIND_SPEED_MPS * dt / dx,
+            "nominal_simulation_dt_s": nominal_dt,
             "simulation_dt_s": dt,
+            "requested_tstop_s": SIMULATION_TSTOP_S,
+            "simulation_tstop_s": simulation_tstop_s,
+            "step_count": step_count,
         })
     (VARIANTS_DIR / "manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"

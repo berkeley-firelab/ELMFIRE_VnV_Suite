@@ -10,6 +10,7 @@ from osgeo import gdal
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 from pathlib import Path
+import csv
 import json
 import math
 import re
@@ -59,40 +60,138 @@ def read_band(path):
     return array
 
 
-def final_output(directory, pattern):
-    """Choose the latest lexically sorted final raster, excluding transients."""
-    paths = [p for p in directory.glob(pattern) if "_transient_" not in p.name]
-    return sorted(paths)[-1] if paths else None
+def unique_time_control(config, key):
+    """Parse one finite positive scalar from one generated namelist."""
+    matches = re.findall(
+        rf"(?mi)^\s*{re.escape(key)}\s*=\s*([0-9.eEdD+-]+)", config
+    )
+    if len(matches) != 1:
+        raise ValueError(f"{key} is not unique")
+    value = float(matches[0].replace("D", "E").replace("d", "e"))
+    if not math.isfinite(value) or value <= 0.0:
+        raise ValueError(f"{key} is not finite and positive")
+    return value
 
 
-def terminal_time_s(path):
-    """Read integer terminal seconds from an ELMFIRE final-raster filename."""
-    match = re.search(r"_(\d+)\.tif$", path.name)
-    return float(match.group(1)) if match else math.nan
+def strict_terminal_outputs(case_dir, item):
+    """Select the unique paired terminal rasters through the strict case contract."""
+    variant = case_dir / item["working_directory"]
+    evidence = {
+        "selection_path": None,
+        "reason": None,
+        "process_success": False,
+        "final_time_s": None,
+        "pre_jump_time_s": None,
+        "timestep_grid_residual_s": None,
+    }
+    marker = variant / "logs" / "completed_input_fingerprint.txt"
+    stdout = variant / "logs" / "elmfire.stdout"
+    if not marker.exists() or marker.read_text(encoding="utf-8").strip() != item.get("input_fingerprint"):
+        ledgers = sorted((variant / "outputs").glob("dump_times_*.csv"))
+        started = (
+            stdout.exists()
+            and "ELMFIRE is running each ensemble member"
+            in stdout.read_text(errors="ignore")
+        )
+        if started and len(ledgers) == 1:
+            try:
+                with ledgers[0].open(newline="", encoding="utf-8") as stream:
+                    partial_rows = list(csv.DictReader(stream))
+                if partial_rows:
+                    last_time = float(partial_rows[-1]["time_seconds"])
+                    evidence["last_recorded_time_s"] = last_time
+                    evidence["reason"] = (
+                        "incomplete execution: last recorded dump at "
+                        f"{last_time:.3f} s; completion fingerprint absent"
+                    )
+                    return None, None, evidence
+            except (OSError, KeyError, TypeError, ValueError, csv.Error):
+                pass
+        evidence["reason"] = "missing or mismatched input fingerprint"
+        return None, None, evidence
+    if not stdout.exists() or "End of simulation reached successfully" not in stdout.read_text(errors="ignore"):
+        evidence["reason"] = "successful termination record is absent"
+        return None, None, evidence
+    evidence["process_success"] = True
+    try:
+        config_path = variant / Path(item.get("config", "elmfire.data.in")).name
+        config = config_path.read_text(encoding="utf-8")
+        tstop = unique_time_control(config, "SIMULATION_TSTOP")
+        timestep = unique_time_control(config, "SIMULATION_DT")
+        met_step = unique_time_control(config, "DT_METEOROLOGY")
+        control_tolerance = max(1.0e-6, 1.0e-9 * tstop)
+        if not math.isclose(
+            tstop, float(item["tstop_s"]), rel_tol=0.0, abs_tol=control_tolerance
+        ):
+            raise ValueError("manifest and namelist stop times disagree")
+        if not math.isclose(
+            timestep, float(item["simulation_dt_s"]), rel_tol=0.0,
+            abs_tol=max(1.0e-12, 1.0e-9 * timestep)
+        ):
+            raise ValueError("manifest and namelist timesteps disagree")
+        if abs(tstop - round(tstop / timestep) * timestep) > control_tolerance:
+            raise ValueError("configured stop is not an exact timestep multiple")
+        ledgers = sorted((variant / "outputs").glob("dump_times_*.csv"))
+        if len(ledgers) != 1:
+            raise ValueError(f"expected one dump-times CSV, found {len(ledgers)}")
+        with ledgers[0].open(newline="", encoding="utf-8") as stream:
+            rows = list(csv.DictReader(stream))
+        final_rows = [
+            row for row in rows
+            if str(row.get("is_final_dump", "")).strip().upper()
+            in {"T", "TRUE", "1", "Y", "YES"}
+        ]
+        if len(final_rows) != 1:
+            raise ValueError(f"expected one final dump record, found {len(final_rows)}")
+        final_time = float(final_rows[0]["time_seconds"])
+        evidence["final_time_s"] = final_time
+        tolerance = max(1.0e-3, 1.0e-6 * tstop)
+        regular = math.isclose(final_time, tstop, rel_tol=0.0, abs_tol=tolerance)
+        pre_jump = final_time - met_step
+        grid_residual = abs(pre_jump - round(pre_jump / timestep) * timestep)
+        if final_time > tstop:
+            evidence["pre_jump_time_s"] = pre_jump
+            evidence["timestep_grid_residual_s"] = grid_residual
+        stalled = (
+            final_time > tstop
+            and math.isfinite(pre_jump)
+            and -tolerance <= pre_jump <= tstop + tolerance
+            and grid_residual <= tolerance
+            and tstop - pre_jump <= timestep + tolerance
+        )
+        if not (regular or stalled):
+            raise ValueError(
+                "terminal record is neither a regular final dump nor a "
+                "compatible timestep-aligned near-stop stalled final dump"
+            )
+        stamp = int(math.floor(final_time + 0.5))
+        if regular:
+            ember_matches = sorted((variant / "outputs").glob(f"ember_flux*_{stamp:07d}.tif"))
+            toa_matches = sorted((variant / "outputs").glob(f"time_of_arrival*_{stamp:07d}.tif"))
+            evidence["selection_path"] = "regular terminal dump"
+        else:
+            ember_matches = sorted((variant / "outputs").glob("ember_flux_[0-9]*.tif"))
+            toa_matches = sorted((variant / "outputs").glob("time_of_arrival_[0-9]*.tif"))
+            evidence["selection_path"] = "stalled-final compatibility"
+        ember_matches = [path for path in ember_matches if "_transient_" not in path.name]
+        toa_matches = [path for path in toa_matches if "_transient_" not in path.name]
+        if len(ember_matches) != 1 or len(toa_matches) != 1:
+            raise ValueError(
+                f"expected one terminal ember/TOA pair, found {len(ember_matches)}/{len(toa_matches)}"
+            )
+        evidence["reason"] = "accepted"
+        return ember_matches[0], toa_matches[0], evidence
+    except (OSError, KeyError, TypeError, ValueError, csv.Error) as exc:
+        evidence["reason"] = str(exc)
+        return None, None, evidence
 
 
 def structure_profiles(case_dir, case, item):
     """Return per-cell and per-structure values from one completed variant."""
     variant_dir = case_dir / item["working_directory"]
-    fingerprint_file = variant_dir / "logs" / "completed_input_fingerprint.txt"
-    if not fingerprint_file.exists():
-        return None
-    if fingerprint_file.read_text(
-            encoding="utf-8").strip() != item.get("input_fingerprint"):
-        return None
-    output_dir = variant_dir / "outputs"
-    ember_path = final_output(output_dir, FINAL_EMBER_GLOB)
-    toa_path = final_output(output_dir, FINAL_TOA_GLOB)
+    ember_path, toa_path, evidence = strict_terminal_outputs(case_dir, item)
     if ember_path is None or toa_path is None:
-        return None
-    # Input fingerprints alone cannot detect a changed TSTOP.  Reject otherwise
-    # compatible rasters unless both terminal filenames match this manifest.
-    expected_tstop = float(item["tstop_s"])
-    if (
-        not np.isclose(terminal_time_s(ember_path), expected_tstop, atol=1.0)
-        or not np.isclose(terminal_time_s(toa_path), expected_tstop, atol=1.0)
-    ):
-        return None
+        return None, evidence
 
     ids = read_band(variant_dir / "data/inputs/structure_id.tif")
     ember = read_band(ember_path)
@@ -155,7 +254,7 @@ def structure_profiles(case_dir, case, item):
     for key in ("x_m", "load_pcs_m2", "ignition_s", "within_relative_range"):
         profile[key] = np.asarray(profile[key], dtype=float)
     profile["ids"] = np.asarray(profile["ids"], dtype=int)
-    return profile
+    return profile, evidence
 
 
 def design_hrr_kw(case, elapsed_s):
@@ -556,24 +655,47 @@ def latex_escape(value):
     text = str(value)
     replacements = {
         "\\": r"\textbackslash{}", "_": r"\_", "%": r"\%",
-        "&": r"\&", "#": r"\#", "<=": r"$\leq$",
+        "&": r"\&", "#": r"\#", "<=": r"$\leq$", ">=": r"$\geq$",
     }
     for old, new in replacements.items():
         text = text.replace(old, new)
     return text
 
 
-def write_artifacts(case_dir, case, manifest, profiles, rows, native_status, overall):
+def write_artifacts(case_dir, case, manifest, profiles, rows, native_status, overall, terminal_evidence):
     """Write JSON evidence and LaTeX macros with no empty calculated cells."""
     output = {
         "case_id": case["id"],
         "overall_status": overall,
         "native_tests_status": native_status,
         "completed_variants": sorted(profiles),
-        "unrun_variants": [
-            {"name": item["name"], "reason": item["capability_status"]}
-            for item in manifest if item["role"] not in profiles
+        "executed_variants": sorted(
+            item["name"] for item in manifest
+            if terminal_evidence[item["name"]].get("process_success")
+        ),
+        "terminal_evidence_rejected_variants": [
+            {
+                "name": item["name"],
+                "reason": terminal_evidence[item["name"]].get("reason"),
+            }
+            for item in manifest
+            if item["runnable"]
+            and terminal_evidence[item["name"]].get("process_success")
+            and item["role"] not in profiles
         ],
+        "unrun_variants": [
+            {
+                "name": item["name"],
+                "reason": (
+                    terminal_evidence[item["name"]].get("reason")
+                    if item["runnable"] else item["capability_status"]
+                ),
+            }
+            for item in manifest
+            if not terminal_evidence[item["name"]].get("process_success")
+            and item["role"] not in profiles
+        ],
+        "terminal_evidence_by_variant": terminal_evidence,
         "metrics": rows,
         "normalization": "ember count divided by physical structure area (10 m times cross-grid width)",
         "reference_times_s": {
@@ -615,8 +737,21 @@ def main():
         (case_dir / "variants" / "manifest.json").read_text(encoding="utf-8")
     )
     profiles = {}
+    terminal_evidence = {}
     for item in manifest:
-        profile = structure_profiles(case_dir, case, item) if item["runnable"] else None
+        if item["runnable"]:
+            profile, evidence = structure_profiles(case_dir, case, item)
+        else:
+            profile = None
+            evidence = {
+                "selection_path": None,
+                "reason": item["capability_status"],
+                "process_success": False,
+                "final_time_s": None,
+                "pre_jump_time_s": None,
+                "timestep_grid_residual_s": None,
+            }
+        terminal_evidence[item["name"]] = evidence
         if profile is not None:
             profiles[item["role"]] = profile
     rows, native_status, overall = calculate_metrics(case, manifest, profiles)
@@ -624,7 +759,8 @@ def main():
     plot_reference_figures(case_dir, case, profiles)
     plot_figure(case_dir, case, manifest, profiles, rows)
     write_artifacts(
-        case_dir, case, manifest, profiles, rows, native_status, overall
+        case_dir, case, manifest, profiles, rows, native_status, overall,
+        terminal_evidence
     )
     print(
         f"[OK] postprocessed {len(profiles)}/{len(manifest)} variants; "

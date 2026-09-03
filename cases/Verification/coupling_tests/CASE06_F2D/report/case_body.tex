@@ -37,6 +37,37 @@ x_{\rm surf}(120)=x_0+R_s(120)=\SI{90.2}{m}.
 \]
 A front substantially beyond this location, together with nonzero ember-ignition cells, demonstrates that firebrands rather than the surface headfire alone control the long-range advance. Accordingly, the principal expected result is a family of nested two-dimensional contours rather than a one-dimensional TOA curve.
 
+% BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
+The largest generated transport speed is
+\[
+ |\mathbf u|_{\max}=\sqrt{(6.71+3.355)^2+(1.0+0.5)^2}
+ =10.1762~\mathrm{m\,s^{-1}},
+\]
+so preprocessing sets
+\(\Delta t=0.5(10)/10.1762=0.491344~\mathrm{s}\).  The surface residence
+time is independently
+\[
+ t_e=10/0.71=14.0845~\mathrm{s}.
+\]
+Starting from \(x_0=5~\mathrm{m}\), a surface-only head fire would be at
+\[
+\begin{array}{c|rrrr}
+t~(\mathrm{s})&30&60&90&120\\\hline
+x_{\mathrm{surf}}~(\mathrm{m})&26.3&47.6&68.9&90.2
+\end{array}
+\]
+and would advance \(0.71(30)=21.3~\mathrm{m}\) between successive target
+times.  The declared 20-m interval threshold is therefore slightly below the
+surface-only analytical increment but still requires two resolved cells.
+At 120 s, the firebrand-excess test
+\(x_{\max}-90.2\geq30~\mathrm{m}\) is equivalently
+\(x_{\max}\geq120.2~\mathrm{m}\), together with a positive ember-ignition
+count.  Exact irreversible evolution gives
+\(|B_j\setminus B_{j+1}|/|B_j|=0\); the numerical allowance is 0.02.
+The final span reference is qualitative nonzero two-dimensional growth, made
+quantitative as at least \(40~\mathrm{m}=4\Delta x\).
+% END EXPLICIT EXPECTED-RESULT DERIVATION
+
 \section{Verification metrics and acceptance criteria}
 The postprocessor selects transient \texttt{phi} rasters within \SI{2}{s} of all four target times and excludes the two-cell halo. It calculates: (i) completeness of all four contours; (ii) the fraction $|B_j\setminus B_{j+1}|/|B_j|$, limited to 0.02; (iii) downwind leading-edge advance, required to be at least \SI{20}{m} in every interval; (iv) final crosswind span, required to be at least \SI{40}{m}; and (v) firebrand excess advance $x_{\max}(120)-x_{\rm surf}(120)$, required to be at least \SI{30}{m} with at least one ember-ignition cell. The overall result is PASS only when every component passes.
 
@@ -92,7 +123,7 @@ ignition or firebrand-emission source explicit.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
 \caption{Whole-domain prepared input configuration for the representative variant.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
@@ -129,7 +160,7 @@ the two-cell numerical buffer.  Counts are divided by physical cell area, giving
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
+\EvidenceFigure[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{../figures/domain_result.pdf}
 \caption{Whole-domain accumulated firebrand density from the representative completed ELMFIRE run.  This
 domain-scale result supplements, rather than replaces, the higher-level verification
 profiles, convergence plots, ensemble statistics, and calculated acceptance metrics below.}
@@ -145,7 +176,7 @@ which are the principal two-dimensional reference observable.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.55\textheight,keepaspectratio]{../figures/two_dimensional_fireline_evolution.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.55\textheight,keepaspectratio]{../figures/two_dimensional_fireline_evolution.pdf}
 \caption{Actual ELMFIRE fire perimeters at four output times under the
 prescribed two-component, space--time wind. The star marks the initial ignition.}
 \label{fig:perimeters}
@@ -157,7 +188,7 @@ whole-domain distribution is already presented in Figure~\ref{fig:domain-result}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{../figures/two_dimensional_transport_fields.pdf}
+\EvidenceFigure[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{../figures/two_dimensional_transport_fields.pdf}
 \caption{Whole-domain cells marked by ELMFIRE as ignitions caused by deposited
 firebrands. The numerical halo is excluded.}
 \label{fig:f2d-fields}

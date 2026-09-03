@@ -17,20 +17,20 @@ Configuration & Recorded value \\
 \endhead
 \bottomrule
 \endlastfoot
-Captured at (UTC) & 2026-09-02T17:16:45+00:00 \\
-Repository revision & 6621fd3b869c \\
+Captured at (UTC) & 2026-09-03T18:18:33+00:00 \\
+Repository revision & 3304df6c77bb \\
 Repository state & dirty \\
-Host platform & Linux-7.0.12-linuxkit-aarch64-with-glibc2.35 \\
-Python runtime & CPython 3.10.12 (/\allowbreak{}usr/\allowbreak{}bin/\allowbreak{}python3) \\
+Host platform & macOS-15.7.7-arm64-arm-64bit \\
+Python runtime & CPython 3.12.9 (/\allowbreak{}opt/\allowbreak{}homebrew/\allowbreak{}anaconda3/\allowbreak{}bin/\allowbreak{}python3) \\
 Conda environment & not active \\
 ELMFIRE command & elmfire \\
-ELMFIRE resolved path & /\allowbreak{}elmfire/\allowbreak{}elmfire/\allowbreak{}build/\allowbreak{}linux/\allowbreak{}bin/\allowbreak{}elmfire \\
+ELMFIRE resolved path & not found on PATH \\
 ELMFIRE version declaration & not declared \\
-ELMFIRE executable SHA-256 & c225b2e00349aa98\allowbreak{}128285b3d3ff9b20\allowbreak{}31d0e20944cd9f1c\allowbreak{}5ee96595d199a920 \\
-MPI launcher & mpirun (Open MPI) 4.1.2 \\
+ELMFIRE executable SHA-256 & not available \\
+MPI launcher & not available \\
 Slurm allocation & not a Slurm build job \\
 Loaded modules & not recorded \\
-Python packages & NumPy 1.26.4; \allowbreak{}Matplotlib 3.8.4; \allowbreak{}PyYAML 6.0.3; \allowbreak{}Rasterio 1.4.4; \allowbreak{}GDAL 3.4.1; \allowbreak{}Pandas 2.2.2; \allowbreak{}GeoPandas 1.1.4; \allowbreak{}Shapely 2.1.2 \\
+Python packages & NumPy 1.26.4; \allowbreak{}Matplotlib 3.9.2; \allowbreak{}PyYAML 6.0.1; \allowbreak{}Rasterio 1.5.0; \allowbreak{}GDAL not installed; \allowbreak{}Pandas 2.2.2; \allowbreak{}GeoPandas not installed; \allowbreak{}Shapely not installed \\
 \end{longtable}
 \normalsize
 
@@ -101,10 +101,10 @@ Case & ELMFIRE command & Input namelist & MPI ranks & Schema \\
 This table is generated from each case's case-local \texttt{outputs/metrics.json}. A successful run script or report build is not treated as scientific evidence of PASS. Missing, incomplete, blocked, or non-decisional results are reported as NOT EVALUABLE.
 
 \textbf{Total cases:} 42\quad
-\textbf{PASS:} 24\quad
-\textbf{FAIL:} 4\quad
+\textbf{PASS:} 30\quad
+\textbf{FAIL:} 8\quad
 \textbf{CHARACTERIZED:} 0\quad
-\textbf{NOT EVALUABLE:} 14
+\textbf{NOT EVALUABLE:} 4
 
 \small
 \setlength{\LTpre}{0.8em}
@@ -123,18 +123,18 @@ Case & Category & Title & Decision \\
 \endfoot
 \bottomrule
 \endlastfoot
-\hyperref[case-detail:case01-bet]{CASE01\_BET} & coupling tests & \hyperref[case-detail:case01-bet]{Biomass Emission-Time Resolution Independence} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
-\hyperref[case-detail:case02-fgr]{CASE02\_FGR} & coupling tests & \hyperref[case-detail:case02-fgr]{Finite-Duration Firebrand Generation} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
-\hyperref[case-detail:case03-etc]{CASE03\_ETC} & coupling tests & \hyperref[case-detail:case03-etc]{Eulerian Firebrand Transport Convergence} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
-\hyperref[case-detail:case04-sti]{CASE04\_STI} & coupling tests & \hyperref[case-detail:case04-sti]{Steady Transport and Immediate Ignition} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
-\hyperref[case-detail:case05-tdw]{CASE05\_TDW} & coupling tests & \hyperref[case-detail:case05-tdw]{Firebrand Transport in Time-Dependent Wind} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
-\hyperref[case-detail:case06-f2d]{CASE06\_F2D} & coupling tests & \hyperref[case-detail:case06-f2d]{Two-Dimensional Firebrand-Driven Spread} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
-\hyperref[case-detail:case07-ipc]{CASE07\_IPC} & coupling tests & \hyperref[case-detail:case07-ipc]{Ignition Probability and SFT Convergence} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
-\hyperref[case-detail:case08-fbc]{CASE08\_FBC} & coupling tests & \hyperref[case-detail:case08-fbc]{Deposited Firebrand Consumption} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
-\hyperref[case-detail:case09-mmd]{CASE09\_MMD} & coupling tests & \hyperref[case-detail:case09-mmd]{Mixed-Mode Ignition-Delay Effects} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
+\hyperref[case-detail:case01-bet]{CASE01\_BET} & coupling tests & \hyperref[case-detail:case01-bet]{Biomass Emission-Time Resolution Independence} & \mbox{\textcolor{green!45!black}{\textbf{PASS}}} \\
+\hyperref[case-detail:case02-fgr]{CASE02\_FGR} & coupling tests & \hyperref[case-detail:case02-fgr]{Finite-Duration Firebrand Generation} & \mbox{\textcolor{green!45!black}{\textbf{PASS}}} \\
+\hyperref[case-detail:case03-etc]{CASE03\_ETC} & coupling tests & \hyperref[case-detail:case03-etc]{Eulerian Firebrand Transport Convergence} & \mbox{\textcolor{red!75!black}{\textbf{FAIL}}} \\
+\hyperref[case-detail:case04-sti]{CASE04\_STI} & coupling tests & \hyperref[case-detail:case04-sti]{Steady Transport and Immediate Ignition} & \mbox{\textcolor{green!45!black}{\textbf{PASS}}} \\
+\hyperref[case-detail:case05-tdw]{CASE05\_TDW} & coupling tests & \hyperref[case-detail:case05-tdw]{Firebrand Transport in Time-Dependent Wind} & \mbox{\textcolor{green!45!black}{\textbf{PASS}}} \\
+\hyperref[case-detail:case06-f2d]{CASE06\_F2D} & coupling tests & \hyperref[case-detail:case06-f2d]{Two-Dimensional Firebrand-Driven Spread} & \mbox{\textcolor{green!45!black}{\textbf{PASS}}} \\
+\hyperref[case-detail:case07-ipc]{CASE07\_IPC} & coupling tests & \hyperref[case-detail:case07-ipc]{Ignition Probability and SFT Convergence} & \mbox{\textcolor{red!75!black}{\textbf{FAIL}}} \\
+\hyperref[case-detail:case08-fbc]{CASE08\_FBC} & coupling tests & \hyperref[case-detail:case08-fbc]{Deposited Firebrand Consumption} & \mbox{\textcolor{red!75!black}{\textbf{FAIL}}} \\
+\hyperref[case-detail:case09-mmd]{CASE09\_MMD} & coupling tests & \hyperref[case-detail:case09-mmd]{Mixed-Mode Ignition-Delay Effects} & \mbox{\textcolor{green!45!black}{\textbf{PASS}}} \\
 \hyperref[case-detail:case10-wsr]{CASE10\_WSR} & coupling tests & \hyperref[case-detail:case10-wsr]{WUI Structural Resolution Sensitivity} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
 \hyperref[case-detail:case11-wsc]{CASE11\_WSC} & coupling tests & \hyperref[case-detail:case11-wsc]{WUI Surface-Coupling Synchronization} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
-\hyperref[case-detail:case12-trs]{CASE12\_TRS} & coupling tests & \hyperref[case-detail:case12-trs]{WUI Temporal-Resolution Sensitivity} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
+\hyperref[case-detail:case12-trs]{CASE12\_TRS} & coupling tests & \hyperref[case-detail:case12-trs]{WUI Temporal-Resolution Sensitivity} & \mbox{\textcolor{red!75!black}{\textbf{FAIL}}} \\
 \hyperref[case-detail:case13-prm]{CASE13\_PRM} & coupling tests & \hyperref[case-detail:case13-prm]{WUI Parametric Response Maps} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
 \hyperref[case-detail:case14-srs]{CASE14\_SRS} & coupling tests & \hyperref[case-detail:case14-srs]{Two-Dimensional Spatial-Resolution Sensitivity} & \mbox{\textcolor{orange!75!black}{\textbf{NOT EVALUABLE}}} \\
 \hyperref[case-detail:case15-cro]{CASE15\_CRO} & unit tests & \hyperref[case-detail:case15-cro]{Case 15: Constant rate of spread} & \mbox{\textcolor{green!45!black}{\textbf{PASS}}} \\

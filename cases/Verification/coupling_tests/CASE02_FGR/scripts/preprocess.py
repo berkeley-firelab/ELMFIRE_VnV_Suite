@@ -123,13 +123,15 @@ def main() -> None:
                 raise FileNotFoundError(f"Missing required case-local table: {source}")
             shutil.copy2(source, variant_dir / "data/misc" / filename)
 
-        config = replace_assignment(template, "SIMULATION_DT", f"{dt:g}")
-        config = replace_assignment(config, "SIMULATION_DTMAX", f"{dt:g}")
-        config = replace_assignment(config, "DTDUMP", f"{SIMULATION_TSTOP_S:g}")
+        step_count = int(math.ceil(SIMULATION_TSTOP_S / dt - 1.0e-12))
+        simulation_tstop_s = step_count * dt
+        config = replace_assignment(template, "SIMULATION_DT", f"{dt:.17g}")
+        config = replace_assignment(config, "SIMULATION_DTMAX", f"{dt:.17g}")
+        config = replace_assignment(config, "DTDUMP", f"{simulation_tstop_s:.17g}")
         config = replace_assignment(
             config,
             "SIMULATION_TSTOP",
-            f"{SIMULATION_TSTOP_S:g}")
+            f"{simulation_tstop_s:.17g}")
         (variant_dir / "elmfire.data.in").write_text(config, encoding="utf-8")
 
         manifest.append({
@@ -150,7 +152,9 @@ def main() -> None:
             "mu_downwind": MU_DOWNWIND, "sigma_downwind": SIGMA_DOWNWIND,
             "p_eps": P_EPS, "wind_speed_mph": WIND_SPEED_MPH,
             "wind_direction_deg": WIND_DIRECTION_DEG,
-            "simulation_tstop_s": SIMULATION_TSTOP_S,
+            "requested_tstop_s": SIMULATION_TSTOP_S,
+            "simulation_tstop_s": simulation_tstop_s,
+            "step_count": step_count,
         })
 
     (VARIANTS_DIR / "manifest.json").write_text(

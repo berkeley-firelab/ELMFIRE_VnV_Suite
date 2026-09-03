@@ -2,20 +2,20 @@
   "schema_version": 3,
   "suite": "validation",
   "aggregate_environment": {
-    "Captured at (UTC)": "2026-09-02T17:16:45+00:00",
-    "Repository revision": "6621fd3b869c",
+    "Captured at (UTC)": "2026-09-03T18:18:33+00:00",
+    "Repository revision": "3304df6c77bb",
     "Repository state": "dirty",
-    "Host platform": "Linux-7.0.12-linuxkit-aarch64-with-glibc2.35",
-    "Python runtime": "CPython 3.10.12 (/usr/bin/python3)",
+    "Host platform": "macOS-15.7.7-arm64-arm-64bit",
+    "Python runtime": "CPython 3.12.9 (/opt/homebrew/anaconda3/bin/python3)",
     "Conda environment": "not active",
     "ELMFIRE command": "elmfire",
-    "ELMFIRE resolved path": "/elmfire/elmfire/build/linux/bin/elmfire",
+    "ELMFIRE resolved path": "not found on PATH",
     "ELMFIRE version declaration": "not declared",
-    "ELMFIRE executable SHA-256": "c225b2e00349aa98128285b3d3ff9b2031d0e20944cd9f1c5ee96595d199a920",
-    "MPI launcher": "mpirun (Open MPI) 4.1.2",
+    "ELMFIRE executable SHA-256": "not available",
+    "MPI launcher": "not available",
     "Slurm allocation": "not a Slurm build job",
     "Loaded modules": "not recorded",
-    "Python packages": "NumPy 1.26.4; Matplotlib 3.8.4; PyYAML 6.0.3; Rasterio 1.4.4; GDAL 3.4.1; Pandas 2.2.2; GeoPandas 1.1.4; Shapely 2.1.2"
+    "Python packages": "NumPy 1.26.4; Matplotlib 3.9.2; PyYAML 6.0.1; Rasterio 1.5.0; GDAL not installed; Pandas 2.2.2; GeoPandas not installed; Shapely not installed"
   },
   "case_count": 3,
   "decision_counts": {
