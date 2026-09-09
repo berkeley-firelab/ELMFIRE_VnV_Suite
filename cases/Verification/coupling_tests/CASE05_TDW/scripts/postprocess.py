@@ -7,7 +7,7 @@ nine-point running-average ROS metrics, and writes JSON, LaTeX, and PDF output.
 It never runs ELMFIRE.
 """
 from __future__ import annotations
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 
@@ -69,13 +69,10 @@ def integrate_reference(times_s: np.ndarray, x0_m: float) -> np.ndarray:
 
 def read_toa(path: Path) -> tuple[np.ndarray, tuple[float, ...]]:
     """Read and validate the final TOA raster and its geotransform."""
-    ds = gdal.Open(str(path), gdal.GA_ReadOnly)
-    if ds is None:
-        raise RuntimeError(f"Could not open {path}")
-    array = ds.GetRasterBand(1).ReadAsArray().astype(float)
-    nodata = ds.GetRasterBand(1).GetNoDataValue()
-    transform = ds.GetGeoTransform()
-    ds = None
+    with rasterio.open(path) as dataset:
+        array = dataset.read(1).astype(float)
+        nodata = dataset.nodata
+        transform = dataset.transform.to_gdal()
     if array.ndim != 2 or array.shape[0] <= 2 * BUFFER_CELLS:
         raise ValueError(f"Unexpected TOA shape {array.shape}")
     if not np.isclose(abs(transform[1]), DX_M, atol=1.0e-6):

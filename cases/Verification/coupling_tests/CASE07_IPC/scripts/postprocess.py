@@ -7,9 +7,9 @@ times with timestep-resolved ember-flux dumps to reconstruct interval-censored
 first-deposition times and actual ignition-delay samples. It writes quantitative
 metrics, LaTeX macros, and two vector-PDF figures. It does not run ELMFIRE.
 """
-from osgeo import gdal
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
+import rasterio
 import csv
 import json
 import math
@@ -64,11 +64,13 @@ def read_member_ros(entry):
     if not files:
         return math.nan, "", 0
     path = files[-1]
-    ds = gdal.Open(str(path))
-    if ds is None:
+    try:
+        dataset = rasterio.open(path)
+    except rasterio.errors.RasterioIOError:
         return math.nan, path.name, 0
-    toa = ds.GetRasterBand(1).ReadAsArray().astype(float)
-    gt = ds.GetGeoTransform()
+    with dataset:
+        toa = dataset.read(1).astype(float)
+        gt = dataset.transform.to_gdal()
     row = toa.shape[0] // 2
     times = toa[row]
     x = gt[0] + (np.arange(toa.shape[1]) + 0.5) * gt[1]
@@ -118,16 +120,17 @@ def read_sft_delays(entry):
                               if position else 0.0)
                       for position, index in enumerate(ordered_indices)}
 
-    toa_ds = gdal.Open(str(toa_path))
-    ignition_ds = gdal.Open(str(ignition_path))
-    if toa_ds is None or ignition_ds is None:
+    try:
+        with rasterio.open(toa_path) as toa_dataset, rasterio.open(
+                ignition_path) as ignition_dataset:
+            toa = toa_dataset.read(1).astype(float)
+            ignition = ignition_dataset.read(1).astype(float)
+            gt = toa_dataset.transform.to_gdal()
+    except rasterio.errors.RasterioIOError:
         return np.array([], dtype=float), {}
-    toa = toa_ds.GetRasterBand(1).ReadAsArray().astype(float)
-    ignition = ignition_ds.GetRasterBand(1).ReadAsArray().astype(float)
     if toa.shape != ignition.shape or toa.shape != (entry["ny"], entry["nx"]):
         return np.array([], dtype=float), {}
     row = BUFFER_CELLS + (entry["ny"] - 2 * BUFFER_CELLS) // 2
-    gt = toa_ds.GetGeoTransform()
     x = gt[0] + (np.arange(entry["nx"]) + 0.5) * gt[1]
     first_midpoint = np.full(entry["nx"], np.nan, dtype=float)
     selected_transients = []
@@ -138,10 +141,14 @@ def read_sft_delays(entry):
         index = int(match.group(1))
         if index not in dump_times:
             continue
-        ds = gdal.Open(str(path))
-        if ds is None or (ds.RasterYSize, ds.RasterXSize) != toa.shape:
+        try:
+            dataset = rasterio.open(path)
+        except rasterio.errors.RasterioIOError:
             return np.array([], dtype=float), {}
-        deposited = ds.GetRasterBand(1).ReadAsArray()[row].astype(float) > 0.0
+        with dataset:
+            if (dataset.height, dataset.width) != toa.shape:
+                return np.array([], dtype=float), {}
+            deposited = dataset.read(1)[row].astype(float) > 0.0
         new = deposited & ~np.isfinite(first_midpoint)
         first_midpoint[new] = 0.5 * (previous_times[index] + dump_times[index])
         selected_transients.append(path.name)

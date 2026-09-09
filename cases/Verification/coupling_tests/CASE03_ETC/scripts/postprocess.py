@@ -10,7 +10,7 @@ from pathlib import Path
 
 import matplotlib
 import numpy as np
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 
 matplotlib.use("Agg")
@@ -87,14 +87,10 @@ def leading_zero_crossing(x: np.ndarray, phi: np.ndarray) -> float:
 
 def read_phi_centerline(path: Path, variant: dict) -> tuple[np.ndarray, np.ndarray]:
     """Read the physical centerline and exclude the two-cell numerical buffer."""
-    dataset = gdal.Open(str(path), gdal.GA_ReadOnly)
-    if dataset is None:
-        raise RuntimeError(f"GDAL could not open {path}")
-    band = dataset.GetRasterBand(1)
-    values = band.ReadAsArray().astype(float)
-    nodata = band.GetNoDataValue()
-    transform = dataset.GetGeoTransform()
-    dataset = None
+    with rasterio.open(path) as dataset:
+        values = dataset.read(1).astype(float)
+        nodata = dataset.nodata
+        transform = dataset.transform.to_gdal()
     expected = (int(variant["ny"]), int(variant["nx"]))
     if values.shape != expected:
         raise ValueError(f"{path} shape {values.shape}; expected {expected}")

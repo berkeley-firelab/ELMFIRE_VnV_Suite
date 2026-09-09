@@ -13,7 +13,8 @@ import matplotlib
 matplotlib.use("Agg")  # Headless backend for batch verification and CI.
 import matplotlib.pyplot as plt
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 # A single explicit sentinel lets every generated raster use the same mask.
 NODATA = -9999.0
 BUFFER_CELLS = 2  # ELMFIRE numerical halo on each raster boundary.
@@ -22,16 +23,30 @@ def load_case(case_dir):
     """Load the human-auditable case contract from case.json."""
     return json.loads((Path(case_dir) / "case.json").read_text(encoding="utf-8"))
 
-def write_tif(path, arr, dx, dtype=gdal.GDT_Float32):
+def write_tif(path, arr, dx, dtype=np.float32):
     """Write one north-up raster; dx is the square cell size in metres."""
     path = Path(path)
-    ds = gdal.GetDriverByName("GTiff").Create(str(path), arr.shape[1], arr.shape[0], 1, dtype)
     # The upper-left origin includes the numerical halo; usable cells begin at
     # BUFFER_CELLS in both array dimensions. Rows increase southward.
-    ds.SetGeoTransform((-BUFFER_CELLS * dx, dx, 0.0, (arr.shape[0] - BUFFER_CELLS) * dx, 0.0, -dx))
-    srs = osr.SpatialReference(); srs.ImportFromEPSG(32610)
-    ds.SetProjection(srs.ExportToWkt())
-    band = ds.GetRasterBand(1); band.WriteArray(arr); band.SetNoDataValue(NODATA); band.FlushCache(); ds = None
+    transform = from_origin(
+        -BUFFER_CELLS * dx,
+        (arr.shape[0] - BUFFER_CELLS) * dx,
+        dx,
+        dx,
+    )
+    with rasterio.open(
+        path,
+        "w",
+        driver="GTiff",
+        height=arr.shape[0],
+        width=arr.shape[1],
+        count=1,
+        dtype=np.dtype(dtype).name,
+        crs="EPSG:32610",
+        transform=transform,
+        nodata=NODATA,
+    ) as dataset:
+        dataset.write(np.asarray(arr, dtype=dtype), 1)
 
 def preprocess(case_dir):
     """Generate deterministic, co-registered inputs without running ELMFIRE."""
@@ -48,7 +63,7 @@ def preprocess(case_dir):
         for j in range(nx):
             fbfm[row, j] = 91 if ((j * dx) % 20.0) < 10.0 else 102
     phi[row, BUFFER_CELLS] = -1.0  # First usable cell, never a boundary cell.
-    rasters = [("asp", zeros, gdal.GDT_Float32), ("cbd", zeros, gdal.GDT_Float32), ("cbh", zeros, gdal.GDT_Float32), ("cc", zeros, gdal.GDT_Float32), ("ch", zeros, gdal.GDT_Float32), ("dem", zeros, gdal.GDT_Float32), ("slp", zeros, gdal.GDT_Float32), ("adj", ones, gdal.GDT_Float32), ("new_phi", phi, gdal.GDT_Float32), ("new_fbfm40", fbfm, gdal.GDT_Int16), ("ws", np.full((ny,nx), 40.0 if c["wui"] else 15.0, dtype=np.float32), gdal.GDT_Float32), ("wd", np.full((ny,nx), 270.0, dtype=np.float32), gdal.GDT_Float32), ("m1", zeros, gdal.GDT_Float32), ("m10", zeros, gdal.GDT_Float32), ("m100", zeros, gdal.GDT_Float32)]
+    rasters = [("asp", zeros, np.float32), ("cbd", zeros, np.float32), ("cbh", zeros, np.float32), ("cc", zeros, np.float32), ("ch", zeros, np.float32), ("dem", zeros, np.float32), ("slp", zeros, np.float32), ("adj", ones, np.float32), ("new_phi", phi, np.float32), ("new_fbfm40", fbfm, np.int16), ("ws", np.full((ny,nx), 40.0 if c["wui"] else 15.0, dtype=np.float32), np.float32), ("wd", np.full((ny,nx), 270.0, dtype=np.float32), np.float32), ("m1", zeros, np.float32), ("m10", zeros, np.float32), ("m100", zeros, np.float32)]
     for name, arr, dtype in rasters:
         write_tif(inp / (name + ".tif"), arr, dx, dtype)
     if c["wui"]:
@@ -57,7 +72,7 @@ def preprocess(case_dir):
         write_tif(inp / "bldg_sep.tif", np.where(isb, 10.0, NODATA).astype(np.float32), dx)
         write_tif(inp / "bldg_nonburnable.tif", np.where(isb, 0.0, NODATA).astype(np.float32), dx)
         write_tif(inp / "bldg_footprint_frac.tif", np.where(isb, 1.0, NODATA).astype(np.float32), dx)
-        write_tif(inp / "bldg_fuel_model.tif", np.where(isb, 14, -9999).astype(np.int16), dx, gdal.GDT_Int16)
+        write_tif(inp / "bldg_fuel_model.tif", np.where(isb, 14, -9999).astype(np.int16), dx, np.int16)
     for fn in ["fuel_models.csv", "building_fuel_models.csv"]:
         src = case_dir / "data" / "misc" / fn
         if not src.is_file():
@@ -68,8 +83,11 @@ def preprocess(case_dir):
 
 def read_raster(path):
     """Return the first raster band as floating-point values."""
-    ds = gdal.Open(str(path))
-    return None if ds is None else ds.GetRasterBand(1).ReadAsArray().astype(float)
+    try:
+        with rasterio.open(path) as dataset:
+            return dataset.read(1).astype(float)
+    except rasterio.errors.RasterioIOError:
+        return None
 
 def pdf_line(path, xs, ys, label):
     """Write a compact vector-PDF profile with labelled SI-unit axes."""
@@ -101,8 +119,9 @@ def postprocess(case_dir):
     """Compare available ELMFIRE output with the reference and emit artifacts."""
     case_dir=Path(case_dir); c=load_case(case_dir); out=case_dir/"outputs"; fig=case_dir/"figures"; rep=case_dir/"report"
     out.mkdir(exist_ok=True); fig.mkdir(exist_ok=True); rep.mkdir(exist_ok=True)
-    input_ds=gdal.Open(str(case_dir/"data/inputs/new_phi.tif"))
-    gt=input_ds.GetGeoTransform(); nx=input_ds.RasterXSize
+    with rasterio.open(case_dir / "data/inputs/new_phi.tif") as input_dataset:
+        gt = input_dataset.transform.to_gdal()
+        nx = input_dataset.width
     x_all=gt[0]+(np.arange(nx)+0.5)*gt[1]
     x=x_all[BUFFER_CELLS:nx-BUFFER_CELLS]
     ignition_x=x_all[BUFFER_CELLS]

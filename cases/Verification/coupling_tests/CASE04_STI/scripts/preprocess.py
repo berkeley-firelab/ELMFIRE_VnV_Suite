@@ -11,7 +11,8 @@ import math
 import re
 import shutil
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 
 # -----------------------------------------------------------------------------
 # Customizable scientific and numerical parameters (SI unless noted)
@@ -43,20 +44,27 @@ REFERENCE_MISC_DIR = CASE_DIR / "data" / "misc"
 
 def write_tif(path, array, dx, dtype):
     """Write a north-up, single-band raster whose halo lies outside the domain."""
-    ds = gdal.GetDriverByName("GTiff").Create(
-        str(path), array.shape[1], array.shape[0], 1, dtype)
     # Columns increase eastward; rows increase southward. The usable domain
     # begins at [BUFFER_CELLS, BUFFER_CELLS], at physical coordinate (0, width).
-    ds.SetGeoTransform((-BUFFER_CELLS * dx, dx, 0.0,
-                        (array.shape[0] - BUFFER_CELLS) * dx, 0.0, -dx))
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(PROJECTION_EPSG)
-    ds.SetProjection(srs.ExportToWkt())
-    band = ds.GetRasterBand(1)
-    band.WriteArray(array)
-    band.SetNoDataValue(NODATA)
-    band.FlushCache()
-    ds = None
+    transform = from_origin(
+        -BUFFER_CELLS * dx,
+        (array.shape[0] - BUFFER_CELLS) * dx,
+        dx,
+        dx,
+    )
+    with rasterio.open(
+        path,
+        "w",
+        driver="GTiff",
+        height=array.shape[0],
+        width=array.shape[1],
+        count=1,
+        dtype=np.dtype(dtype).name,
+        crs=f"EPSG:{PROJECTION_EPSG}",
+        transform=transform,
+        nodata=NODATA,
+    ) as dataset:
+        dataset.write(np.asarray(array, dtype=dtype), 1)
 
 
 def replace_key(text, key, value):
@@ -77,16 +85,16 @@ def build_inputs(target, nx, ny, dx):
     centre_row = BUFFER_CELLS + (ny - 2 * BUFFER_CELLS) // 2
     phi[centre_row, BUFFER_CELLS] = INITIAL_PHI
     rasters = {
-        "asp": (zeros, gdal.GDT_Float32), "cbd": (zeros, gdal.GDT_Float32),
-        "cbh": (zeros, gdal.GDT_Float32), "cc": (zeros, gdal.GDT_Float32),
-        "ch": (zeros, gdal.GDT_Float32), "dem": (zeros, gdal.GDT_Float32),
-        "slp": (zeros, gdal.GDT_Float32), "adj": (ones, gdal.GDT_Float32),
-        "new_phi": (phi, gdal.GDT_Float32),
-        "new_fbfm40": (np.full((ny, nx), FUEL_MODEL, np.int16), gdal.GDT_Int16),
-        "ws": (np.full((ny, nx), WIND_SPEED_MPH, np.float32), gdal.GDT_Float32),
-        "wd": (np.full((ny, nx), WIND_DIRECTION_DEG, np.float32), gdal.GDT_Float32),
-        "m1": (zeros, gdal.GDT_Float32), "m10": (zeros, gdal.GDT_Float32),
-        "m100": (zeros, gdal.GDT_Float32),
+        "asp": (zeros, np.float32), "cbd": (zeros, np.float32),
+        "cbh": (zeros, np.float32), "cc": (zeros, np.float32),
+        "ch": (zeros, np.float32), "dem": (zeros, np.float32),
+        "slp": (zeros, np.float32), "adj": (ones, np.float32),
+        "new_phi": (phi, np.float32),
+        "new_fbfm40": (np.full((ny, nx), FUEL_MODEL, np.int16), np.int16),
+        "ws": (np.full((ny, nx), WIND_SPEED_MPH, np.float32), np.float32),
+        "wd": (np.full((ny, nx), WIND_DIRECTION_DEG, np.float32), np.float32),
+        "m1": (zeros, np.float32), "m10": (zeros, np.float32),
+        "m100": (zeros, np.float32),
     }
     for name, (array, dtype) in rasters.items():
         write_tif(target / f"{name}.tif", array, dx, dtype)

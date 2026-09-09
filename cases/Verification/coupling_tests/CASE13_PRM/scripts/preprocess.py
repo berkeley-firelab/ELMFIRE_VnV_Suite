@@ -12,7 +12,8 @@ import json
 import math
 
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 
 # Customizable preprocessing parameters.
 CASE_FILENAME = "case.json"
@@ -31,26 +32,19 @@ STRUCTURE_FUEL_MODEL = 91
 def write_tif(path, array, dx, dtype):
     """Write one aligned north-up raster with a two-cell numerical buffer."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    dataset = gdal.GetDriverByName("GTiff").Create(
-        str(path), array.shape[1], array.shape[0], 1, dtype,
-        options=["COMPRESS=DEFLATE", "PREDICTOR=2"],
+    transform = from_origin(
+        -BUFFER_CELLS * dx,
+        (array.shape[0] - BUFFER_CELLS) * dx,
+        dx,
+        dx,
     )
-    if dataset is None:
-        raise RuntimeError(f"Could not create {path}")
-    dataset.SetGeoTransform((
-        -BUFFER_CELLS * dx, dx, 0.0,
-        (array.shape[0] - BUFFER_CELLS) * dx, 0.0, -dx,
-    ))
-    reference = osr.SpatialReference()
-    reference.ImportFromEPSG(EPSG)
-    dataset.SetProjection(reference.ExportToWkt())
-    band = dataset.GetRasterBand(1)
-    band.WriteArray(array)
-    band.SetNoDataValue(
-        NODATA_INT if np.issubdtype(array.dtype, np.integer) else NODATA_FLOAT
-    )
-    band.FlushCache()
-    dataset = None
+    nodata = NODATA_INT if np.issubdtype(array.dtype, np.integer) else NODATA_FLOAT
+    with rasterio.open(
+        path, "w", driver="GTiff", height=array.shape[0], width=array.shape[1],
+        count=1, dtype=np.dtype(dtype).name, crs=f"EPSG:{EPSG}",
+        transform=transform, nodata=nodata, compress="deflate", predictor=2,
+    ) as dataset:
+        dataset.write(np.asarray(array, dtype=dtype), 1)
 
 
 def interval_overlap(left, right, interval_left, interval_right):
@@ -143,10 +137,10 @@ def write_geometry(case_dir, case, row, name):
     phi[source_mask] = -1.0
 
     input_dir = case_dir / "variants" / name / "data" / "inputs"
-    write_tif(input_dir / "new_fbfm40.tif", fbfm, dx, gdal.GDT_Int16)
-    write_tif(input_dir / "structure_fraction.tif", fraction, dx, gdal.GDT_Float32)
-    write_tif(input_dir / "structure_id.tif", structure_id, dx, gdal.GDT_Int32)
-    write_tif(input_dir / "new_phi.tif", phi, dx, gdal.GDT_Float32)
+    write_tif(input_dir / "new_fbfm40.tif", fbfm, dx, np.int16)
+    write_tif(input_dir / "structure_fraction.tif", fraction, dx, np.float32)
+    write_tif(input_dir / "structure_id.tif", structure_id, dx, np.int32)
+    write_tif(input_dir / "new_phi.tif", phi, dx, np.float32)
     return {
         "working_directory": str((input_dir.parents[1]).relative_to(case_dir)),
         "physical_nx": physical_nx,

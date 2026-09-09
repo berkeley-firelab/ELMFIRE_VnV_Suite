@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
-from osgeo import gdal
+import rasterio
 
 
 BUFFER_CELLS = 2
@@ -21,16 +21,16 @@ FIGURE_DPI = 180
 
 
 def _read_raster(path):
-    """Return the first raster band, nodata value, and GDAL geotransform."""
-    dataset = gdal.Open(str(path), gdal.GA_ReadOnly)
-    if dataset is None:
-        raise RuntimeError(f"Cannot open raster: {path}")
-    band = dataset.GetRasterBand(1)
-    array = band.ReadAsArray().astype(float)
-    nodata = band.GetNoDataValue()
-    geotransform = dataset.GetGeoTransform()
-    dataset = None
-    return array, nodata, geotransform
+    """Return the first raster band, nodata value, and GDAL-style transform."""
+    try:
+        with rasterio.open(path) as dataset:
+            return (
+                dataset.read(1).astype(float),
+                dataset.nodata,
+                dataset.transform.to_gdal(),
+            )
+    except rasterio.errors.RasterioIOError as error:
+        raise RuntimeError(f"Cannot open raster: {path}") from error
 
 
 def _physical_view(array, geotransform, buffer_cells=BUFFER_CELLS):

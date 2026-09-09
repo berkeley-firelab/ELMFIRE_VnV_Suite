@@ -6,7 +6,7 @@ cells by physical structure, computes declared pass/fail metrics, and always
 writes a complete metrics table and a report-ready vector figure.
 """
 
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 from pathlib import Path
@@ -49,12 +49,9 @@ COLORS = {
 
 def read_band(path):
     """Read one raster band as float and retain NoData as NaN."""
-    ds = gdal.Open(str(path))
-    if ds is None:
-        raise RuntimeError(f"Could not open {path}")
-    band = ds.GetRasterBand(1)
-    array = band.ReadAsArray().astype(float)
-    nodata = band.GetNoDataValue()
+    with rasterio.open(path) as dataset:
+        array = dataset.read(1).astype(float)
+        nodata = dataset.nodata
     if nodata is not None:
         array[np.isclose(array, nodata)] = np.nan
     return array

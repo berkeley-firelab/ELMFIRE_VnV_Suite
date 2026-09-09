@@ -22,9 +22,11 @@ ELMFIRE_BIN=/path/to/elmfire \
   cases/Validation/landscape_scale/camp_fire/run_case.sh
 ```
 
-The default launch uses 51 MPI ranks, matching the archived 50-member ensemble
-workflow. Override it with `ELMFIRE_MPI_RANKS`. Preprocessing requires Python,
-NumPy, Matplotlib, Rasterio, PyYAML, and GDAL's `ogr2ogr`. Result comparison
+The default launch uses 50 MPI ranks, one per ensemble member, and accepts a
+smaller positive override through `ELMFIRE_MPI_RANKS`. The shared Savio header
+keeps those ranks on one node and disables PROJ network caching to prevent MPI
+ranks from contending for a shared user-cache database. Preprocessing requires
+Python, NumPy, Matplotlib, Rasterio, PyYAML, and GDAL's `ogr2ogr`. Result comparison
 additionally requires Pandas, GeoPandas, and Shapely with their geospatial
 runtime libraries.
 

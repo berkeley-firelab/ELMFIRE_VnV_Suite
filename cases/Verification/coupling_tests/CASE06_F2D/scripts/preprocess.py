@@ -9,7 +9,8 @@ import json
 import math
 from pathlib import Path
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 
 # -----------------------------------------------------------------------------
 # Customizable preprocessing parameters (SI units unless explicitly noted)
@@ -47,21 +48,18 @@ def write_tif(path, values, dtype):
     """Write a 2-D or band-first 3-D array on the common buffered grid."""
     a = values[np.newaxis, ...] if values.ndim == 2 else values
     (nb, ny, nx) = a.shape
-    ds = gdal.GetDriverByName('GTiff').Create(
-        str(path), nx, ny, nb, dtype, options=['COMPRESS=DEFLATE'])
-    if ds is None:
-        raise RuntimeError(f'Could not create {path}')
-    ds.SetGeoTransform((X_MIN_M - BUFFER_CELLS * DX_M, DX_M, 0.0,
-                       Y_MAX_M + BUFFER_CELLS * DX_M, 0.0, -DX_M))
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(EPSG)
-    ds.SetProjection(srs.ExportToWkt())
-    for (k, v) in enumerate(a, 1):
-        b = ds.GetRasterBand(k)
-        b.WriteArray(v)
-        b.SetNoDataValue(NODATA)
-        b.FlushCache()
-    ds = None
+    transform = from_origin(
+        X_MIN_M - BUFFER_CELLS * DX_M,
+        Y_MAX_M + BUFFER_CELLS * DX_M,
+        DX_M,
+        DX_M,
+    )
+    with rasterio.open(
+        path, 'w', driver='GTiff', height=ny, width=nx, count=nb,
+        dtype=np.dtype(dtype).name, crs=f'EPSG:{EPSG}',
+        transform=transform, nodata=NODATA, compress='deflate',
+    ) as dataset:
+        dataset.write(np.asarray(a, dtype=dtype))
 
 
 def main():
@@ -97,9 +95,9 @@ def main():
         'dem': z, 'slp': z, 'adj': one, 'new_phi': phi,
     }
     for name, values in continuous_inputs.items():
-        write_tif(inp / f'{name}.tif', values, gdal.GDT_Float32)
+        write_tif(inp / f'{name}.tif', values, np.float32)
     fuel = np.full((ny, nx), FUEL_MODEL, dtype=np.int16)
-    write_tif(inp / 'new_fbfm40.tif', fuel, gdal.GDT_Int16)
+    write_tif(inp / 'new_fbfm40.tif', fuel, np.int16)
     x = X_MIN_M + (np.arange(nx) - BUFFER_CELLS + 0.5) * DX_M
     y = Y_MAX_M - (np.arange(ny) - BUFFER_CELLS + 0.5) * DX_M
     times = np.arange(0.0, TSTOP_S + 0.5 * MET_DT_S, MET_DT_S)
@@ -115,10 +113,10 @@ def main():
         vv = np.broadcast_to(v[:, None], (ny, nx))
         ws[k] = np.hypot(uu, vv) / MPS_PER_MPH
         wd[k] = (np.degrees(np.arctan2(uu, vv)) - 180.0) % 360.0
-    write_tif(inp / 'ws.tif', ws, gdal.GDT_Float32)
-    write_tif(inp / 'wd.tif', wd, gdal.GDT_Float32)
+    write_tif(inp / 'ws.tif', ws, np.float32)
+    write_tif(inp / 'wd.tif', wd, np.float32)
     for name in ('m1', 'm10', 'm100'):
-        write_tif(inp / f'{name}.tif', np.zeros_like(ws), gdal.GDT_Float32)
+        write_tif(inp / f'{name}.tif', np.zeros_like(ws), np.float32)
     for fn in ('fuel_models.csv', 'building_fuel_models.csv'):
         src = CASE_DIR / 'data' / 'misc' / fn
         if not src.is_file():

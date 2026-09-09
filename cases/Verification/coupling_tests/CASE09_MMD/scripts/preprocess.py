@@ -14,7 +14,8 @@ import re
 import shutil
 
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 
 
 # -----------------------------------------------------------------------------
@@ -57,26 +58,28 @@ def resolve(value, fallback):
     return fallback if value is None else value
 
 
-def write_tif(path, array, dx, buffer_cells, dtype=gdal.GDT_Float32):
+def write_tif(path, array, dx, buffer_cells, dtype=np.float32):
     """Write a north-up, single-band, co-registered verification raster."""
     path = Path(path)
-    dataset = gdal.GetDriverByName("GTiff").Create(
-        str(path), array.shape[1], array.shape[0], 1, dtype
+    transform = from_origin(
+        -buffer_cells * dx,
+        (array.shape[0] - buffer_cells) * dx,
+        dx,
+        dx,
     )
-    if dataset is None:
-        raise RuntimeError(f"Could not create {path}")
-    dataset.SetGeoTransform(
-        (-buffer_cells * dx, dx, 0.0,
-         (array.shape[0] - buffer_cells) * dx, 0.0, -dx)
-    )
-    spatial_ref = osr.SpatialReference()
-    spatial_ref.ImportFromEPSG(PROJECTION_EPSG)
-    dataset.SetProjection(spatial_ref.ExportToWkt())
-    band = dataset.GetRasterBand(1)
-    band.WriteArray(array)
-    band.SetNoDataValue(NODATA)
-    band.FlushCache()
-    dataset = None
+    with rasterio.open(
+        path,
+        "w",
+        driver="GTiff",
+        height=array.shape[0],
+        width=array.shape[1],
+        count=1,
+        dtype=np.dtype(dtype).name,
+        crs=f"EPSG:{PROJECTION_EPSG}",
+        transform=transform,
+        nodata=NODATA,
+    ) as dataset:
+        dataset.write(np.asarray(array, dtype=dtype), 1)
 
 
 def replace_assignment(text, key, value):
@@ -101,21 +104,21 @@ def write_input_stack(input_dir, nx, ny, dx, buffer_cells, wind_mph):
     phi[buffer_cells:ny - buffer_cells, buffer_cells] = INITIAL_PHI
 
     rasters = (
-        ("asp", zeros, gdal.GDT_Float32),
-        ("cbd", zeros, gdal.GDT_Float32),
-        ("cbh", zeros, gdal.GDT_Float32),
-        ("cc", zeros, gdal.GDT_Float32),
-        ("ch", zeros, gdal.GDT_Float32),
-        ("dem", zeros, gdal.GDT_Float32),
-        ("slp", zeros, gdal.GDT_Float32),
-        ("adj", ones, gdal.GDT_Float32),
-        ("new_phi", phi, gdal.GDT_Float32),
-        ("new_fbfm40", fbfm, gdal.GDT_Int16),
-        ("ws", np.full((ny, nx), wind_mph, dtype=np.float32), gdal.GDT_Float32),
-        ("wd", np.full((ny, nx), WIND_DIRECTION_DEG, dtype=np.float32), gdal.GDT_Float32),
-        ("m1", np.full((ny, nx), DEAD_FUEL_MOISTURE_PERCENT, dtype=np.float32), gdal.GDT_Float32),
-        ("m10", np.full((ny, nx), DEAD_FUEL_MOISTURE_PERCENT, dtype=np.float32), gdal.GDT_Float32),
-        ("m100", np.full((ny, nx), DEAD_FUEL_MOISTURE_PERCENT, dtype=np.float32), gdal.GDT_Float32),
+        ("asp", zeros, np.float32),
+        ("cbd", zeros, np.float32),
+        ("cbh", zeros, np.float32),
+        ("cc", zeros, np.float32),
+        ("ch", zeros, np.float32),
+        ("dem", zeros, np.float32),
+        ("slp", zeros, np.float32),
+        ("adj", ones, np.float32),
+        ("new_phi", phi, np.float32),
+        ("new_fbfm40", fbfm, np.int16),
+        ("ws", np.full((ny, nx), wind_mph, dtype=np.float32), np.float32),
+        ("wd", np.full((ny, nx), WIND_DIRECTION_DEG, dtype=np.float32), np.float32),
+        ("m1", np.full((ny, nx), DEAD_FUEL_MOISTURE_PERCENT, dtype=np.float32), np.float32),
+        ("m10", np.full((ny, nx), DEAD_FUEL_MOISTURE_PERCENT, dtype=np.float32), np.float32),
+        ("m100", np.full((ny, nx), DEAD_FUEL_MOISTURE_PERCENT, dtype=np.float32), np.float32),
     )
     for name, array, dtype in rasters:
         write_tif(input_dir / f"{name}.tif", array, dx, buffer_cells, dtype)

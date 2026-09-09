@@ -9,6 +9,7 @@ set -euo pipefail
 
 CASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+export PYTHONNOUSERSITE=1
 
 # Stage 1: generate the complete parameter design and capability manifest.
 echo "[INFO] Preprocessing $(basename "$CASE_DIR")"

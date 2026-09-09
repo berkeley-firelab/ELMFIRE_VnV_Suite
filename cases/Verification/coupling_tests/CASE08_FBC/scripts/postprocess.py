@@ -7,7 +7,7 @@ consumption ratios, profile-convergence errors, surface-TOA invariance,
 nonnegativity checks, the Boolean decision, LaTeX macros, and a vector PDF.
 It never runs ELMFIRE. Arrays are [row, column]; the two-cell halo is excluded.
 """
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 import json
@@ -36,13 +36,10 @@ REPORT_DIR = CASE_DIR / "report"
 
 def read_raster(path):
     """Read one raster and return array, geotransform, and cell size."""
-    ds = gdal.Open(str(path))
-    if ds is None:
-        raise RuntimeError(f"GDAL could not open {path}")
-    array = ds.GetRasterBand(1).ReadAsArray().astype(float)
-    gt = ds.GetGeoTransform()
-    dx = float(gt[1])
-    ds = None
+    with rasterio.open(path) as dataset:
+        array = dataset.read(1).astype(float)
+        gt = dataset.transform.to_gdal()
+        dx = float(dataset.transform.a)
     return array, gt, dx
 
 

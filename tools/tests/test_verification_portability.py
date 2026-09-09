@@ -70,6 +70,40 @@ class VerificationPortabilityTests(unittest.TestCase):
             if "$ELMFIRE_BIN" in runner or "${ELMFIRE_BIN}" in runner:
                 self.assertRegex(runner, default, case.name)
 
+    def test_case_python_does_not_require_gdal_bindings(self) -> None:
+        """Keep case scripts independent of the ABI-sensitive osgeo package."""
+        forbidden = re.compile(r"(?:from\s+osgeo\b|import\s+osgeo\b)")
+        for case in self.active_cases():
+            for script in (case / "scripts").glob("*.py"):
+                source = script.read_text(encoding="utf-8")
+                self.assertIsNone(
+                    forbidden.search(source),
+                    f"{script} imports osgeo; use Rasterio for Python raster I/O",
+                )
+
+    def test_case_runners_ignore_user_site_packages(self) -> None:
+        """Prevent ~/.local packages from shadowing the selected HPC environment."""
+        for case in self.active_cases():
+            runner = (case / "run_case.sh").read_text(encoding="utf-8")
+            self.assertRegex(
+                runner,
+                r"(?m)^export\s+PYTHONNOUSERSITE=1\s*$",
+                case.name,
+            )
+
+    def test_case_namelists_do_not_hard_code_system_gdal(self) -> None:
+        """Let ELMFIRE resolve the GDAL utilities from the active environment."""
+        for case in self.active_cases():
+            for namelist in (case / "elmfire.data.in", case / "elmfire.data"):
+                if not namelist.is_file():
+                    continue
+                source = namelist.read_text(encoding="utf-8")
+                self.assertNotRegex(
+                    source,
+                    r"(?mi)^\s*PATH_TO_GDAL\s*=\s*['\"]?/usr/bin/?['\"]?",
+                    str(namelist),
+                )
+
     def test_rothermel_sweeps_generate_bounded_phi_inputs(self) -> None:
         common_cases = (
             "unit_tests/CASE34_FMS",

@@ -1,7 +1,9 @@
 .PHONY: new run run-all run-verification run-validation build-all \
-	report-inputs verification-report validation-report reports main clean configure
+	report-inputs verification-report validation-report reports main clean \
+	prepare-run configure
 
 SUITE ?= all
+ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 # Find all ELMFIRE config files
 ELMFIRE_CONFIGS := $(shell find cases -type f -name 'elmfire.data.in')
@@ -54,7 +56,13 @@ main: reports
 clean:
 	@python3 ./tools/clean_artifacts.py --apply
 
-# Update GDAL paths + ensure all *.sh are executable
+# Prepare a clean evaluation boundary. In addition to the normal cleanup,
+# invalidate prior metrics, figures, generated report inputs, and compiled PDFs.
+prepare-run:
+	@python3 ./tools/clean_artifacts.py --apply --prepare-run
+
+# Optionally update GDAL paths and always repair executable permissions that
+# may be lost when the suite is copied to an HPC filesystem.
 configure:
 	@if [ -n "$(PATH_TO_GDAL)" ]; then \
 		for cfg in $(ELMFIRE_CONFIGS); do \
@@ -62,7 +70,8 @@ configure:
 			python3 ./tools/refresh_gdal_path.py "$$cfg" "$(PATH_TO_GDAL)"; \
 		done; \
 	else \
-		echo "PATH_TO_GDAL is not set. Usage: make configure PATH_TO_GDAL=/opt/conda/bin"; \
+		echo "[INFO] PATH_TO_GDAL not supplied; leaving namelists unchanged."; \
 	fi
-	@echo "[INFO] Making all shell scripts in $(ROOT_DIR) executable..."
-	@find "$(ROOT_DIR)" -type f -name "*.sh" -exec chmod +x {} \;
+	@echo "[INFO] Restoring user-executable permission on suite shell scripts..."
+	@find "$(ROOT_DIR)" -path "$(ROOT_DIR)/.git" -prune -o \
+		-type f -name "*.sh" -exec chmod u+x {} +

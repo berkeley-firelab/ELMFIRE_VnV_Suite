@@ -11,6 +11,9 @@ set -euo pipefail
 CASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 ELMFIRE_BIN="${ELMFIRE_BIN:-elmfire}"
+# Do not allow ABI-incompatible packages under ~/.local to shadow the selected
+# Conda or virtual environment on HPC systems.
+export PYTHONNOUSERSITE=1
 
 # Stage 1: generate deterministic rasters, namelists, and the variant manifest.
 echo "[INFO] Preprocessing $(basename "$CASE_DIR")"

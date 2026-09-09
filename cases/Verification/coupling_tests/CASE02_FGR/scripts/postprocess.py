@@ -9,7 +9,7 @@ from pathlib import Path
 
 import matplotlib
 import numpy as np
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 
 matplotlib.use("Agg")
@@ -62,14 +62,10 @@ def analytical_profile(variant: dict) -> tuple[np.ndarray, np.ndarray, int]:
 def read_ember_profile(
         path: Path, variant: dict) -> tuple[np.ndarray, np.ndarray, float]:
     """Extract the physical-domain ember profile and exclude the numerical buffer cells."""
-    dataset = gdal.Open(str(path), gdal.GA_ReadOnly)
-    if dataset is None:
-        raise RuntimeError(f"GDAL could not open {path}")
-    band = dataset.GetRasterBand(1)
-    array = band.ReadAsArray().astype(float)
-    nodata = band.GetNoDataValue()
-    transform = dataset.GetGeoTransform()
-    dataset = None
+    with rasterio.open(path) as dataset:
+        array = dataset.read(1).astype(float)
+        nodata = dataset.nodata
+        transform = dataset.transform.to_gdal()
     expected_shape = (int(variant["ny"]), int(variant["nx"]))
     if array.shape != expected_shape:
         raise ValueError(f"{path} shape {array.shape}; expected {expected_shape}")

@@ -53,3 +53,10 @@ export PYTHON_BIN
 
 echo "[INFO] Verification Python: $PYTHON_BIN"
 "$PYTHON_BIN" -c 'import sys; print("[INFO] Python version:", sys.version.split()[0])'
+if ! "$PYTHON_BIN" -c 'import numpy, matplotlib, yaml, rasterio'; then
+  echo "[ERROR] Verification Python dependencies are unavailable in: $PYTHON_BIN" >&2
+  echo "[ERROR] Install requirements.txt into ELMFIRE_VNV_CONDA_ENV before submitting." >&2
+  exit 2
+fi
+"$PYTHON_BIN" -c \
+  'import rasterio; print("[INFO] Rasterio:", rasterio.__version__, rasterio.__file__)'

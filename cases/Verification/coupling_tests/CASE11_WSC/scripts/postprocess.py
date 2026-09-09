@@ -7,7 +7,7 @@ within-structure firebrand-load distortion, and writes standalone report
 artifacts. It never runs ELMFIRE.
 """
 
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 from pathlib import Path
@@ -34,12 +34,9 @@ COLORS = {
 
 def read_band(path):
     """Read one raster band and convert its NoData cells to NaN."""
-    ds = gdal.Open(str(path))
-    if ds is None:
-        raise RuntimeError(f"Could not open {path}")
-    band = ds.GetRasterBand(1)
-    values = band.ReadAsArray().astype(float)
-    nodata = band.GetNoDataValue()
+    with rasterio.open(path) as dataset:
+        values = dataset.read(1).astype(float)
+        nodata = dataset.nodata
     if nodata is not None:
         values[np.isclose(values, nodata)] = np.nan
     return values

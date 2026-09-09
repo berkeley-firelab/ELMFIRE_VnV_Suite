@@ -3,8 +3,15 @@ set -euo pipefail
 
 CASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 ELMFIRE_BIN=${ELMFIRE_BIN:-elmfire}
-ELMFIRE_MPI_RANKS=${ELMFIRE_MPI_RANKS:-51}
+ELMFIRE_MPI_RANKS=${ELMFIRE_MPI_RANKS:-50}
 PYTHON_BIN=${PYTHON_BIN:-python3}
+export PYTHONNOUSERSITE=1
+export PROJ_NETWORK=OFF
+
+if ! [[ "$ELMFIRE_MPI_RANKS" =~ ^[1-9][0-9]*$ ]] || [[ "$ELMFIRE_MPI_RANKS" -gt 50 ]]; then
+  echo "[ERROR] ELMFIRE_MPI_RANKS must be an integer from 1 through 50 for this 50-member case." >&2
+  exit 2
+fi
 
 mkdir -p "$CASE_DIR/outputs" "$CASE_DIR/figures" "$CASE_DIR/logs/scratch"
 "$PYTHON_BIN" "$CASE_DIR/scripts/preprocess.py"
@@ -21,5 +28,5 @@ echo "[INFO] Running Thomas Fire validation with $ELMFIRE_MPI_RANKS MPI rank(s).
   >"$CASE_DIR/logs/elmfire.stdout" 2>"$CASE_DIR/logs/elmfire.stderr"
 
 "$PYTHON_BIN" "$CASE_DIR/scripts/postprocess.py"
-"$CASE_DIR/compile_case.sh"
+bash "$CASE_DIR/compile_case.sh"
 echo "[OK] Thomas Fire validation pipeline complete."

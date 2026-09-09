@@ -10,6 +10,7 @@ set -euo pipefail
 
 CASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+export PYTHONNOUSERSITE=1
 ELMFIRE_BIN="${ELMFIRE_BIN:-elmfire}"
 
 # Stage 1: generate deterministic rasters, namelists, and the variant manifest.

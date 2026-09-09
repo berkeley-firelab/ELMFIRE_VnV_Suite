@@ -40,6 +40,7 @@
     "leading_edge_normalized_rmse_max": 0.1,
     "mean_ros_relative_error_max": 0.1,
     "accumulation_relative_error_max": 0.1,
+    "minimum_accumulation_reference_cells": 2,
     "minimum_toa_cells": 2
   },
   "source_references": [

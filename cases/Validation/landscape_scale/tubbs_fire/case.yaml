@@ -7,7 +7,7 @@ source_archive: "../../3_FIRES/Tubbs_VAL.rar"
 elmfire:
   bin: "elmfire"
   config: "elmfire.data.in"
-  mpi_ranks: 51
+  mpi_ranks: 50
   runtime_limit_s: 3000000
 
 validation:
@@ -36,7 +36,7 @@ namelist_contract:
       invariants:
         TIME_CONTROL.SIMULATION_TSTOP: 43200.0
         TIME_CONTROL.TARGET_CFL: 0.45
-        SIMULATOR.NUM_IGNITIONS: 1
+        SIMULATOR.NUM_IGNITIONS: 0
         SIMULATOR.CROWN_FIRE_MODEL: 2
         MONTE_CARLO.NUM_ENSEMBLE_MEMBERS: 50
         MONTE_CARLO.SEED: 2024

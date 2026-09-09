@@ -6,7 +6,7 @@ computes the declared comparison metrics, and writes standalone report
 artifacts. It never launches ELMFIRE.
 """
 
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 from pathlib import Path
@@ -47,12 +47,9 @@ COLORS = {
 
 def read_band(path, counts=False):
     """Read a GeoTIFF band; retain zero as a valid deposited-ember count."""
-    dataset = gdal.Open(str(path))
-    if dataset is None:
-        raise RuntimeError(f"Could not open {path}")
-    band = dataset.GetRasterBand(1)
-    array = band.ReadAsArray().astype(float)
-    nodata = band.GetNoDataValue()
+    with rasterio.open(path) as dataset:
+        array = dataset.read(1).astype(float)
+        nodata = dataset.nodata
     if nodata is not None and not (counts and np.isclose(nodata, 0.0)):
         array[np.isclose(array, nodata)] = np.nan
     return array

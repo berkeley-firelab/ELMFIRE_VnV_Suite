@@ -9,6 +9,7 @@ set -euo pipefail
 
 CASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+export PYTHONNOUSERSITE=1
 ELMFIRE_BIN="${ELMFIRE_BIN:-elmfire}"
 
 # Stage 1: create deterministic inputs and refresh the local namelist.

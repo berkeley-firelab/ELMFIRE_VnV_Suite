@@ -7,13 +7,13 @@ extracts leading-edge/ROS histories directly from every dumped level-set field,
 and evaluates each variant's accumulation plateau. It then writes JSON, LaTeX
 macros, and vector PDFs. It never runs ELMFIRE.
 """
-from osgeo import gdal
 from spatial_evidence import generate_spatial_evidence
 from pathlib import Path
 import csv
 import json
 import re
 import numpy as np
+import rasterio
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -36,11 +36,12 @@ BUFFER_CELLS = 2
 
 def read_raster(path):
     """Read one raster and return its array, geotransform, and dimensions."""
-    ds = gdal.Open(str(path))
-    if ds is None:
-        raise RuntimeError(f"cannot open {path}")
-    return ds.GetRasterBand(1).ReadAsArray().astype(
-        float), ds.GetGeoTransform(), (ds.RasterYSize, ds.RasterXSize)
+    with rasterio.open(path) as dataset:
+        return (
+            dataset.read(1).astype(float),
+            dataset.transform.to_gdal(),
+            (dataset.height, dataset.width),
+        )
 
 
 def exactly_one_final(directory, prefix):
@@ -154,6 +155,57 @@ def latex_value(value):
     return str(value).replace("_", r"\_")
 
 
+def evaluate_accumulation_plateau(
+        accumulation_density, reference_profile, plateau_mask, minimum_cells,
+        relative_error_limit):
+    """Evaluate accumulation only where an independent reference is defined.
+
+    ``flin`` and ``vs`` are burned-cell products. A zero or nodata cell does
+    not define the PER-MW residence-time reference and must not become an
+    artificial zero reference value.
+    """
+    valid = (
+        plateau_mask
+        & np.isfinite(accumulation_density)
+        & (accumulation_density >= 0.0)
+        & np.isfinite(reference_profile)
+        & (reference_profile > 0.0)
+    )
+    reference_cells = int(np.count_nonzero(valid))
+    result = {
+        "accumulation_reference_cells": reference_cells,
+        "accumulation_reference_required_cells": int(minimum_cells),
+    }
+    if reference_cells < minimum_cells:
+        result.update(
+            accumulation_plateau_density_pcs_m2="not computed",
+            accumulation_reference_density_pcs_m2="not computed",
+            accumulation_relative_error="not computed",
+            accumulation_passed="NOT EVALUABLE",
+            accumulation_reference_status="NOT EVALUABLE",
+            accumulation_evaluation_reason=(
+                f"fewer than {minimum_cells} plateau cells have finite positive "
+                "FLIN/VS reference values; inspect the completed wildland outputs"
+            ),
+        )
+        return result, float("nan")
+
+    plateau_density = float(np.median(accumulation_density[valid]))
+    reference_density = float(np.median(reference_profile[valid]))
+    # The validity mask guarantees a finite, strictly positive denominator.
+    accumulation_error = abs(
+        plateau_density - reference_density) / reference_density
+    result.update(
+        accumulation_plateau_density_pcs_m2=plateau_density,
+        accumulation_reference_density_pcs_m2=reference_density,
+        accumulation_relative_error=accumulation_error,
+        accumulation_passed=accumulation_error <= relative_error_limit,
+        accumulation_reference_status="PASS",
+        accumulation_evaluation_reason="reference support is sufficient",
+    )
+    return result, reference_density
+
+
 def write_reference_figure(profiles, figures):
     """Reproduce the four canonical steady-transport observables.
 
@@ -240,6 +292,11 @@ def main():
                 "ember_ignition_state_consistency_passed": "NOT EVALUABLE",
                 "accumulation_relative_error": "not computed",
                 "accumulation_passed": "NOT EVALUABLE",
+                "accumulation_reference_cells": "not computed",
+                "accumulation_reference_required_cells": int(
+                    limits["minimum_accumulation_reference_cells"]),
+                "accumulation_reference_status": "NOT EVALUABLE",
+                "accumulation_evaluation_reason": "required raster outputs are missing",
                 "total_accumulated_firebrands_domain_pcs": "not computed",
                 "active_deposition_rows": "not computed",
             }
@@ -356,6 +413,8 @@ def main():
                                  PER_AREA_EMISSION_DURATION_S /
                                  (dx *
                                   REPRESENTED_STRIP_WIDTH_M))
+            reference_profile = np.full_like(
+                accumulation_density, reference_density, dtype=float)
         else:
             flin_file = exactly_one_final(out, "flin")
             flin, _, flin_shape = read_raster(flin_file)
@@ -363,23 +422,36 @@ def main():
             vs, _, vs_shape = read_raster(vs_file)
             if flin_shape != expected_shape or vs_shape != expected_shape:
                 raise RuntimeError("stale wildland accumulation-reference dimensions")
+            flin_profile = flin[row, sl]
             vs_mps = vs[row, sl] * 0.3048 / 60.0
-            reference_profile = np.divide(EMBER_GR_PER_MW_1M * (flin[row, sl] / 1000.0), vs_mps,
-                                          out=np.zeros_like(vs_mps), where=vs_mps > 0)
-            reference_density = float(np.median(reference_profile[plateau_mask]))
+            source_reference_valid = (
+                np.isfinite(flin_profile)
+                & np.isfinite(vs_mps)
+                & (flin_profile > 0.0)
+                & (vs_mps > 0.0)
+            )
+            reference_profile = np.full_like(vs_mps, np.nan, dtype=float)
+            reference_profile[source_reference_valid] = (
+                EMBER_GR_PER_MW_1M
+                * (flin_profile[source_reference_valid] / 1000.0)
+                / vs_mps[source_reference_valid]
+            )
             item.update(selected_flin_file=str(flin_file.relative_to(CASE_DIR)),
                         selected_vs_file=str(vs_file.relative_to(CASE_DIR)),
                         reference_nominal_accumulation_pcs=EXPECTED_ACCUMULATION_PCS)
-        plateau_density = float(np.median(accumulation_density[plateau_mask]))
-        accumulation_error = abs(
-            plateau_density - reference_density) / reference_density
+        item["accumulation_observed_plateau_median_all_cells_pcs_m2"] = float(
+            np.median(accumulation_density[plateau_mask]))
+        accumulation_result, reference_density = evaluate_accumulation_plateau(
+            accumulation_density,
+            reference_profile,
+            plateau_mask,
+            int(limits["minimum_accumulation_reference_cells"]),
+            float(limits["accumulation_relative_error_max"]),
+        )
         active_rows = int(np.count_nonzero(np.sum(physical_flux, axis=1) > 0))
         item.update(
             active_deposition_rows=active_rows,
-            accumulation_plateau_density_pcs_m2=plateau_density,
-            accumulation_reference_density_pcs_m2=reference_density,
-            accumulation_relative_error=accumulation_error,
-            accumulation_passed=accumulation_error <= limits["accumulation_relative_error_max"])
+            **accumulation_result)
         profiles[name + "_accumulation"] = (x,
                                             accumulation_density,
                                             reference_density,
@@ -398,15 +470,34 @@ def main():
     required_variant_count = len(manifest["required_variants"])
     evaluated_variant_count = sum(
         "selected_toa_file" in item for item in results.values())
-    evaluation_complete = complete and evaluated_variant_count == required_variant_count
+    output_complete = complete and evaluated_variant_count == required_variant_count
+    unevaluable_reasons = [
+        f"{name}: {item.get('accumulation_evaluation_reason', 'metric unavailable')}"
+        for name, item in results.items()
+        if item.get("accumulation_passed") == "NOT EVALUABLE"
+    ]
+    evaluation_complete = output_complete and not unevaluable_reasons
+    overall_status = (
+        "PASS" if evaluation_complete and passed
+        else "FAIL" if evaluation_complete
+        else "NOT EVALUABLE"
+    )
     metrics = {
         "case_id": config["id"],
-        "status": (("pass" if passed else "fail")
-                   if evaluation_complete else "insufficient_output"),
+        "overall_status": overall_status,
+        "status": overall_status,
         "verification_passed": (passed if evaluation_complete else "not_evaluated"),
+        "reason": (
+            "; ".join(unevaluable_reasons)
+            if unevaluable_reasons
+            else "required output artifacts are incomplete"
+            if not output_complete
+            else "all required metrics were evaluated"
+        ),
         "required_variants": required_variant_count,
         "evaluated_variants": evaluated_variant_count,
-        "output_completeness_passed": evaluation_complete,
+        "output_completeness_passed": output_complete,
+        "evaluation_complete": evaluation_complete,
         "limits": limits,
         "expected_accumulation_pcs": expected_accumulation,
         "variants": results}

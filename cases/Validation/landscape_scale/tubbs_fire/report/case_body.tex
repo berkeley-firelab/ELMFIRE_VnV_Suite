@@ -120,7 +120,8 @@ the ignition treatment is \IgnitionDescription{}.  The simulation uses
 \EnsembleSize{} members, a target CFL of 0.45, crown-fire model 2, and PER-MW
 firebrand generation with empirical transport distance, Eulerian accumulation,
 and physical ignition.  These physical values, seeds, uncertainty ranges,
-ignition choices, and WUI settings are retained from the received archive.  In
+ignition choices, and WUI settings are retained from the received archive except
+for the documented removal of a contradictory fixed Tubbs ignition.  In
 the available material they are \emph{documented by configuration} but their
 scientific selection rationale is unsupported; they must not be described as
 independently derived or literature-justified.
@@ -162,9 +163,9 @@ not rewrite raw evidence.
 \texttt{run\_case.sh} then launches ELMFIRE, runs the case-local postprocessor,
 and compiles this report.  The executable, Python interpreter, and MPI rank
 count can be selected through \texttt{ELMFIRE\_BIN}, \texttt{PYTHON\_BIN}, and
-\texttt{ELMFIRE\_MPI\_RANKS}.  The default 51 ranks follow the received workflow
-for a 50-member ensemble.  Outputs and logs are retained rather than deleted or
-renamed.  Reproducible input identity does not by itself guarantee result
+\texttt{ELMFIRE\_MPI\_RANKS}.  The default 50 ranks assign one rank to each
+ensemble member and avoid an unnecessary virtual rank.  Outputs and logs are
+retained rather than deleted or renamed.  Reproducible input identity does not by itself guarantee result
 reproducibility: each run must also record the actual ELMFIRE revision,
 compiler, dependencies, and platform.
 

@@ -52,7 +52,12 @@ diagnostic, but it is not mixed into the one-dimensional plotted observable.
 For the PER-AREA variant, the configured source gives
 $n_\infty=GR\Delta x\tau_{\rm ember}/(1~\mathrm{m})$. For the PER-MW
 variant, Equation~\ref{eq:accumulation} divided by
-$\Delta x(1~\mathrm{m})$ gives the run-derived density reference.
+$\Delta x(1~\mathrm{m})$ gives the run-derived density reference. A zero or
+nodata final burned-cell FLIN or VS value does not define an independent
+residence-time reference. The evaluator retains only finite cells with
+$FLIN>0$ and $VS>0$, requires at least two such cells in the declared plateau,
+and otherwise reports the accumulation component as \textbf{NOT EVALUABLE}
+rather than forming a relative error against zero.
 
 The discrete algorithm is: generate embers in every active source cell; distribute
 them among downwind bins; accumulate them in landing cells; apply DIRECT ignition
@@ -126,6 +131,10 @@ $|\widetilde n-n_{\rm ref}|/n_{\rm ref}\le0.10$, where
 $\widetilde n$ is the median centre-row density from Equation~\ref{eq:density}
 over the fully developed 155--195~m plateau. The corresponding analytical or
 run-derived reference is calculated independently of the ember-flux values.
+For the PER-MW variant, the same mask is applied to the observed density and
+the co-located FLIN/VS reference, with at least two finite, strictly positive
+reference cells required. Insufficient support makes the metric NOT EVALUABLE;
+a zero denominator is never treated as a failed relative-error comparison.
 Domain-wide deposited totals are also recorded as diagnostics. Exactly two
 manifest variants and one final raster of every required
 kind are mandatory. The overall decision is the conjunction of completeness and
@@ -169,7 +178,8 @@ TOA profile error & Mean and maximum of \(|t_i-t_{ref,i}|/t_{ref,i}\) on valid c
 Leading-edge error & RMSE of the rightmost interpolated $\phi=0$ crossing relative to \(x_{LE,0}+U(t-t_0)\), normalized by the observable reference displacement. & \(\mathrm{NRMSE}\le0.10\) \\
 Mean-ROS error & Relative error of fitted leading-edge ROS against \(U=\SI{6.71}{m.s^{-1}}\). & \(\le0.10\) \\
 Ignition-state consistency & Every ember-ignited physical cell has a finite, nonnegative TOA. & No inconsistent cells \\
-Accumulation plateau error & Relative error of median one-metre-strip density over 155--\SI{195}{m} against the independent reference. & \(\le0.10\) for both variants \\
+Accumulation reference support & Finite positive co-located FLIN/VS cells over 155--\SI{195}{m}; zeros and nodata cannot define the PER-MW residence-time reference. & At least two cells; otherwise NOT EVALUABLE \\
+Accumulation plateau error & Relative error of median one-metre-strip density over 155--\SI{195}{m} against the independent reference, using the same valid-reference mask for the PER-MW variant. & \(\le0.10\) for both variants \\
 Overall decision & Conjunction of completeness and every component for both variants. & PASS only if all pass \\
 \bottomrule
 \end{tabular}

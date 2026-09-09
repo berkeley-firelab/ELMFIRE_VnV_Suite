@@ -3,6 +3,7 @@ set -euo pipefail
 
 CASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+export PYTHONNOUSERSITE=1
 ELMFIRE_BIN="${ELMFIRE_BIN:-elmfire}"
 
 mkdir -p "$CASE_DIR/data/outputs" "$CASE_DIR/data/scratch" "$CASE_DIR/logs" "$CASE_DIR/figures" "$CASE_DIR/outputs"

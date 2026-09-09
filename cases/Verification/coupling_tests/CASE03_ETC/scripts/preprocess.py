@@ -9,7 +9,8 @@ import shutil
 from pathlib import Path
 
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 
 # -----------------------------------------------------------------------------
 # Customizable preprocessing parameters (physical quantities use SI units)
@@ -45,22 +46,15 @@ def replace_assignment(text: str, name: str, value: str) -> str:
 def write_tif(path: Path, values: np.ndarray, dx: float, dtype: int) -> None:
     """Write a deterministic, georeferenced GeoTIFF on the common buffered verification grid."""
     ny, nx = values.shape
-    dataset = gdal.GetDriverByName("GTiff").Create(
-        str(path), nx, ny, 1, dtype, options=["COMPRESS=DEFLATE"]
+    transform = from_origin(
+        -BUFFER_CELLS * dx, DOMAIN_WIDTH_M + BUFFER_CELLS * dx, dx, dx
     )
-    if dataset is None:
-        raise RuntimeError(f"Could not create {path}")
-    dataset.SetGeoTransform(
-        (-BUFFER_CELLS * dx, dx, 0.0, DOMAIN_WIDTH_M + BUFFER_CELLS * dx, 0.0, -dx)
-    )
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(PROJECTION_EPSG)
-    dataset.SetProjection(srs.ExportToWkt())
-    band = dataset.GetRasterBand(1)
-    band.WriteArray(values)
-    band.SetNoDataValue(NODATA)
-    band.FlushCache()
-    dataset = None
+    with rasterio.open(
+        path, "w", driver="GTiff", height=ny, width=nx, count=1,
+        dtype=np.dtype(dtype).name, crs=f"EPSG:{PROJECTION_EPSG}",
+        transform=transform, nodata=NODATA, compress="deflate",
+    ) as dataset:
+        dataset.write(np.asarray(values, dtype=dtype), 1)
 
 
 def write_inputs(directory: Path, dx: float, nx: int, ny: int) -> tuple[int, int]:
@@ -80,10 +74,10 @@ def write_inputs(directory: Path, dx: float, nx: int, ny: int) -> tuple[int, int
         "m1": zeros, "m10": zeros, "m100": zeros,
     }
     for name, values in float_rasters.items():
-        write_tif(directory / f"{name}.tif", values, dx, gdal.GDT_Float32)
+        write_tif(directory / f"{name}.tif", values, dx, np.float32)
     write_tif(
         directory / "new_fbfm40.tif",
-        np.full((ny, nx), WILDLAND_FUEL_MODEL, dtype=np.int16), dx, gdal.GDT_Int16,
+        np.full((ny, nx), WILDLAND_FUEL_MODEL, dtype=np.int16), dx, np.int16,
     )
     return ignition_row, ignition_column
 

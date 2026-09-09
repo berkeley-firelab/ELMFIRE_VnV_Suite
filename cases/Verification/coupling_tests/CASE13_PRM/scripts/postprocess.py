@@ -10,7 +10,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from osgeo import gdal
+import rasterio
 
 # Customizable postprocessing parameters.
 CASE_FILENAME = "case.json"
@@ -31,10 +31,8 @@ def read_csv(path):
 
 def read_raster(path):
     """Read one prepared raster and return its values and geotransform."""
-    dataset = gdal.Open(str(path), gdal.GA_ReadOnly)
-    if dataset is None:
-        raise FileNotFoundError(path)
-    return dataset.GetRasterBand(1).ReadAsArray(), dataset.GetGeoTransform()
+    with rasterio.open(path) as dataset:
+        return dataset.read(1), dataset.transform.to_gdal()
 
 
 def add_horizontal_colorbar(figure, axis, image, label, ticks=None):

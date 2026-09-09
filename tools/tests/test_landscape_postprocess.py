@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -102,6 +103,27 @@ class LandscapePostprocessTests(unittest.TestCase):
             macros = (case / "report/metrics_macros.tex").read_text(encoding="utf-8")
             self.assertIn(r"\DefineMetric{status}{CHARACTERIZED}", macros)
             self.assertIn(r"\DefineMetric{jaccard}{0.25}", macros)
+
+    def test_arrival_plot_handles_never_burned_cells_without_warning(self) -> None:
+        arrival = np.array(
+            [
+                [[np.nan, 3600.0], [np.nan, 7200.0]],
+                [[np.nan, np.nan], [np.nan, 10800.0]],
+            ]
+        )
+        valid = np.ones((2, 2), dtype=bool)
+
+        with tempfile.TemporaryDirectory() as directory:
+            previous = POSTPROCESS.FIGURE_DIR
+            POSTPROCESS.FIGURE_DIR = Path(directory)
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("error", RuntimeWarning)
+                    POSTPROCESS.plot_arrival(arrival, valid)
+            finally:
+                POSTPROCESS.FIGURE_DIR = previous
+
+            self.assertTrue((Path(directory) / "arrival_time_summary.pdf").is_file())
 
 
 if __name__ == "__main__":

@@ -192,3 +192,60 @@ class ArtifactClassificationTests(unittest.TestCase):
             self.assertNotIn(pdf, classified)
             self.assertNotIn(source, classified)
             self.assertNotIn(generated, classified)
+
+    def test_prepare_run_invalidates_prior_evaluation_but_preserves_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            case = root / "cases/Verification/unit_tests/CASE34_FMS"
+            report = case / "report"
+            outputs = case / "outputs"
+            figures = case / "figures"
+            generated = root / "main_report/generated"
+            for path in (report, outputs, figures, generated):
+                path.mkdir(parents=True)
+
+            removable_files = {
+                report / "case_report.pdf",
+                report / "metrics_macros.tex",
+                root / "main_report/verification_report.pdf",
+            }
+            preserved_files = {
+                report / "case_report.tex",
+                report / "case_body.tex",
+                case / "case.yaml",
+                case / "elmfire.data.in",
+                root / "main_report/verification_report.tex",
+            }
+            runtime_products = {
+                outputs / "metrics.json",
+                figures / "sweep_response.pdf",
+                generated / "verification_summary.tex",
+                generated / "verification_summary.json",
+            }
+            for path in removable_files | preserved_files | runtime_products:
+                path.write_text("test", encoding="utf-8")
+
+            original_root = CLEAN.ROOT_DIR
+            try:
+                CLEAN.ROOT_DIR = root
+                files, runtime_directories, _ = CLEAN.cleanup_inventory(
+                    prepare_run=True
+                )
+                cleaned = CLEAN.empty_runtime_directories(
+                    runtime_directories,
+                    apply=True,
+                    preserve_report_support=False,
+                )
+            finally:
+                CLEAN.ROOT_DIR = original_root
+
+            self.assertEqual(set(files), removable_files)
+            self.assertEqual(
+                set(runtime_directories), {outputs, figures, generated}
+            )
+            self.assertEqual(cleaned, 3)
+            self.assertTrue(preserved_files.isdisjoint(files))
+            for path in preserved_files:
+                self.assertTrue(path.is_file())
+            for path in runtime_products:
+                self.assertFalse(path.exists())

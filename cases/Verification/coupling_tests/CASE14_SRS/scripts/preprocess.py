@@ -12,7 +12,8 @@ import math
 import shutil
 
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 
 # Customizable preprocessing parameters.
 CASE_FILENAME = "case.json"
@@ -40,23 +41,19 @@ BUILDING_IGNITION_PROBABILITY_PERCENT = 90.0
 def write_tif(path, array, dx, dtype):
     """Write one aligned north-up GeoTIFF."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    ds = gdal.GetDriverByName("GTiff").Create(
-        str(path), array.shape[1], array.shape[0], 1, dtype,
-        options=["COMPRESS=DEFLATE", "PREDICTOR=2"]
+    transform = from_origin(
+        -BUFFER_CELLS * dx,
+        (array.shape[0] - BUFFER_CELLS) * dx,
+        dx,
+        dx,
     )
-    if ds is None:
-        raise RuntimeError(f"Could not create {path}")
-    ds.SetGeoTransform((-BUFFER_CELLS * dx, dx, 0.0,
-                        (array.shape[0] - BUFFER_CELLS) * dx, 0.0, -dx))
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(EPSG)
-    ds.SetProjection(srs.ExportToWkt())
-    band = ds.GetRasterBand(1)
-    band.WriteArray(array)
-    band.SetNoDataValue(NODATA_INT if np.issubdtype(array.dtype, np.integer)
-                        else NODATA_FLOAT)
-    band.FlushCache()
-    ds = None
+    nodata = NODATA_INT if np.issubdtype(array.dtype, np.integer) else NODATA_FLOAT
+    with rasterio.open(
+        path, "w", driver="GTiff", height=array.shape[0], width=array.shape[1],
+        count=1, dtype=np.dtype(dtype).name, crs=f"EPSG:{EPSG}",
+        transform=transform, nodata=nodata, compress="deflate", predictor=2,
+    ) as dataset:
+        dataset.write(np.asarray(array, dtype=dtype), 1)
 
 
 def interval_overlap(left, right, a, b):
@@ -246,17 +243,17 @@ def write_variant(case_dir, template, case, dx):
     direction = np.full((ny, nx), WIND_DIRECTION_DEG, np.float32)
     moisture = np.full((ny, nx), MOISTURE_PERCENT, np.float32)
     rasters = {
-        "asp": (zeros, gdal.GDT_Float32), "cbd": (zeros, gdal.GDT_Float32),
-        "cbh": (zeros, gdal.GDT_Float32), "cc": (zeros, gdal.GDT_Float32),
-        "ch": (zeros, gdal.GDT_Float32), "dem": (zeros, gdal.GDT_Float32),
-        "slp": (zeros, gdal.GDT_Float32), "adj": (ones, gdal.GDT_Float32),
-        "new_phi": (phi, gdal.GDT_Float32),
-        "new_fbfm40": (fbfm, gdal.GDT_Int16),
-        "ws": (wind, gdal.GDT_Float32), "wd": (direction, gdal.GDT_Float32),
-        "m1": (moisture, gdal.GDT_Float32), "m10": (moisture, gdal.GDT_Float32),
-        "m100": (moisture, gdal.GDT_Float32),
-        "structure_fraction": (fraction, gdal.GDT_Float32),
-        "structure_id": (structure_id, gdal.GDT_Int32),
+        "asp": (zeros, np.float32), "cbd": (zeros, np.float32),
+        "cbh": (zeros, np.float32), "cc": (zeros, np.float32),
+        "ch": (zeros, np.float32), "dem": (zeros, np.float32),
+        "slp": (zeros, np.float32), "adj": (ones, np.float32),
+        "new_phi": (phi, np.float32),
+        "new_fbfm40": (fbfm, np.int16),
+        "ws": (wind, np.float32), "wd": (direction, np.float32),
+        "m1": (moisture, np.float32), "m10": (moisture, np.float32),
+        "m100": (moisture, np.float32),
+        "structure_fraction": (fraction, np.float32),
+        "structure_id": (structure_id, np.int32),
     }
     for filename, (array, dtype) in rasters.items():
         write_tif(inputs / f"{filename}.tif", array, dx, dtype)
@@ -265,10 +262,10 @@ def write_variant(case_dir, template, case, dx):
         """Broadcast one physical building property over represented structure cells and nodata elsewhere."""
         return np.where(building_mask, value, NODATA_FLOAT).astype(dtype)
     props = {
-        "bldg_area": (size, np.float32, gdal.GDT_Float32),
-        "bldg_sep": (separation, np.float32, gdal.GDT_Float32),
-        "bldg_nonburnable": (BUILDING_NONBURNABLE_FRACTION, np.float32, gdal.GDT_Float32),
-        "bldg_footprint_frac": (1.0, np.float32, gdal.GDT_Float32),
+        "bldg_area": (size, np.float32, np.float32),
+        "bldg_sep": (separation, np.float32, np.float32),
+        "bldg_nonburnable": (BUILDING_NONBURNABLE_FRACTION, np.float32, np.float32),
+        "bldg_footprint_frac": (1.0, np.float32, np.float32),
     }
     for filename, (value, dtype, gtype) in props.items():
         write_tif(inputs / f"{filename}.tif", building_values(value, dtype), dx, gtype)
@@ -281,7 +278,7 @@ def write_variant(case_dir, template, case, dx):
             NODATA_INT).astype(
             np.int16),
         dx,
-        gdal.GDT_Int16)
+        np.int16)
 
     shutil.copyfile(case_dir / "data" / "misc" / "fuel_models.csv",
                     misc / "fuel_models.csv")

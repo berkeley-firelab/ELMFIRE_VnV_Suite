@@ -9,7 +9,7 @@ from pathlib import Path
 
 import matplotlib
 import numpy as np
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 
 matplotlib.use("Agg")
@@ -35,13 +35,10 @@ def latest_raster(directory: Path, prefix: str) -> Path | None:
 
 def read_raster(path: Path, dx: float, nx: int, ny: int):
     """Read one GDAL raster into a floating-point array while preserving nodata handling at the caller."""
-    ds = gdal.Open(str(path), gdal.GA_ReadOnly)
-    if ds is None:
-        raise RuntimeError(f"GDAL could not open {path}")
-    band = ds.GetRasterBand(1)
-    array = band.ReadAsArray().astype(float)
-    nodata, transform = band.GetNoDataValue(), ds.GetGeoTransform()
-    ds = None
+    with rasterio.open(path) as dataset:
+        array = dataset.read(1).astype(float)
+        nodata = dataset.nodata
+        transform = dataset.transform.to_gdal()
     if array.shape != (ny, nx):
         raise ValueError(
             f"{path} has shape {array.shape}; expected {(ny, nx)}. "

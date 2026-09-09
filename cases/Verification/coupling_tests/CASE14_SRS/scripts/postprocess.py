@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Postprocess the two-dimensional spatial-resolution sweep."""
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 from pathlib import Path
@@ -23,12 +23,8 @@ MIN_STRUCTURES_FOR_ROS = 3
 
 def read_raster(path):
     """Read one GDAL raster into a floating-point array while preserving nodata handling at the caller."""
-    ds = gdal.Open(str(path))
-    if ds is None:
-        raise FileNotFoundError(path)
-    array = ds.ReadAsArray()
-    ds = None
-    return array
+    with rasterio.open(path) as dataset:
+        return dataset.read(1)
 
 
 def unique_time_control(config, key):

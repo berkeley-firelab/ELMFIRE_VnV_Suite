@@ -12,7 +12,8 @@ import math
 from pathlib import Path
 
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 
 # -----------------------------------------------------------------------------
 # Customizable verification parameters (SI units unless explicitly noted)
@@ -43,23 +44,18 @@ def write_tif(path: Path, values: np.ndarray, dtype: int) -> None:
     """Write a 2-D array or a band-first 3-D array with the common grid."""
     bands = values[np.newaxis, ...] if values.ndim == 2 else values
     nbands, rows, columns = bands.shape
-    ds = gdal.GetDriverByName("GTiff").Create(
-        str(path), columns, rows, nbands, dtype, options=["COMPRESS=DEFLATE"]
+    transform = from_origin(
+        -BUFFER_CELLS * DX_M,
+        PHYSICAL_WIDTH_M + BUFFER_CELLS * DX_M,
+        DX_M,
+        DX_M,
     )
-    if ds is None:
-        raise RuntimeError(f"Could not create {path}")
-    # The two-cell halo lies outside the physical [0,L] x [0,W] domain.
-    ds.SetGeoTransform((-BUFFER_CELLS * DX_M, DX_M, 0.0,
-                        PHYSICAL_WIDTH_M + BUFFER_CELLS * DX_M, 0.0, -DX_M))
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(PROJECTION_EPSG)
-    ds.SetProjection(srs.ExportToWkt())
-    for band_index, array in enumerate(bands, 1):
-        band = ds.GetRasterBand(band_index)
-        band.WriteArray(array)
-        band.SetNoDataValue(NODATA)
-        band.FlushCache()
-    ds = None
+    with rasterio.open(
+        path, "w", driver="GTiff", height=rows, width=columns, count=nbands,
+        dtype=np.dtype(dtype).name, crs=f"EPSG:{PROJECTION_EPSG}",
+        transform=transform, nodata=NODATA, compress="deflate",
+    ) as dataset:
+        dataset.write(np.asarray(bands, dtype=dtype))
 
 
 def main() -> None:
@@ -89,11 +85,11 @@ def main() -> None:
         "dem": zeros, "slp": zeros, "adj": ones, "new_phi": phi,
     }
     for name, array in static.items():
-        write_tif(input_dir / f"{name}.tif", array, gdal.GDT_Float32)
+        write_tif(input_dir / f"{name}.tif", array, np.float32)
     write_tif(
         input_dir / "new_fbfm40.tif",
         np.full((ny, nx), WILDLAND_FUEL_MODEL, dtype=np.int16),
-        gdal.GDT_Int16,
+        np.int16,
     )
 
     # Wind samples are stored at t_b=(b-1) DT_METEOROLOGY. ELMFIRE linearly
@@ -107,14 +103,14 @@ def main() -> None:
             2.0 * np.pi * x_m / WIND_WAVELENGTH_M
         ) * np.sin(2.0 * np.pi * time_s / WIND_PERIOD_S)
         wind_mps[band_index, :, :] = profile[np.newaxis, :]
-    write_tif(input_dir / "ws.tif", wind_mps / MPS_PER_MPH, gdal.GDT_Float32)
+    write_tif(input_dir / "ws.tif", wind_mps / MPS_PER_MPH, np.float32)
     write_tif(
         input_dir / "wd.tif",
         np.full_like(wind_mps, WIND_DIRECTION_DEG, dtype=np.float32),
-        gdal.GDT_Float32,
+        np.float32,
     )
     for name in ("m1", "m10", "m100"):
-        write_tif(input_dir / f"{name}.tif", np.zeros_like(wind_mps), gdal.GDT_Float32)
+        write_tif(input_dir / f"{name}.tif", np.zeros_like(wind_mps), np.float32)
 
     for filename in ("fuel_models.csv", "building_fuel_models.csv"):
         source = CASE_DIR / "data" / "misc" / filename

@@ -26,6 +26,11 @@ describes the inspected local interface, not a pristine release tag.
   `USE_SIMPLE_IGNITION_MODEL = .FALSE.` with
   `IGNITION_MODEL = 'PHYSICAL'`.
 - Moved the Tubbs `HRR_ELLIPSE_ADJ` assignment from `SIMULATOR` to `WUI`.
+- Set Tubbs `NUM_IGNITIONS = 0` and removed its archived `X_IGN`, `Y_IGN`, and
+  `T_IGN` point. The same namelist enables `RANDOM_IGNITIONS` and
+  `USE_IGNITION_MASK`; current ELMFIRE executes point and random ignitions
+  cumulatively, while the case report and ensemble design specify random
+  ignition-mask sampling only.
 - Mapped archived building-spread model type 3 in the Thomas and Tubbs cases to
   current UCB/UMD type 2. The current source documents only types 1 and 2.
 - Replaced host-specific GDAL paths with `PATH_TO_GDAL = 'auto'`, which the

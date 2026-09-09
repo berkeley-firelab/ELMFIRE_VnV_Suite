@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 import matplotlib
 import numpy as np
-from osgeo import gdal
+import rasterio
 from spatial_evidence import generate_spatial_evidence
 
 matplotlib.use('Agg')
@@ -37,10 +37,8 @@ NODATA_LIMIT = -1000.0
 
 def read_raster(path):
     """Read one GeoTIFF band with its geotransform."""
-    ds = gdal.Open(str(path))
-    if ds is None:
-        raise RuntimeError(f'Cannot open {path}')
-    return (ds.GetRasterBand(1).ReadAsArray().astype(float), ds.GetGeoTransform())
+    with rasterio.open(path) as dataset:
+        return dataset.read(1).astype(float), dataset.transform.to_gdal()
 
 
 def dump_map(out):

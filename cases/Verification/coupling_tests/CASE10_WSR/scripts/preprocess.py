@@ -12,7 +12,8 @@ import math
 import shutil
 
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 
 # Customizable preprocessing parameters (SI units unless noted).
 CASE_FILENAME = "case.json"
@@ -58,24 +59,19 @@ def input_fingerprint(variant_dir):
 def write_tif(path, array, dx, dtype):
     """Write a north-up, one-band GeoTIFF aligned with the ELMFIRE domain."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    ds = gdal.GetDriverByName("GTiff").Create(
-        str(path), array.shape[1], array.shape[0], 1, dtype
+    transform = from_origin(
+        -BUFFER_CELLS * dx,
+        (array.shape[0] - BUFFER_CELLS) * dx,
+        dx,
+        dx,
     )
-    if ds is None:
-        raise RuntimeError(f"Could not create {path}")
-    ds.SetGeoTransform(
-        (-BUFFER_CELLS * dx, dx, 0.0,
-         (array.shape[0] - BUFFER_CELLS) * dx, 0.0, -dx)
-    )
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(EPSG)
-    ds.SetProjection(srs.ExportToWkt())
-    band = ds.GetRasterBand(1)
-    band.WriteArray(array)
     nodata = NODATA_INT if np.issubdtype(array.dtype, np.integer) else NODATA_FLOAT
-    band.SetNoDataValue(nodata)
-    band.FlushCache()
-    ds = None
+    with rasterio.open(
+        path, "w", driver="GTiff", height=array.shape[0], width=array.shape[1],
+        count=1, dtype=np.dtype(dtype).name, crs=f"EPSG:{EPSG}",
+        transform=transform, nodata=nodata,
+    ) as dataset:
+        dataset.write(np.asarray(array, dtype=dtype), 1)
 
 
 def interval_overlap(left, right, interval_left, interval_right):
@@ -224,21 +220,21 @@ def write_variant(case_dir, template, case, spec, feature_available):
     wind_speed = np.full((ny, nx), case["wind_speed_mph"], dtype=np.float32)
     wind_direction = np.full((ny, nx), WIND_DIRECTION_DEG, dtype=np.float32)
     rasters = {
-        "asp": (zeros, gdal.GDT_Float32),
-        "cbd": (zeros, gdal.GDT_Float32),
-        "cbh": (zeros, gdal.GDT_Float32),
-        "cc": (zeros, gdal.GDT_Float32),
-        "ch": (zeros, gdal.GDT_Float32),
-        "dem": (zeros, gdal.GDT_Float32),
-        "slp": (zeros, gdal.GDT_Float32),
-        "adj": (ones, gdal.GDT_Float32),
-        "new_phi": (phi, gdal.GDT_Float32),
-        "new_fbfm40": (fbfm, gdal.GDT_Int16),
-        "ws": (wind_speed, gdal.GDT_Float32),
-        "wd": (wind_direction, gdal.GDT_Float32),
-        "m1": (np.full((ny, nx), MOISTURE_PERCENT, np.float32), gdal.GDT_Float32),
-        "m10": (np.full((ny, nx), MOISTURE_PERCENT, np.float32), gdal.GDT_Float32),
-        "m100": (np.full((ny, nx), MOISTURE_PERCENT, np.float32), gdal.GDT_Float32),
+        "asp": (zeros, np.float32),
+        "cbd": (zeros, np.float32),
+        "cbh": (zeros, np.float32),
+        "cc": (zeros, np.float32),
+        "ch": (zeros, np.float32),
+        "dem": (zeros, np.float32),
+        "slp": (zeros, np.float32),
+        "adj": (ones, np.float32),
+        "new_phi": (phi, np.float32),
+        "new_fbfm40": (fbfm, np.int16),
+        "ws": (wind_speed, np.float32),
+        "wd": (wind_direction, np.float32),
+        "m1": (np.full((ny, nx), MOISTURE_PERCENT, np.float32), np.float32),
+        "m10": (np.full((ny, nx), MOISTURE_PERCENT, np.float32), np.float32),
+        "m100": (np.full((ny, nx), MOISTURE_PERCENT, np.float32), np.float32),
     }
     for filename, (array, dtype) in rasters.items():
         write_tif(input_dir / f"{filename}.tif", array, dx, dtype)
@@ -254,9 +250,9 @@ def write_variant(case_dir, template, case, spec, feature_available):
             BUILDING_PLAN_DIMENSION_M,
             np.float32),
         dx,
-        gdal.GDT_Float32)
+        np.float32)
     write_tif(input_dir / "bldg_sep.tif",
-              building_values(BUILDING_SEPARATION_M, np.float32), dx, gdal.GDT_Float32)
+              building_values(BUILDING_SEPARATION_M, np.float32), dx, np.float32)
     write_tif(
         input_dir /
         "bldg_nonburnable.tif",
@@ -264,7 +260,7 @@ def write_variant(case_dir, template, case, spec, feature_available):
             BUILDING_NONBURNABLE_FRACTION,
             np.float32),
         dx,
-        gdal.GDT_Float32)
+        np.float32)
     write_tif(
         input_dir /
         "bldg_footprint_frac.tif",
@@ -272,7 +268,7 @@ def write_variant(case_dir, template, case, spec, feature_available):
             BUILDING_FOOTPRINT_FRACTION,
             np.float32),
         dx,
-        gdal.GDT_Float32)
+        np.float32)
     write_tif(
         input_dir /
         "bldg_fuel_model.tif",
@@ -282,10 +278,10 @@ def write_variant(case_dir, template, case, spec, feature_available):
             NODATA_INT).astype(
             np.int16),
         dx,
-        gdal.GDT_Int16)
+        np.int16)
     # Auxiliary rasters support resolution-independent physical aggregation.
-    write_tif(input_dir / "structure_id.tif", structure_ids, dx, gdal.GDT_Int16)
-    write_tif(input_dir / "structure_fraction.tif", fractions, dx, gdal.GDT_Float32)
+    write_tif(input_dir / "structure_id.tif", structure_ids, dx, np.int16)
+    write_tif(input_dir / "structure_fraction.tif", fractions, dx, np.float32)
 
     fuel_models = case_dir / "data" / "misc" / "fuel_models.csv"
     building_models = case_dir / "data" / "misc" / "building_fuel_models.csv"

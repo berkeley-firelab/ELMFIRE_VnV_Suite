@@ -105,6 +105,33 @@ class DiscoverCasesTests(unittest.TestCase):
             "elmfire-camp_fire",
         )
 
+    def test_validation_slurm_header_uses_one_rank_per_member(self) -> None:
+        root = MODULE_PATH.parents[1]
+        header = (root / "common/slurm_validation_head.txt").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("#SBATCH --nodes=1", header)
+        self.assertIn("#SBATCH --ntasks=50", header)
+        self.assertIn("#SBATCH --ntasks-per-node=50", header)
+        self.assertIn("export PROJ_NETWORK=OFF", header)
+        self.assertIn('export ELMFIRE_MPI_RANKS="${SLURM_NTASKS:-50}"', header)
+        self.assertNotIn('ELMFIRE_MPI_RANKS:-${SLURM_NTASKS', header)
+        self.assertNotIn("#SBATCH --ntasks=51", header)
+
+    def test_landscape_runners_do_not_require_compile_script_execute_bit(self) -> None:
+        root = MODULE_PATH.parents[1]
+        cases = root / "cases/Validation/landscape_scale"
+
+        for case_id in ("camp_fire", "thomas_fire", "tubbs_fire"):
+            runner = (cases / case_id / "run_case.sh").read_text(encoding="utf-8")
+            with self.subTest(case_id=case_id):
+                self.assertIn('if [[ -n "${SLURM_NTASKS:-}" ]]', runner)
+                self.assertIn("ELMFIRE_MPI_RANKS=$SLURM_NTASKS", runner)
+                self.assertIn('ELMFIRE_MPI_RANKS=${ELMFIRE_MPI_RANKS:-50}', runner)
+                self.assertIn('bash "$CASE_DIR/compile_case.sh"', runner)
+                self.assertIn("export PROJ_NETWORK=OFF", runner)
+
 
 if __name__ == "__main__":
     unittest.main()

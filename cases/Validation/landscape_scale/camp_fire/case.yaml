@@ -7,7 +7,7 @@ source_archive: "../../3_FIRES/Camp_VAL.rar"
 elmfire:
   bin: "elmfire"
   config: "elmfire.data.in"
-  mpi_ranks: 51
+  mpi_ranks: 50
   runtime_limit_s: 30000000
 
 validation:

@@ -162,9 +162,9 @@ not rewrite raw evidence.
 \texttt{run\_case.sh} then launches ELMFIRE, runs the case-local postprocessor,
 and compiles this report.  The executable, Python interpreter, and MPI rank
 count can be selected through \texttt{ELMFIRE\_BIN}, \texttt{PYTHON\_BIN}, and
-\texttt{ELMFIRE\_MPI\_RANKS}.  The default 51 ranks follow the received workflow
-for a 50-member ensemble.  Outputs and logs are retained rather than deleted or
-renamed.  Reproducible input identity does not by itself guarantee result
+\texttt{ELMFIRE\_MPI\_RANKS}.  The default 50 ranks assign one rank to each
+ensemble member and avoid an unnecessary virtual rank.  Outputs and logs are
+retained rather than deleted or renamed.  Reproducible input identity does not by itself guarantee result
 reproducibility: each run must also record the actual ELMFIRE revision,
 compiler, dependencies, and platform.
 

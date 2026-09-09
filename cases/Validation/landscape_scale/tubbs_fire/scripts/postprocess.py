@@ -222,9 +222,11 @@ def plot_comparison(probability: np.ndarray, observed: np.ndarray, predicted: np
 def plot_arrival(arrival: np.ndarray, valid: np.ndarray) -> None:
     burned = (arrival > 0.0) & (arrival <= CONFIG["comparison_s"])
     conditioned = np.where(burned, arrival, np.nan)
-    with np.errstate(all="ignore"):
-        median = np.nanmedian(conditioned, axis=0) / 3600.0
-    median[~valid] = np.nan
+    has_arrival = valid & np.any(burned, axis=0)
+    median = np.full(valid.shape, np.nan, dtype=float)
+    median[has_arrival] = (
+        np.nanmedian(conditioned[:, has_arrival], axis=0) / 3600.0
+    )
     fig, ax = plt.subplots(figsize=(8.2, 6.0))
     image = ax.imshow(median, cmap="viridis")
     fig.colorbar(image, ax=ax, label="conditional median arrival time (h)")

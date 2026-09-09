@@ -6,9 +6,9 @@ Analytical surface-fire curves are labelled as expectations. Missing or
 incomplete model output is explicitly non-passing.
 """
 
-from osgeo import gdal
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
+import rasterio
 from pathlib import Path
 import json
 import re
@@ -64,13 +64,15 @@ def final_raster(output_dir, stem):
 
 def read_raster(path):
     """Read one GeoTIFF and return its array and georeferencing."""
-    dataset = gdal.Open(str(path))
-    if dataset is None:
-        raise RuntimeError(f"GDAL could not open {path}")
-    array = dataset.GetRasterBand(1).ReadAsArray().astype(float)
-    transform = dataset.GetGeoTransform()
-    nodata = dataset.GetRasterBand(1).GetNoDataValue()
-    return array, transform, nodata
+    try:
+        with rasterio.open(path) as dataset:
+            return (
+                dataset.read(1).astype(float),
+                dataset.transform.to_gdal(),
+                dataset.nodata,
+            )
+    except rasterio.errors.RasterioIOError as error:
+        raise RuntimeError(f"Rasterio could not open {path}") from error
 
 
 def valid_values(array, nodata):

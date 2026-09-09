@@ -13,7 +13,8 @@ import shutil
 from pathlib import Path
 
 import numpy as np
-from osgeo import gdal, osr
+import rasterio
+from rasterio.transform import from_origin
 
 # -----------------------------------------------------------------------------
 # Customizable preprocessing parameters (physical quantities use SI units)
@@ -39,22 +40,16 @@ WILDLAND_FUEL_MODEL = 102
 def write_tif(path: Path, array: np.ndarray, dx: float, dtype: int) -> None:
     """Write a deterministic, georeferenced GeoTIFF on the common buffered verification grid."""
     rows, columns = array.shape
-    dataset = gdal.GetDriverByName("GTiff").Create(
-        str(path), columns, rows, 1, dtype, options=["COMPRESS=DEFLATE"]
-    )
-    if dataset is None:
-        raise RuntimeError(f"Could not create {path}")
     active_rows = rows - 2 * BUFFER_CELLS
-    dataset.SetGeoTransform(
-        (-BUFFER_CELLS * dx, dx, 0.0, (active_rows + BUFFER_CELLS) * dx, 0.0, -dx))
-    spatial_ref = osr.SpatialReference()
-    spatial_ref.ImportFromEPSG(PROJECTION_EPSG)
-    dataset.SetProjection(spatial_ref.ExportToWkt())
-    band = dataset.GetRasterBand(1)
-    band.WriteArray(array)
-    band.SetNoDataValue(NODATA)
-    band.FlushCache()
-    dataset = None
+    transform = from_origin(
+        -BUFFER_CELLS * dx, (active_rows + BUFFER_CELLS) * dx, dx, dx
+    )
+    with rasterio.open(
+        path, "w", driver="GTiff", height=rows, width=columns, count=1,
+        dtype=np.dtype(dtype).name, crs=f"EPSG:{PROJECTION_EPSG}",
+        transform=transform, nodata=NODATA, compress="deflate",
+    ) as dataset:
+        dataset.write(np.asarray(array, dtype=dtype), 1)
 
 
 def replace_assignment(config: str, name: str, value: str) -> str:
@@ -81,9 +76,9 @@ def write_inputs(input_dir: Path, dx: float, nx: int, ny: int) -> None:
         "m1": zeros, "m10": zeros, "m100": zeros,
     }
     for name, array in rasters.items():
-        write_tif(input_dir / f"{name}.tif", array, dx, gdal.GDT_Float32)
+        write_tif(input_dir / f"{name}.tif", array, dx, np.float32)
     fuel_model = np.full((ny, nx), WILDLAND_FUEL_MODEL, dtype=np.int16)
-    write_tif(input_dir / "new_fbfm40.tif", fuel_model, dx, gdal.GDT_Int16)
+    write_tif(input_dir / "new_fbfm40.tif", fuel_model, dx, np.int16)
 
 
 def main() -> None:
