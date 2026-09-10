@@ -7,46 +7,47 @@
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
 \emergencystretch=2em
 
-\title{ELMFIRE Verification Summary Report}
-\author{ELMFIRE Verification and Validation Suite}
-\date{\today}
-
 \begin{document}
-\maketitle
+\newcommand{\GuideTitle}{ELMFIRE Verification Guide}
+\input{generated/verification_cover_metadata.tex}
+\input{cover_page.tex}
 
-\begin{abstract}
+\section*{About This Guide}
+\phantomsection
+\addcontentsline{toc}{section}{About This Guide}
 This document aggregates the standalone reports for every runnable verification
 case currently discovered under \texttt{cases/Verification}.  The opening
 summary records environment and execution configuration and reports each case's
 scientific decision from its case-local \texttt{outputs/metrics.json}; command
 completion and PDF availability are not substituted for verification evidence.
-\end{abstract}
 
+\clearpage
 \tableofcontents
 \clearpage
 
-\input{generated/verification_summary.tex}
+\section{How to Read This Guide}
 
-\section{Scope and decision policy}
+Start with the verification summary for the aggregate-build environment,
+case-declared execution configuration, and scientific decision table.  The
+case identifiers in the summary link to the corresponding case-report entries.
+The complete standalone reports follow in the stable numerical order defined
+by \path{cases/Verification/CASE_REGISTRY.md}; each retains its own scientific
+context, equations, metrics, citations, acceptance criteria, and limitations.
 
-The report order follows the stable numerical CASE identifier.  Each standalone
-case PDF is included intact to preserve its equations, figures, acceptance
-criteria, and limitations.  PASS and FAIL retain the decision made by the
-case-local postprocessor.  A missing result, an unrun or incomplete workflow,
-or an unsupported capability is shown as NOT EVALUABLE.  The linked summary at
-the beginning records the aggregate-build environment, case-declared execution
-configuration, and scientific decisions before the complete case reports.
+Interpret PASS and FAIL as the decision made by the case-local postprocessor
+against that case's declared acceptance criteria.  A missing result, an unrun
+or incomplete workflow, or an unsupported capability is shown as NOT
+EVALUABLE.  Command completion and PDF availability alone do not establish a
+scientific decision.
 
-\section{How to read this report}
-
-Each entry is the complete standalone PDF for one verification case.  Cases
-follow the stable order in
-\path{cases/Verification/CASE_REGISTRY.md}, and each report retains its own
-scientific context, equations, metrics, citations, and decision.  Aggregating
+The aggregate-build environment describes how this guide was assembled; it is
+not necessarily the execution environment of every included case.  Aggregating
 the compiled PDFs keeps case-local macros, labels, bibliographies, and packages
 isolated from one another.  After standalone reports change, rebuild this guide
 with \texttt{make verification-report} or rebuild both suite reports with
 \texttt{make reports}.
+
+\input{generated/verification_summary.tex}
 
 \input{generated/verification_cases.tex}
 

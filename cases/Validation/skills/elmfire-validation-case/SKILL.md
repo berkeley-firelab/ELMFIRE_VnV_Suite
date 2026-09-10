@@ -8,6 +8,90 @@ description: Create, complete, or review self-contained ELMFIRE validation cases
 Create an auditable comparison between ELMFIRE and evidence external to the
 model. Complete the case, not only its report.
 
+## Purpose and scope
+
+Use this skill to evaluate ELMFIRE against historical observations,
+experimental measurements, or independent high-fidelity reference data. Place
+structure or controlled-experiment comparisons in `structure_scale/` and
+historical-fire, landscape-reconstruction, or risk comparisons in
+`landscape_scale/`. Keep validation distinct from implementation verification
+and disclose any calibration dependence; matching data used to select model
+parameters is not independent validation.
+
+The intended case is independently runnable and owns its metadata, namelist,
+source-data record, deterministic preprocessing, runner, postprocessing,
+metrics, visualizations, logs, and standalone report. Its core structure is:
+
+```text
+<case_id>/
+|-- case.yaml
+|-- elmfire.data.in
+|-- run_case.sh
+|-- compile_case.sh
+|-- data/
+|   |-- raw/ or archive_payload/
+|   |-- derived/
+|   |-- observations/
+|   `-- source_manifest.json
+|-- scripts/
+|-- outputs/metrics.json
+|-- figures/
+|-- logs/
+`-- report/                   # standalone six-file LaTeX report project
+```
+
+Read [case_contract.md](references/case_contract.md) for the detailed layout,
+[data_and_configuration.md](references/data_and_configuration.md) for
+traceability requirements, and [report_structure.md](references/report_structure.md)
+for the scientific argument.
+
+## Require source and sufficient design evidence
+
+Require the user to provide the explicit path to the ELMFIRE source root that
+the new case will exercise. If the request omits it, ask for it and do not
+design or generate the case until it is supplied. Do not infer the checkout
+from `ELMFIRE_BIN`, `PATH`, an existing case, or an old namelist.
+
+Inspect that source checkout to determine the supported simulation
+configuration, namelist schema and defaults, input raster roles and formats,
+source-provided utilities or scripts, model pathways, output fields, units,
+grid/time conventions, and version-specific constraints. Record the source
+revision and dirty state used for design. The source checkout is authoritative
+implementation evidence but must not become a runtime dependency of the case.
+
+Before implementation, check whether the request defines the event or
+experiment, validation claim, spatial and temporal scope, model inputs,
+observations, configuration, preprocessing, outputs, metrics, uncertainty, and
+decision rule. If details are missing, inspect any clearly identified paper,
+thesis, report, dataset specification, or other technical reference supplied by
+the user. When it resolves the gaps, follow it as closely as the inspected
+ELMFIRE implementation and available evidence permit, including simulation
+configuration, input preparation and visualization, derivations,
+nomenclature, and output visualization. Cite it, label documented, derived,
+inferred, calibrated, and user-specified choices, and explain every deviation.
+
+If no clear reference is supplied, or the reference leaves consequential
+choices unresolved, ask the user to complete this template and proceed only
+after the required information is available:
+
+```text
+ELMFIRE source root and intended revision:
+Validation event, experiment, and intended claim:
+Structure-scale or landscape-scale case:
+Technical references and local paths/DOIs/URLs:
+Domain, grid, start/stop times, timestep, and ensemble design:
+Ignition, fuels, terrain, moisture, weather, canopy/WUI, and interventions:
+Raw input and observation paths, providers, versions, units, CRS, and licenses:
+Required preprocessing and spatial/temporal alignment:
+Required output fields, times/members, and visualizations:
+Metrics, uncertainty treatment, baselines, and predeclared decision rule:
+Calibration data or choices and required evaluation separation:
+Known limitations, missing evidence, or access constraints:
+```
+
+Do not fill unsupported consequential settings with convenient defaults or tune
+them against the observations used for evaluation.
+
 ## Establish the evidence and scope
 
 1. Read the repository `README.md`, the relevant Validation category README,
@@ -22,7 +106,7 @@ model. Complete the case, not only its report.
 4. Put structure-to-structure or experimental comparisons in
    `structure_scale/`; put historical-fire, landscape reconstruction, or risk
    comparisons in `landscape_scale/`.
-5. Read [data_and_configuration.md](references/data_and_configuration.md). Build
+5. Apply [data_and_configuration.md](references/data_and_configuration.md). Build
    an evidence table connecting every consequential input and namelist choice to
    a case-local source, external citation, defensible inference, or explicit
    user decision.
@@ -37,7 +121,8 @@ for evaluation.
 
 ## Keep the case reproducible
 
-Read [case_contract.md](references/case_contract.md) before adding files.
+Apply the detailed requirements in [case_contract.md](references/case_contract.md)
+before adding files.
 
 - Keep raw/source data immutable. Generate transformed inputs under a separate
   case-local directory and record transformation provenance.

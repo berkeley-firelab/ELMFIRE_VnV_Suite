@@ -7,10 +7,91 @@ description: Create, extend, or review independently runnable ELMFIRE verificati
 
 Create one auditable verification case without changing unrelated cases or scientific behavior.
 
+## Purpose and scope
+
+Use this skill to test a specific ELMFIRE mathematical, numerical, or
+algorithmic implementation against an analytical solution, manufactured
+solution, invariant, convergence expectation, independently calculated result,
+or other known response. Use `unit_tests/` for an isolated behavior and
+`coupling_tests/` for an interaction among multiple components. Do not use
+historical or experimental agreement as a substitute for implementation
+verification, and do not broaden a requested case into model calibration or
+general performance testing.
+
+The intended case is independently runnable and owns its metadata, namelist,
+input generation, runner, postprocessor, metrics, figures, logs, and standalone
+report. Its core structure is:
+
+```text
+CASE##_PURPOSE/
+|-- case.yaml
+|-- case.json                 # when repository tooling requires it
+|-- elmfire.data.in           # unless explicitly not applicable
+|-- run_case.sh
+|-- compile_case.sh
+|-- data/
+|-- scripts/
+|-- variants/                 # generated state when variants are used
+|-- outputs/metrics.json
+|-- figures/
+|-- logs/
+`-- report/                   # standalone six-file LaTeX report project
+```
+
+Read [case_contract.md](references/case_contract.md) for the detailed layout and
+[report_structure.md](references/report_structure.md) for the scientific
+argument.
+
+## Require source and sufficient design evidence
+
+Require the user to provide the explicit path to the ELMFIRE source root that
+the new case will exercise. If the request omits it, ask for it and do not
+design or generate the case until it is supplied. Do not infer the checkout
+from `ELMFIRE_BIN`, `PATH`, an existing case, or an old namelist.
+
+Inspect that source checkout to determine the implemented equations and update
+path, supported simulation configuration, namelist schema and defaults, input
+raster roles and formats, source-provided utilities or scripts, output fields,
+units, sign and grid conventions, and version-specific constraints. Record the
+source revision and dirty state used for design. The source checkout is
+authoritative implementation evidence but must not become a runtime dependency
+of the case.
+
+Before implementation, check whether the request defines the verification
+objective, known response, controlled and varied quantities, domain and timing,
+required inputs and outputs, metrics, tolerances, and limitations. If details
+are missing, inspect any clearly identified paper, thesis, report, benchmark,
+or other technical reference supplied by the user. When it resolves the gaps,
+follow it as closely as the inspected ELMFIRE implementation permits, including
+simulation configuration, input construction and visualization, derivation,
+nomenclature, and output visualization. Cite it, label documented and inferred
+choices, and explain deviations rather than silently modernizing the case.
+
+If no clear reference is supplied, or the reference leaves consequential
+choices unresolved, ask the user to complete this template and proceed only
+after the required information is available:
+
+```text
+ELMFIRE source root and intended revision:
+Verification behavior or implementation path:
+Unit or coupling case:
+Technical references and local paths/DOIs/URLs:
+Expected analytical, manufactured, invariant, or comparative response:
+Domain, grid, timestep, duration, ignition, and boundary conditions:
+Enabled/disabled models and required variants:
+Input rasters/data, units, and deterministic generation method:
+Required output fields and selection times:
+Metrics, tolerance rationale, and overall acceptance rule:
+Known limitations or required exclusions:
+```
+
+Do not choose convenient scientific values or acceptance thresholds merely to
+make the case runnable.
+
 ## Establish the case contract
 
 1. Read the repository `README.md`, `cases/Verification/CASE_REGISTRY.md`, the relevant category README, and `cases/case_template/`.
-2. Inspect the current ELMFIRE implementation for the exact variables, namelist keys, units, sign conventions, grid conventions, and output names being tested. Do not infer these from old case files alone.
+2. Inspect the user-specified ELMFIRE source root for the exact variables, namelist keys, units, sign conventions, grid conventions, input requirements, and output names being tested. Do not infer these from old case files alone.
 3. State the controlled behavior, analytic or otherwise known response, observables, metrics, tolerances, failure conditions, and limitations before implementing the case.
 4. Put an isolated function or known-response test in `unit_tests/`; put a multi-component interaction in `coupling_tests/`.
 5. Obtain the next unused identifier from the registry. Use `CASE##_<PURPOSE>`, where `<PURPOSE>` is a short stable uppercase abbreviation. Never renumber or reuse an existing identifier.
@@ -30,7 +111,8 @@ Treat self-containment as a hard requirement. The case must own every operationa
 - If useful logic exists elsewhere, copy the smallest necessary logic into the case and rewrite it as clear case-specific code.
 - Resolve all case resources relative to the case root, not the caller's working directory.
 
-Read [case_contract.md](references/case_contract.md) before adding or changing files.
+Apply the detailed requirements in [case_contract.md](references/case_contract.md)
+before adding or changing files.
 
 ## Write readable scripts
 

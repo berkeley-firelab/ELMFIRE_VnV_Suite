@@ -2,24 +2,24 @@
   "schema_version": 3,
   "suite": "validation",
   "aggregate_environment": {
-    "Captured at (UTC)": "2026-09-09T21:56:01+00:00",
-    "Repository revision": "4142380c6534",
+    "Captured at (UTC)": "2026-09-09T22:26:10+00:00",
+    "Repository revision": "7769fc9e1181",
     "Repository state": "dirty",
     "Host platform": "macOS-15.7.7-arm64-arm-64bit",
     "Python runtime": "CPython 3.12.9 (/opt/homebrew/anaconda3/bin/python3)",
     "Conda environment": "not active",
     "ELMFIRE command": "elmfire",
     "ELMFIRE resolved path": "not found on PATH",
-    "ELMFIRE version declaration": "not declared",
+    "ELMFIRE version declaration": "2025.0717",
     "ELMFIRE executable SHA-256": "not available",
-    "MPI launcher": "not available",
+    "MPI launcher": "mpirun (Open MPI) 5.0.6",
     "Slurm allocation": "not a Slurm build job",
     "Loaded modules": "not recorded",
     "Python packages": "NumPy 1.26.4; Matplotlib 3.9.2; PyYAML 6.0.1; Rasterio 1.5.0; GDAL not installed; Pandas 2.2.2; GeoPandas not installed; Shapely not installed"
   },
   "case_count": 3,
   "decision_counts": {
-    "NOT EVALUABLE": 3
+    "CHARACTERIZED": 3
   },
   "cases": [
     {
@@ -34,10 +34,10 @@
       "report_pdf": "cases/Validation/landscape_scale/camp_fire/report/case_report.pdf",
       "report_available": true,
       "metrics_file": "cases/Validation/landscape_scale/camp_fire/outputs/metrics.json",
-      "metrics_available": false,
-      "raw_status": "missing metrics.json",
-      "decision": "NOT EVALUABLE",
-      "detail": "No case-local outputs/metrics.json is available."
+      "metrics_available": true,
+      "raw_status": "CHARACTERIZED",
+      "decision": "CHARACTERIZED",
+      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
     },
     {
       "case_id": "thomas_fire",
@@ -51,10 +51,10 @@
       "report_pdf": "cases/Validation/landscape_scale/thomas_fire/report/case_report.pdf",
       "report_available": true,
       "metrics_file": "cases/Validation/landscape_scale/thomas_fire/outputs/metrics.json",
-      "metrics_available": false,
-      "raw_status": "missing metrics.json",
-      "decision": "NOT EVALUABLE",
-      "detail": "No case-local outputs/metrics.json is available."
+      "metrics_available": true,
+      "raw_status": "CHARACTERIZED",
+      "decision": "CHARACTERIZED",
+      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
     },
     {
       "case_id": "tubbs_fire",
@@ -68,10 +68,10 @@
       "report_pdf": "cases/Validation/landscape_scale/tubbs_fire/report/case_report.pdf",
       "report_available": true,
       "metrics_file": "cases/Validation/landscape_scale/tubbs_fire/outputs/metrics.json",
-      "metrics_available": false,
-      "raw_status": "missing metrics.json",
-      "decision": "NOT EVALUABLE",
-      "detail": "No case-local outputs/metrics.json is available."
+      "metrics_available": true,
+      "raw_status": "CHARACTERIZED",
+      "decision": "CHARACTERIZED",
+      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
     }
   ]
 }

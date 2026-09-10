@@ -7,36 +7,43 @@
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
 \emergencystretch=2em
 
-\title{ELMFIRE Validation Summary Report}
-\author{ELMFIRE Verification and Validation Suite}
-\date{\today}
-
 \begin{document}
-\maketitle
+\newcommand{\GuideTitle}{ELMFIRE Validation Guide}
+\input{generated/validation_cover_metadata.tex}
+\input{cover_page.tex}
 
-\begin{abstract}
+\section*{About This Guide}
+\phantomsection
+\addcontentsline{toc}{section}{About This Guide}
 This document aggregates the standalone reports for every runnable validation
 case currently discovered under \texttt{cases/Validation}.  The opening summary
 records environment and execution configuration and reports each case's
 scientific decision from its case-local \texttt{outputs/metrics.json}; command
 completion and PDF availability are not substituted for validation evidence.
-\end{abstract}
 
+\clearpage
 \tableofcontents
 \clearpage
 
+\section{How to Read This Guide}
+
+Start with the validation summary for the aggregate-build environment,
+case-declared execution configuration, and scientific decision table.  The
+case identifiers in the summary link to the corresponding case-report entries.
+The common landscape-validation evidence then explains the metrics and
+limitations shared by the current cases, followed by each complete standalone
+case report with its event-specific provenance, configuration, figures,
+results, and limitations.
+
+Interpret PASS and FAIL only where a case defines a justified acceptance
+decision.  CHARACTERIZED means that descriptive metrics exist without a
+justified pass threshold.  Missing, unrun, incomplete, or otherwise
+non-decisional evidence is shown as NOT EVALUABLE.  Command completion and PDF
+availability alone do not establish validation evidence.  The aggregate-build
+environment describes how this guide was assembled; it is not necessarily the
+execution environment of every included case.
+
 \input{generated/validation_summary.tex}
-
-\section{Scope and decision policy}
-
-Each standalone case PDF is included intact to preserve its data provenance,
-configuration rationale, figures, metrics, and limitations.  PASS and FAIL are
-used only when a case defines a justified acceptance decision.  CHARACTERIZED
-means descriptive metrics exist without a justified pass threshold.  Missing,
-unrun, incomplete, or otherwise non-decisional evidence is shown as NOT
-EVALUABLE.  The linked summary at the beginning records the aggregate-build
-environment, case-declared execution configuration, and scientific decisions
-before the complete case reports.
 
 \section{Common landscape-validation evidence}
 
