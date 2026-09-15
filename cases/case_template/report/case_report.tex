@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[12pt]{article}
 % --- Packages every case needs ---
 \usepackage{amsmath,amssymb}
 \usepackage{siunitx}
@@ -10,6 +10,10 @@
 % --- Any helper macros you like ---
 \newcommand{\atanII}[2]{\operatorname{atan2}\!\left(#1,#2\right)} % safer atan2
 
+\input{case_macros.tex}
+\title{\CaseTitle}
+\input{report_style.tex}
 \begin{document}
+\maketitle
 \subfile{case_body.tex}
 \end{document}

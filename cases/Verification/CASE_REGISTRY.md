@@ -46,6 +46,13 @@ This is the authoritative mapping of stable verification identifiers to case pur
 | `CASE40_WSD` | coupling | Wind-slope vector addition and spread direction |
 | `CASE41_CFP` | unit | Custom fuel-table parameter response |
 | `CASE42_WAF` | coupling | Wind-adjustment-factor coupling to Rothermel spread |
+| `CASE43_WER` | coupling | WU-E ellipse response and rotational covariance |
+| `CASE44_WHP` | coupling | WU-E design-fire and heat-parameter response |
+| `CASE45_HRS` | coupling | WU-E heat-to-urban-rate-of-spread response |
+| `CASE46_WUT` | coupling | Wildland-to-urban WU-E transition and isolated receivers |
+| `CASE47_UWT` | coupling | Urban-to-wildland WU-E transition and isolated receivers |
+| `CASE48_WGC` | coupling | WU-E uniform-community spatial convergence |
+| `CASE49_WTC` | coupling | WU-E uniform-community temporal convergence |
 
 ## Naming rules
 

@@ -7,7 +7,7 @@ PYTHON_BIN="${PYTHON_BIN:-python3}"
 "$PYTHON_BIN" "$CASE_DIR/scripts/metrics_to_macro.py"
 (
   cd "$CASE_DIR/report"
-  latexmk -pdf -silent case_report.tex
+  latexmk -lualatex -silent case_report.tex
 )
 echo "[OK] Built $CASE_DIR/report/case_report.pdf"
 

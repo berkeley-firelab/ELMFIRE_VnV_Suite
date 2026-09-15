@@ -113,3 +113,8 @@ cases/Verification/coupling_tests/CASE33_SDO/data/
 !cases/Verification/coupling_tests/CASE40_WSD/data/misc/fuel_models.csv
 !cases/Verification/coupling_tests/CASE42_WAF/data/misc/
 !cases/Verification/coupling_tests/CASE42_WAF/data/misc/fuel_models.csv
+
+# Frozen WU-E fuel tables are source inputs; only generated variant copies are ignored.
+!cases/Verification/coupling_tests/CASE4[3-9]_*/data/
+!cases/Verification/coupling_tests/CASE4[3-9]_*/data/misc/
+!cases/Verification/coupling_tests/CASE4[3-9]_*/data/misc/*.csv

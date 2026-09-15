@@ -92,7 +92,7 @@ $I_{B,\mathrm{sim}}=\Metric{meanreferenceflinmwperm}$~MW/m and
 $V_{s,\mathrm{sim}}=\Metric{meanreferencerosmpers}$~m/s. These values give
 $N''_{\mathrm{ref}}=\Metric{meansimulationreferencedensitypcsm2}$~pcs/m$^2$.
 The per-variant values and selected raster cells are retained in
-\texttt{../outputs/metrics.json}.
+\path{../outputs/metrics.json}.
 
 % BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
 The generated numerical substitutions make the cancellation visible.  With
@@ -124,8 +124,8 @@ normalizers; the ember-flux field being tested does not determine them.  With
 \]
 For each generated mesh the expected far-field error is therefore zero, and
 the substituted decision requires
-\(\operatorname{mean}_{150<x\leq200}|N''-N''_{\mathrm{ref}}|/
-N''_{\mathrm{ref}}\leq0.05\).
+\[\operatorname{mean}_{150<x\leq200}|N''-N''_{\mathrm{ref}}|/
+N''_{\mathrm{ref}}\leq0.05.\]
 % END EXPLICIT EXPECTED-RESULT DERIVATION
 
 \section{Verification metrics and acceptance criteria}

@@ -115,3 +115,27 @@ Each case report has two obligations:
 The master guide is an aggregator, not a source of case content. A case must not depend on the guide for its preamble fragments, definitions, macros, bibliography entries, figures, derivation, or scientific context. Prefer aggregation of the successfully compiled standalone report artifact when that avoids macro, label, bibliography, or package collisions. If the repository instead includes `case_body.tex` directly, keep the body free of document-level commands, use case-prefixed labels and macro names, and ensure the master explicitly loads the case's local metadata and macro files.
 
 Use consistent terminology, units, section names, and status vocabulary across cases. Do not assume that the reader encountered another case first, and do not create cross-case references needed to understand or evaluate the current case. Cross-case comparisons may be added to the master guide as separate synthesis material, but they cannot replace a case's local derivation or decision argument.
+
+## Required report typography
+
+Use the current suite style for every standalone verification and validation case report and the body of both aggregate summary reports:
+
+| Element | Font and size | Alignment |
+| --- | --- | --- |
+| Report title | Times New Roman, bold, 15 pt | Left |
+| Main prose in individual reports and aggregate summaries | Times New Roman, regular, 12 pt | Justified |
+| Section, subsection, subsubsection, and paragraph headings | Times New Roman, bold, 15 pt | Left |
+| Figure and table captions | Times New Roman, regular, 12 pt | Justified |
+| Tables | Times New Roman, normally 12 pt; compact text at least 10 pt | Appropriate to column contents |
+
+Case titles contain only the report title: omit subtitle, author/organization subtitle blocks, and title dates. Retain scientifically relevant dates and provenance in the body. The aggregate guide's separately maintained cover layout is independent of the case title rule.
+
+Keep figure labels readable at their final printed size. Wrap table cells, split tables, or use multipage tables rather than shrinking tables below 10 pt with `resizebox` or `scalebox`. Mathematical notation may use mathematical fonts and code identifiers may use monospace styling.
+
+The canonical style is `main_report/report_style.tex`. When formatting changes are approved, update that style and synchronize exact local copies into every current case's `report/report_style.tex` and the case template. Load the local file last in the case wrapper's preamble. Cases must never load the canonical file by an external relative path at runtime: independent compilation must remain possible without the suite. Future cases inherit the template copy.
+
+Compile using `latexmk -lualatex`. Genuine Times New Roman regular, bold, italic, and bold italic fonts are required system dependencies; do not silently substitute Nimbus Roman, Liberation Serif, or TeX Gyre Termes. The current style uses 15/17 pt size/leading for titles and headings, 12/14 pt for body text and figure/table captions, and 10/12 pt for compact text.
+
+For a formatting-only request, edit report sources/styles, report build commands, and these instructions only. Do not run preprocessing, simulation, or numerical postprocessing; do not alter namelists, input data, model parameters, evaluation criteria, or result artifacts. Compile directly from existing report inputs, then refresh the guides from the standalone PDFs. Inspect actual PDF font embedding, title weight and size, page layout, captions, and tables. Resolve line overflow through report layout changes while preserving the approved style and scientific content. Distinguish pre-existing missing evidence from formatting failures.
+
+Use `\documentclass[12pt]{article}` in both individual and aggregate report wrappers. Keep `\normalsize` at 12 pt with 14 pt leading, and use the local style's `\ReportBodyText` to restore normal body text after compact material. This rule includes introductions, summary narratives, lists, interpretation, and conclusions. Compact table sizes are exceptions for table content only: enclose their size commands in a local group and restore 12 pt prose afterward. Summary generators must emit these groups and resets so regeneration cannot introduce smaller narrative text. Verify 12 pt body text in the compiled individual PDFs and on aggregate summary pages, including prose after tables; source declarations alone are insufficient.

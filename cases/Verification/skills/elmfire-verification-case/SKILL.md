@@ -174,3 +174,7 @@ Before finishing:
 8. For generated-variant cases, validate in an isolated copy after removing the copied `variants/` tree; preprocessing must regenerate it without modifying or borrowing from the source-case generated artifacts.
 9. When terminal-time alignment applies, mechanically verify that generated timestep and stop-time values are finite and positive, that the stop time is an exact timestep multiple, and that the timestep still satisfies the case-specific stability and accuracy constraints.
 10. If stalled-final compatibility is supported, test regular final dumps, near-stop stalls, explicitly expected no-propagation stalls, unexpected early stalls, and ambiguous or incomplete evidence.
+
+## Report formatting
+
+Follow the mandatory typography in [report_structure.md](references/report_structure.md#required-report-typography): Times New Roman 12 pt justified body text in both individual case reports and aggregate summaries; bold 15 pt left-aligned titles and section headings; regular 12 pt justified figure and table captions; tables at least 10 pt. Case titles have no subtitles or title dates. Keep the canonical `main_report/report_style.tex`, case-local copies, and case-template copy synchronized; compile locally with LuaLaTeX. Use a 12 pt document-class base, scope compact table sizes locally, and restore 12 pt prose after tables. Formatting-only work must preserve simulation configurations, scientific scripts, criteria, and results and must not run simulations.

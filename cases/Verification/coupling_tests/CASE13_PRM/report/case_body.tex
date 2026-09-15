@@ -225,7 +225,7 @@ constants at its beginning, enumerates all 270 points into
 \texttt{outputs/parameter\_design.csv}, writes each variant's co-registered
 structure-fraction, structure-ID, fuel-model, and initial-level-set rasters,
 and records their fingerprints in the capability manifest. It scans the current Fortran source for
-\texttt{USE\_RESOLUTION\_INDEPENDENT\_STRUCTURES}. The case refuses to mark a
+\path{USE_RESOLUTION_INDEPENDENT_STRUCTURES}. The case refuses to mark a
 point runnable unless that source capability and a matching case adapter both
 exist. This guard is necessary because running the native cell-local model
 would reproduce the cell-local discretization defect rather than the intended

@@ -40,10 +40,10 @@ report-inputs:
 	@python3 ./tools/generate_summary_reports.py
 
 verification-report: report-inputs
-	@cd main_report && latexmk -pdf -silent verification_report.tex
+	@cd main_report && latexmk -lualatex -silent verification_report.tex
 
 validation-report: report-inputs
-	@cd main_report && latexmk -pdf -silent validation_report.tex
+	@cd main_report && latexmk -lualatex -silent validation_report.tex
 
 reports: verification-report validation-report
 

@@ -2,10 +2,11 @@
 \clearpage
 \section{Validation summary}
 \label{sec:validation-summary}
+\ReportBodyText
 \subsection{Environment captured for this aggregate}
 This environment was captured when the aggregate report was generated. It describes the report-build process and must not be interpreted as the execution environment of every case unless the cases were run and aggregated in the same job. ELMFIRE is not executed to obtain this information.
 
-\small
+\begingroup\small
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.68\textwidth}@{}}
 \toprule
 Configuration & Recorded value \\
@@ -17,27 +18,27 @@ Configuration & Recorded value \\
 \endhead
 \bottomrule
 \endlastfoot
-Captured at (UTC) & 2026-09-09T22:26:10+00:00 \\
-Repository revision & 7769fc9e1181 \\
+Captured at (UTC) & 2026-09-15T05:52:30+00:00 \\
+Repository revision & 076d88a30ce3 \\
 Repository state & dirty \\
-Host platform & macOS-15.7.7-arm64-arm-64bit \\
-Python runtime & CPython 3.12.9 (/\allowbreak{}opt/\allowbreak{}homebrew/\allowbreak{}anaconda3/\allowbreak{}bin/\allowbreak{}python3) \\
+Host platform & Linux-7.0.12-linuxkit-aarch64-with-glibc2.35 \\
+Python runtime & CPython 3.10.12 (/\allowbreak{}usr/\allowbreak{}bin/\allowbreak{}python3) \\
 Conda environment & not active \\
 ELMFIRE command & elmfire \\
-ELMFIRE resolved path & not found on PATH \\
-ELMFIRE version declaration & 2025.0717 \\
-ELMFIRE executable SHA-256 & not available \\
-MPI launcher & mpirun (Open MPI) 5.0.6 \\
+ELMFIRE resolved path & /\allowbreak{}elmfire/\allowbreak{}elmfire/\allowbreak{}build/\allowbreak{}linux/\allowbreak{}bin/\allowbreak{}elmfire \\
+ELMFIRE version declaration & 2025.1002 \\
+ELMFIRE executable SHA-256 & c225b2e00349aa98\allowbreak{}128285b3d3ff9b20\allowbreak{}31d0e20944cd9f1c\allowbreak{}5ee96595d199a920 \\
+MPI launcher & mpirun (Open MPI) 4.1.2 \\
 Slurm allocation & not a Slurm build job \\
 Loaded modules & not recorded \\
-Python packages & NumPy 1.26.4; \allowbreak{}Matplotlib 3.9.2; \allowbreak{}PyYAML 6.0.1; \allowbreak{}Rasterio 1.5.0; \allowbreak{}GDAL not installed; \allowbreak{}Pandas 2.2.2; \allowbreak{}GeoPandas not installed; \allowbreak{}Shapely not installed \\
+Python packages & NumPy 1.26.4; \allowbreak{}Matplotlib 3.8.4; \allowbreak{}PyYAML 6.0.3; \allowbreak{}Rasterio 1.4.4; \allowbreak{}GDAL 3.4.1; \allowbreak{}Pandas 2.2.2; \allowbreak{}GeoPandas 1.1.4; \allowbreak{}Shapely 2.1.2 \\
 \end{longtable}
-\normalsize
+\endgroup\ReportBodyText
 
 \subsection{Case-declared execution configuration}
 These values come only from each case's \texttt{case.yaml}. They summarize the declared executable command, namelist, MPI allocation, and namelist contract. A missing declaration is reported explicitly rather than inferred.
 
-\scriptsize
+\begingroup\scriptsize
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}@{}}
 \toprule
 Case & ELMFIRE command & Input namelist & MPI ranks & Schema \\
@@ -56,7 +57,7 @@ Case & ELMFIRE command & Input namelist & MPI ranks & Schema \\
 \hyperref[case-detail:thomas-fire]{thomas\_fire} & elmfire & elmfire.data.in & 50 & 1 \\
 \hyperref[case-detail:tubbs-fire]{tubbs\_fire} & elmfire & elmfire.data.in & 50 & 1 \\
 \end{longtable}
-\normalsize
+\endgroup\ReportBodyText
 
 \subsection{Scientific decision summary}
 This table is generated from each case's case-local \texttt{outputs/metrics.json}. A successful run script or report build is not treated as scientific evidence of PASS. Missing, incomplete, blocked, or non-decisional results are reported as NOT EVALUABLE.
@@ -67,7 +68,7 @@ This table is generated from each case's case-local \texttt{outputs/metrics.json
 \textbf{CHARACTERIZED:} 3\quad
 \textbf{NOT EVALUABLE:} 0
 
-\small
+\begingroup\small
 \setlength{\LTpre}{0.8em}
 \setlength{\LTpost}{0pt}
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.38\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}@{}}
@@ -88,7 +89,7 @@ Case & Category & Title & Decision \\
 \hyperref[case-detail:thomas-fire]{thomas\_fire} & landscape scale & \hyperref[case-detail:thomas-fire]{2017 Thomas Fire landscape reconstruction} & \mbox{\textcolor{blue!70!black}{\textbf{CHARACTERIZED}}} \\
 \hyperref[case-detail:tubbs-fire]{tubbs\_fire} & landscape scale & \hyperref[case-detail:tubbs-fire]{2017 Tubbs Fire landscape reconstruction} & \mbox{\textcolor{blue!70!black}{\textbf{CHARACTERIZED}}} \\
 \end{longtable}
-\normalsize
+\endgroup\ReportBodyText
 
 \begin{samepage}
 \paragraph{Decision vocabulary.}

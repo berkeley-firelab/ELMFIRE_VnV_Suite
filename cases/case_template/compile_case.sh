@@ -13,7 +13,7 @@ echo "[INFO] Creating $MACROS_TEX from $METRICS_JSON"
 python3 "$CASE_DIR/scripts/metrics_to_macro.py"
 
 # --- Build case report PDF ---
-( cd "$CASE_DIR/report" && latexmk -pdf -silent case_report.tex )
+( cd "$CASE_DIR/report" && latexmk -lualatex -silent case_report.tex )
 
 # --- Done ---
 echo "[OK] Built $CASE_DIR/report/case_report.pdf"

@@ -62,7 +62,7 @@ will be prepared:
 - **GNU Make, Bash, Coreutils**: required for the helper scripts in `tools/` and
   the per-case `run_case.sh` pipelines (standard on Linux).
 - **Python ≥ 3.9** with `pip`.
-- **LaTeX**: for linux system (server/HPC), install LaTeX following the instrution at `https://www.tug.org/texlive/quickinstall.html`.
+- **LaTeX**: install TeX Live with LuaLaTeX, `luaotfload`, `fontspec`, and `latexmk` (on Ubuntu, include `texlive-luatex`). Reports require genuine **Times New Roman** regular, bold, italic, and bold italic fonts; the Microsoft core-fonts package (`ttf-mscorefonts-installer`) supplies them. Verify with `fc-match "Times New Roman"`; a substitute font is not compliant.
 - **GDAL/RasterIO dependencies** (e.g. `gdal-bin`, `libgdal-dev`) These are required by ELMFIRE and `rasterio` in some post-processing
   scripts.
 
@@ -450,3 +450,11 @@ for each affected case:
   maintainers can understand and reproduce the verification scenario.
 - Prefer referencing the executable via `ELMFIRE_BIN` to avoid hard-coding
   machine-specific paths in `case.yaml`.
+
+### Report typography and formatting-only builds
+
+All individual case reports and aggregate summaries use Times New Roman: 12 pt justified body text, 15 pt bold left-aligned section headings and report titles, and 12 pt regular justified figure and table captions. Omit case subtitles and title dates. Tables must remain at least 10 pt at their final printed size; wrap or split them instead of scaling them down. The canonical style is `main_report/report_style.tex`; keep identical local copies in each case and `cases/case_template/report/report_style.tex` for independent builds. The aggregate guides retain their separately maintained cover layout. Equations retain mathematical fonts and code identifiers retain monospace styling.
+
+To rebuild only a report from its existing evidence, run `latexmk -lualatex -interaction=nonstopmode -halt-on-error case_report.tex` inside that case’s `report/` directory. This avoids preprocessing and simulation. After rebuilding the standalone PDFs, `make reports` refreshes both aggregate guides from existing results. Do not run `run_case.sh`, preprocessing, or numerical postprocessing for a typography-only change.
+
+Both individual and summary wrappers use a 12 pt document-class base. Compact table sizing must be locally scoped; restore `\ReportBodyText` afterward so surrounding narrative remains 12 pt.

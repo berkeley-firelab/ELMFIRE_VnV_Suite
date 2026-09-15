@@ -35,7 +35,7 @@ compile_missing_case_reports() {
       fi
     elif (
       cd "$report_dir"
-      latexmk -pdf -silent -interaction=nonstopmode -halt-on-error case_report.tex
+      latexmk -lualatex -silent -interaction=nonstopmode -halt-on-error case_report.tex
     ); then
       primary_succeeded=1
     fi
@@ -48,7 +48,7 @@ compile_missing_case_reports() {
       # required because latexmk remembers the preceding failed invocation.
       if ! (
         cd "$report_dir"
-        latexmk -g -pdf -silent -interaction=nonstopmode -halt-on-error \
+        latexmk -g -lualatex -silent -interaction=nonstopmode -halt-on-error \
           -usepretex='\PassOptionsToPackage{draft}{graphicx}' \
           case_report.tex
       ); then
@@ -78,10 +78,10 @@ compile_missing_case_reports || case_report_failures=1
 # Scientific decisions remain derived solely from outputs/metrics.json.
 "$PYTHON_BIN" "$ROOT_DIR/tools/generate_summary_reports.py"
 
-(cd "$MAIN_DIR" && latexmk -pdf -silent verification_report.tex)
+(cd "$MAIN_DIR" && latexmk -lualatex -silent verification_report.tex)
 echo "[OK] Built $MAIN_DIR/verification_report.pdf"
 
-(cd "$MAIN_DIR" && latexmk -pdf -silent validation_report.tex)
+(cd "$MAIN_DIR" && latexmk -lualatex -silent validation_report.tex)
 echo "[OK] Built $MAIN_DIR/validation_report.pdf"
 
 if [[ "$case_report_failures" -ne 0 ]]; then

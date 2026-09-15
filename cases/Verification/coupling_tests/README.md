@@ -34,3 +34,14 @@ coupling from 20-ft wind and canopy inputs through ELMFIRE's wind-adjustment
 factor into the Rothermel response. Their scalar reference equations are
 case-local, but their decisions intentionally cover more than one runtime
 component, so they remain coupling tests.
+
+`CASE43_WER` through `CASE49_WTC` form the deterministic WU-E Ellipse--Heat
+verification suite. They cover ellipse and material response, design-fire heat
+release, the heat-to-spread-rate mapping, both wildland--urban transition
+directions, isolated receivers, and uniform-community space/time convergence.
+The cases disable firebrands and other unrelated mechanisms, distinguish the
+current executable behavior from publication-level model intent, and report an
+unavailable or nonselectable pathway as `NOT EVALUABLE` rather than treating a
+missing capability as evidence of success. The shared source/document map is
+recorded in `../WUE_TRACEABILITY.md`; every case remains independently runnable
+and carries the equations and evidence needed for its own decision.

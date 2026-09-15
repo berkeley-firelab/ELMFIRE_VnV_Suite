@@ -393,13 +393,14 @@ def write_summary_table(
         r"\clearpage",
         rf"\section{{{title} summary}}",
         rf"\label{{sec:{suite}-summary}}",
+        r"\ReportBodyText",
         r"\subsection{Environment captured for this aggregate}",
         "This environment was captured when the aggregate report was generated. "
         "It describes the report-build process and must not be interpreted as the "
         "execution environment of every case unless the cases were run and aggregated "
         "in the same job. ELMFIRE is not executed to obtain this information.",
         "",
-        r"\small",
+        r"\begingroup\small",
         r"\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.68\textwidth}@{}}",
         r"\toprule",
         r"Configuration & Recorded value \\",
@@ -417,7 +418,7 @@ def write_summary_table(
     lines.extend(
         [
             r"\end{longtable}",
-            r"\normalsize",
+            r"\endgroup\ReportBodyText",
             "",
             r"\subsection{Case-declared execution configuration}",
             r"These values come only from each case's \texttt{case.yaml}. They "
@@ -425,7 +426,7 @@ def write_summary_table(
             "and namelist contract. A missing declaration is reported explicitly "
             "rather than inferred.",
             "",
-            r"\scriptsize",
+            r"\begingroup\scriptsize",
             r"\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}@{}}",
             r"\toprule",
             r"Case & ELMFIRE command & Input namelist & MPI ranks & Schema \\",
@@ -460,7 +461,7 @@ def write_summary_table(
     lines.extend(
         [
             r"\end{longtable}",
-            r"\normalsize",
+            r"\endgroup\ReportBodyText",
             "",
             r"\subsection{Scientific decision summary}",
             "This table is generated from each case's case-local "
@@ -474,7 +475,7 @@ def write_summary_table(
             rf"\textbf{{CHARACTERIZED:}} {counts.get('CHARACTERIZED', 0)}\quad",
             rf"\textbf{{NOT EVALUABLE:}} {counts.get('NOT EVALUABLE', 0)}",
             "",
-            r"\small",
+            r"\begingroup\small",
             r"\setlength{\LTpre}{0.8em}",
             r"\setlength{\LTpost}{0pt}",
             r"\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.38\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}@{}}",
@@ -511,7 +512,7 @@ def write_summary_table(
     lines.extend(
         [
             r"\end{longtable}",
-            r"\normalsize",
+            r"\endgroup\ReportBodyText",
             "",
             r"\begin{samepage}",
             r"\paragraph{Decision vocabulary.}",
