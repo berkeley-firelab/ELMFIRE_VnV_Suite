@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import json
 from pathlib import Path
 
@@ -199,6 +201,7 @@ def main() -> None:
         fig.colorbar(image, ax=ax, shrink=0.78, label="arrival time (s)")
     fig.suptitle("CASE30 ELMFIRE time-of-arrival fields")
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG / "verification_summary.pdf", bbox_inches="tight")
     plt.close(fig)
 
@@ -206,6 +209,7 @@ def main() -> None:
     ax.imshow(dual, cmap="inferno", origin="upper")
     ax.set_title("Two simultaneous point ignitions; no wind")
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG / "input_configuration.pdf", bbox_inches="tight")
     plt.close(fig)
 

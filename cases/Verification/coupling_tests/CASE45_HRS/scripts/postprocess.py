@@ -2,6 +2,8 @@
 """Evaluate CASE45 from case-local black-box raster outputs only."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import csv
 import json
 import math
@@ -336,12 +338,26 @@ def unavailable(
 
 def save_figure(rows: list[dict[str, object]]) -> None:
     """Plot measured speeds, heat stimuli, and spatial output on separate figures."""
-    labels = [str(r["id"]).replace("_", " ") for r in rows]
+    condition_names = {
+        "energy_below": "Energy below 30 MJ",
+        "energy_equal": "Energy equal to 30 MJ",
+        "energy_above": "Energy above 30 MJ",
+        "wind_below_35": "Wind speed 34.9 mph",
+        "wind_equal_35": "Wind speed 35 mph",
+        "wind_above_35": "Wind speed 35.1 mph",
+        "normal_back": "Backward-facing front",
+        "normal_side": "Crosswind-facing front",
+        "hrr_half": "Half reference heat release",
+        "hrr_double": "Twice reference heat release",
+        "ftp_low": "Lower material\nfire-thermal property",
+        "ftp_high": "Higher material\nfire-thermal property",
+    }
+    labels = [condition_names.get(str(r["id"]), str(r["id"]).replace("_", " ")) for r in rows]
     y = np.arange(len(rows))
-    for filename, title in (("response_summary", "Receiver spread: prediction and observation"), ("heat_stimulus", "Measured energy at receiver arrival")):
+    for filename, title in (("response_summary", "Receiver spread: reference and simulation"), ("heat_stimulus", "Simulated energy at receiver arrival")):
         fig, ax = plt.subplots(figsize=(7.2, 5.8), constrained_layout=True)
         if filename == "response_summary":
-            ax.plot([float(r["oracle_vs_ft_min"]) for r in rows], y, "o", label="Fixed-FTP oracle")
+            ax.plot([float(r["oracle_vs_ft_min"]) for r in rows], y, "o", label="Independent prediction\n(fixed material property)")
             ax.plot([float(r["measured_vs_ft_min"]) for r in rows], y, "x", ms=8, label="ELMFIRE")
             ax.set_xlabel("Local spread rate (ft/min)")
         else:
@@ -353,6 +369,7 @@ def save_figure(rows: list[dict[str, object]]) -> None:
         ax.grid(axis="x", alpha=0.25)
         ax.set_title(title)
         ax.legend(loc="lower right")
+        polish_figure(fig)
         fig.savefig(CASE_DIR / f"figures/{filename}.pdf", metadata=PDF_METADATA)
         plt.close(fig)
     row = next(r for r in rows if r["id"] == "wind_equal_35")
@@ -367,6 +384,7 @@ def save_figure(rows: list[dict[str, object]]) -> None:
     ax.legend()
     fig.colorbar(im, ax=ax, label="Spread rate (ft/min)")
     ax.set(xlabel="Easting (m)", ylabel="Northing (m)", title="Whole domain: wind_equal_35, t = 4 s")
+    polish_figure(fig)
     fig.savefig(CASE_DIR / "figures/domain_result.pdf", metadata=PDF_METADATA)
     plt.close(fig)
 

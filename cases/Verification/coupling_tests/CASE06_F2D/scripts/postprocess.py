@@ -6,6 +6,8 @@ requested perimeter times, calculates explicit acceptance metrics, generates the
 vector figure, and writes case-local JSON and LaTeX artifacts.
 """
 from __future__ import annotations
+
+from report_language import polish_figure, report_text
 import csv
 import json
 import re
@@ -72,6 +74,7 @@ def write_field_diagnostics(out, figs, gt):
     axis.set(title='Cells ignited by deposited firebrands',
              xlabel='x [m]', ylabel='y [m]', xlim=(0, 800), ylim=(-100, 200))
     axis.grid(alpha=0.15)
+    polish_figure(fig)
     fig.savefig(
         figs / 'two_dimensional_transport_fields.pdf',
         bbox_inches='tight', pad_inches=0.06)
@@ -201,6 +204,7 @@ def main():
         ax.set_aspect('equal', adjustable='box')
         ax.grid(alpha=0.2)
         ax.legend(ncol=3, loc='upper left')
+        polish_figure(fig)
         fig.savefig(figs / 'two_dimensional_fireline_evolution.pdf')
         plt.close(fig)
         write_field_diagnostics(out, figs, gt)
@@ -217,7 +221,7 @@ def main():
         safe = re.sub('[^A-Za-z0-9]+', '', k)
         value = str(v).replace('_', '\\_')
         lines.append(f'\\expandafter\\def\\csname metric@{safe}\\endcsname{{{value}}}')
-    (report / 'metrics_macros.tex').write_text('\n'.join(lines) + '\n')
+    (report / 'metrics_macros.tex').write_text(report_text('\n'.join(lines) + '\n'))
     print('[OK] two-dimensional transport case evaluated: {}'.format(metrics['status']))
 
 

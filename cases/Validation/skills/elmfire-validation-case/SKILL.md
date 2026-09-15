@@ -45,6 +45,12 @@ Read [case_contract.md](references/case_contract.md) for the detailed layout,
 traceability requirements, and [report_structure.md](references/report_structure.md)
 for the scientific argument.
 
+## Reader-facing language
+
+Read and follow [report_language.md](references/report_language.md) for all report
+prose, generated text, and figure labels. Operational names in these instructions
+are for construction and maintenance only; they must not appear in reports.
+
 ## Require source and sufficient design evidence
 
 Require the user to provide the explicit path to the ELMFIRE source root that
@@ -198,7 +204,7 @@ context.
 2. Confirm raw evidence is unchanged and every derived artifact is reproducible.
 3. Confirm preprocessing and postprocessing are case-local, non-destructive, and
    readable.
-4. Confirm every metric traces to an observed phenomenon, specifies exact file,
+4. Confirm every metric traces to an observed phenomenon, specifies the physical output quantity, uniqueness,
    region, mask, time/member selection, formula, uncertainty treatment,
    rationale, baseline, and decision use.
 5. Confirm every input and result figure has units, time/member context, spatial

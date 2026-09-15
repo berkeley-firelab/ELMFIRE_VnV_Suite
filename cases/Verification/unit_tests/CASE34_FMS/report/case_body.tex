@@ -1,5 +1,6 @@
 \section{Verification purpose}
-This executable-level known-response test verifies that ELMFIRE reads standard fuel-model parameters and evaluates the no-wind, no-slope Rothermel surface spread model for \FuelSet.  It exercises fuel-table parsing, class weighting, reaction intensity, heat sink, and the base rate of spread while crown fire, spotting, buildings, acceleration, wind, and slope are excluded.  It can expose column-order, unit, weighting, and model-selection errors.  This is implementation verification, not comparison with an observed fire.  The verification question is whether all five variants reproduce the independent reaction-intensity and base-ROS calculations within \IrTolerance{} and \RosTolerance{}, with TOA-derived ROS within 5\%.
+
+This controlled known-response case verifies that ELMFIRE reads standard fuel-model parameters and evaluates the no-wind, no-slope Rothermel surface spread model for \FuelSet.  It exercises fuel-table parsing, class weighting, reaction intensity, heat sink, and the base rate of spread (ROS) while crown fire, spotting, buildings, acceleration, wind, and slope are excluded.  It can expose column-order, unit, weighting, and model-selection errors.  This is implementation verification, not comparison with an observed fire.  The verification question is whether all five simulation conditions reproduce the independent reaction-intensity and base-ROS calculations within \IrTolerance{} and \RosTolerance{}, with time of arrival (TOA)-derived ROS within 5\%.
 
 \section{Mathematical formulation and numerical implementation}
 The no-wind, no-slope rate is
@@ -7,7 +8,7 @@ The no-wind, no-slope rate is
 where $I_R$ is reaction intensity, $\xi$ is the propagating-flux ratio, $\rho_b$ is bulk density, $\epsilon$ is effective heating number, and $Q_{ig}=250+1116M_f$ in native Rothermel units.  Dead and live classes are area-weighted before their moisture-damping contributions are combined.  The equations and standard fuel definitions follow Patricia L. Andrews, \emph{The Rothermel Surface Fire Spread Model and Associated Developments}, RMRS-GTR-371 (2018).  ELMFIRE returns spread rate in metres per minute and reaction intensity in \si{kW.m^{-2}}.
 
 \section{Derivation of expected behavior}
-The case-local \texttt{rothermel\_reference.py} reads the same frozen fuel-table rows but independently evaluates every algebraic step stated above.  It does not import ELMFIRE source or use a simulation output as a reference.  Each predicted $I_R$ and $R_0$ is therefore a deterministic known response.  A bounded planar signed-distance front turns the scalar normal speed into a second independent prediction, $t(x)=t_0+(x-x_0)/(R_0/60)$.
+The case-specific independent Rothermel reference calculation reads the same frozen fuel-table rows but independently evaluates every algebraic step stated above.  It does not import ELMFIRE source or use a simulation output as a reference.  Each predicted $I_R$ and $R_0$ is therefore a deterministic known response.  A bounded planar signed-distance front turns the scalar normal speed into a second independent prediction, $t(x)=t_0+(x-x_0)/(R_0/60)$.
 
 % BEGIN EXPLICIT METRIC DERIVATION
 Each reference is calculated independently with
@@ -30,7 +31,7 @@ record.  The resulting substitutions are
 \]
 (for example, Fuel Model~2 gives
 \(2.702741~\mathrm{ft\,min^{-1}}(0.3048)=0.823796~\mathrm{m\,min^{-1}}\)).
-For variant \(i\), direct errors are
+For simulation condition \(i\), direct errors are
 \(e_{R,i}=|R_{\max,i}-R_{\mathrm{ref},i}|/
 \max(|R_{\mathrm{ref},i}|,10^{-8})\) and the analogous \(e_{I,i}\).
 The TOA fit is \(t=a+bx\), so \(R_{\mathrm{TOA}}=60/b\) and
@@ -42,12 +43,12 @@ R_{\mathrm{ref},i}\leq0.05\), and \(\min_iR_i^2\geq0.995\).
 % END EXPLICIT METRIC DERIVATION
 
 \section{Verification metrics and acceptance criteria}
-The direct spread raster tests the calculated speed with maximum relative error 0.02; the reaction-intensity raster tests the source term with maximum relative error 0.01.  Their medians use colocated valid cells at the planar head, beginning one cell behind the initial east face, so direct verification does not require the front to traverse a downstream corridor. Linear regression of positive arrival time against interior $x$ coordinate tests propagation independently: maximum ROS error is 0.05 and minimum $R^2$ is 0.995. TOA is required only for variants whose planned duration supports a multi-cell fit. All five variants and all four aggregate metrics are required; missing or malformed required evidence gives NOT EVALUABLE.
+The direct spread raster tests the calculated speed with maximum relative error 0.02; the reaction-intensity raster tests the source term with maximum relative error 0.01.  Their medians use colocated valid cells at the planar head, beginning one cell behind the initial east face, so direct verification does not require the front to traverse a downstream corridor. Linear regression of positive arrival time against interior $x$ coordinate tests propagation independently: maximum ROS error is 0.05 and minimum $R^2$ is 0.995. TOA is required only for simulation conditions whose planned duration supports a multi-cell fit. All five simulation conditions and all four aggregate metrics are required; missing or malformed required evidence gives NOT EVALUABLE.
 
 \section{Simulation configuration and predicted outcome}
 
-The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every positive oracle ROS, \texttt{SIMULATION\_DT} and \texttt{SIMULATION\_DTMAX} use the whole-second value obtained by rounding the 5\%-of-cell target downward, with a one-second minimum; every generated value remains below the configured CFL limit of 0.2. The stop time is rounded upward to an exact integer multiple of that step. This avoids a shortened final step that can trigger ELMFIRE's stalled-front branch and corrupt the terminal timestamp. A zero-ROS variant retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The evaluator always requires uniquely named rasters tied to one final dump record. It accepts a stalled-final record only when subtracting the configured meteorology interval reconstructs the requested stop time within one configured timestep. A TOA-required variant must reach the \texttt{SIMULATION\_TSTOP} in its generated namelist; a direct-only variant may terminate early because lack of propagation is part of the state being tested.
-The domain is \SI{1400}{m} square with \SI{10}{m} cells.  A finite \SI{50}{m}-wide ignition strip has a planar east face initially at $x=-\SI{400}{m}$ and terminates well inside the north and south boundaries; the interior analysis corridor is therefore one-dimensional without presenting ELMFIRE with an edge-to-edge contained front.  Moistures are 5, 7, and 9\% for dead classes and 90\% for both live classes.  Wind and slope are zero.  Run duration is selected from the predicted rate to provide approximately \SI{300}{m} of travel.  The interior results should be planar but need not have a monotonic ordering across fuel models because packing, SAV, load, depth, and extinction moisture interact.
+The finite-strip PHI raster is a signed-distance field clipped to ELMFIRE's supported $[-1,1]$ interval, preserving both an ignited interior and a resolved front gradient. For every positive reference spread rate, the prescribed and maximum timesteps use the whole-second value obtained by rounding the 5\%-of-cell target downward, with a one-second minimum; every generated value remains below the configured Courant--Friedrichs--Lewy (CFL) limit of 0.2. The stop time is rounded upward to an exact integer multiple of that step. This avoids a shortened final step that can trigger ELMFIRE's stalled-front branch and corrupt the terminal timestamp. A zero-ROS simulation condition retains a 5 s step and is evaluated from direct fields without requiring TOA propagation. The evaluator always requires uniquely named rasters tied to one final dump record. It accepts a stalled-final record only when subtracting the configured meteorology interval reconstructs the requested stop time within one configured timestep. A TOA-required simulation condition must reach the prescribed stop time in its generated namelist; a direct-only simulation condition may terminate early because lack of propagation is part of the state being tested.
+The domain is \SI{1400}{m} square with \SI{10}{m} cells.  A finite \SI{50}{m}-wide ignition strip has a planar east face initially at $x=-\SI{400}{m}$ and terminates well inside the north and south boundaries; the interior analysis corridor is therefore one-dimensional without presenting ELMFIRE with an edge-to-edge contained front.  Moistures are 5, 7, and 9\% for dead classes and 90\% for both live classes.  Wind and slope are zero.  Run duration is selected from the predicted rate to provide approximately \SI{300}{m} of travel.  The interior results should be planar but need not have a monotonic ordering across fuel models because packing, surface-area-to-volume ratio (SAV), load, depth, and extinction moisture interact.
 
 \begin{center}\begin{tabular}{p{0.22\textwidth}p{0.24\textwidth}p{0.12\textwidth}p{0.32\textwidth}}\toprule
 Parameter & Configured value & Units & Role \\
@@ -58,21 +59,21 @@ Wind/slope & 0 / 0 & mph / degrees & Isolates base fuel response \\
 Timing & generated whole-second step and exact-multiple stop & s & CFL-safe terminal evidence \\
 \bottomrule\end{tabular}\end{center}
 
-Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+Figure~\ref{fig:input-configuration} shows the prescribed spatial condition used in this experiment. The displayed field represents the initial level-set geometry or a controlling fuel, terrain, moisture, wind, or canopy quantity, as identified by the figure labels. The plotted values come from the prepared simulation inputs, not from the expected response.
 
 \begin{figure}[H]
   \centering
   \IfFileExists{../figures/input_configuration.pdf}{%
     \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
-  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
-  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  }{\fbox{\parbox{0.88\textwidth}{Prepared-input evidence is unavailable. The prescribed configuration is described in the text; this absence does not establish that it was simulated.}}}
+  \caption{Prepared input conditions from the prescribed spatial fields. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
   \label{fig:input-configuration}
 \end{figure}
 
 \section{Actual simulation results}
-The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} required variants.  Its authoritative state is \textbf{\VerificationStatus}.  No plotted curve is substituted for missing simulation artifacts.
+The available results cover \CompletedVariantCount{} of \RequiredVariantCount{} required simulation conditions.  The scientific decision is \textbf{\VerificationStatus}.  No plotted curve is substituted for missing simulation results.
 \ifnum\CompletedVariantCount>0
-\IfFileExists{../figures/sweep_response.pdf}{\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{sweep_response.pdf}\caption{Hand-calculated and ELMFIRE rate of spread (ROS, m/min) and reaction intensity (kW/m2) for all five completed standard-fuel variants. Each fuel model uses one color in both panels; open diamonds denote the independent hand calculation and filled circles denote ELMFIRE.}\end{figure}}{}
+\IfFileExists{../figures/sweep_response.pdf}{\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{sweep_response.pdf}\caption{Independently calculated and ELMFIRE rate of spread (ROS, m/min) and reaction intensity (kW/m2) for all five completed standard-fuel simulation conditions. Each fuel model uses one color in both panels; open diamonds denote the independent hand calculation and filled circles denote ELMFIRE.}\end{figure}}{}
 \fi
 
 \section{Calculated metrics and verification decision}

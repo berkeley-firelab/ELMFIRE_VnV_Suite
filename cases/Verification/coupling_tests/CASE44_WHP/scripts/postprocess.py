@@ -2,6 +2,8 @@
 """Fail-closed CASE44 comparison against the case-local intended-model oracle."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import csv
 import json
 import math
@@ -346,6 +348,7 @@ def plot_comparison(result: dict[str, object]) -> None:
         fig.colorbar(image, ax=axis, shrink=0.80, label=r"Heat flux (kW m$^{-2}$)")
         axis.set(title=title, xlabel="Raster column", ylabel="Raster row")
     fig.suptitle(f"CASE44 heat response at t={result['times'][peak]:g} s ({result['id']})")
+    polish_figure(fig)
     fig.savefig(
         CASE_DIR / "figures" / "heat_response_comparison.pdf", bbox_inches="tight",
         metadata={"CreationDate": None, "ModDate": None},

@@ -2,6 +2,8 @@
 """Generate all CASE43 variants, deterministic rasters, and reference figures."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import json
 import re
 import shutil
@@ -227,6 +229,7 @@ def plot_inputs(representative: dict[str, object]) -> None:
         axis.tick_params(axis="x", rotation=30)
     fig.suptitle("CASE43 prepared inputs")
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
+    polish_figure(fig)
     fig.savefig(FIGURE_DIR / "input_configuration.pdf", bbox_inches="tight",
                 metadata={"CreationDate": None, "ModDate": None})
     plt.close(fig)
@@ -244,7 +247,7 @@ def plot_expected(variants: list[dict[str, object]]) -> None:
         axes[0].plot(speed, [float(item["ellipse"][key]) for item in branches], "o-", label=label)
     axes[0].axvline(10.0, color="black", ls="--", lw=0.8)
     axes[0].axvline(17.3, color="black", ls="--", lw=0.8)
-    axes[0].set(xlabel="Source wind speed (m/s)", ylabel="Regression reach (m)", title="Branch-boundary oracle")
+    axes[0].set(xlabel="Source wind speed (m/s)", ylabel="Predicted flame reach (m)", title="Reference response at wind-regression boundaries")
     axes[0].legend(fontsize=12)
 
     area = [item for item in variants if item["family"] == "Hamada A"]
@@ -253,7 +256,7 @@ def plot_expected(variants: list[dict[str, object]]) -> None:
         [float(item["ellipse"]["dist_downwind_m"]) for item in area],
         "o-",
     )
-    axes[1].set(xlabel="Hamada A (m)", ylabel="Downwind reach (m)", title="Plan-dimension response")
+    axes[1].set(xlabel="Characteristic building dimension, A (m)", ylabel="Downwind reach (m)", title="Building-dimension response")
 
     distance = [item for item in variants if item["family"] == "Hamada D"]
     axes[2].plot(
@@ -261,11 +264,12 @@ def plot_expected(variants: list[dict[str, object]]) -> None:
         [float(item["ellipse"]["dist_downwind_m"]) for item in distance],
         "o-",
     )
-    axes[2].axvline(50.0, color="black", ls="--", lw=0.8, label="source clamp")
-    axes[2].set(xlabel="Configured Hamada D (m)", ylabel="Downwind reach (m)", title="Separation and clamp")
+    axes[2].axvline(50.0, color="black", ls="--", lw=0.8, label="50 m separation limit")
+    axes[2].set(xlabel="Building separation, D (m)", ylabel="Downwind reach (m)", title="Response to building separation")
     axes[2].legend(fontsize=12)
     for axis in axes:
         axis.grid(alpha=0.25)
+    polish_figure(fig)
     fig.savefig(
         FIGURE_DIR / "expected_response.pdf", bbox_inches="tight",
         metadata={"CreationDate": None, "ModDate": None},

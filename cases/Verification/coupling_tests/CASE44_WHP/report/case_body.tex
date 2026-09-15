@@ -1,34 +1,28 @@
 \section{Verification purpose}
 
-This case verifies the response of the intended downscaled WU-E model-2 heat
+This case verifies the response of the intended downscaled Wildland--Urban ELMFIRE (WU--E) model-2 heat
 calculation to the design-fire curve, target building-fuel properties,
-\texttt{HRR\_ELLIPSE\_ADJ}, the radiation cutoff, and multiple simultaneous
+heat-release-rate (HRR) ellipse adjustment, the radiation cutoff, and multiple simultaneous
 sources.  It is designed to expose breakpoint errors, confusion between a
 plateau duration and its absolute end time, use of the wrong target-property
 path, incorrect heat-area normalization, missing cutoff logic, a failure to
 accumulate transient heat, or nonlinear source aggregation.
 
-Nineteen deterministic variants use one or two stationary WU-E sources.
-Nonburnable FBFM93 background and a zero spread-adjustment raster suppress
+Nineteen deterministic simulation conditions use one or two stationary WU-E sources.
+Nonburnable fire behavior fuel model (FBFM) 93 background and a zero spread-adjustment raster suppress
 propagation; spotting, terrain, and weather variation are disabled.  The
-intended intended downscaled formulation is the numerical acceptance oracle. The mapped
-namelist, spread-rate, and level-set files were byte-identical to the pinned
-commit even though the inspected working tree also contained other modified
-files and untracked directories. Differences between that executable path and
-the intended equations below are reported as deviations.
+intended downscaled formulation is the numerical acceptance reference. The
+reviewed configuration interpretation, spread-rate calculation, and level-set
+formulation were identical to the specified ELMFIRE source revision; this
+identity claim does not extend to all other model components. Differences
+between the simulated response and the intended equations below are reported
+as deviations.
 
-\textbf{Verification question.} Do all variants reproduce the complete
-time-dependent HRRPUA, direct-flame-contact, radiation, and accumulated-heat
+\textbf{Verification question.} Do all simulation conditions reproduce the complete
+time-dependent heat-release rate per unit area (HRRPUA), direct-flame-contact (DFC), radiation, and accumulated-heat
 fields within \HeatMapTolerance{} normalized $L_1$ error, while satisfying
 the exact parameter scalings, radiation support, source-superposition, and
 no-propagation invariants?
-
-
-\paragraph{Reading the notation.}
-WU--E denotes the Wildland--Urban ELMFIRE model. HRR is heat-release rate;
-HRRPUA is heat-release rate per unit area. DFC means direct flame contact,
-TOA means time of arrival, and ROS means rate of spread. FTP is the material
-fire-thermal property used in the intended heat-to-spread law.
 
 \ReportOverview
 
@@ -83,15 +77,15 @@ sources.  Total received heat is updated every one-second solver step as
  Q^{\mathrm{total}}_j \mathrel{+}=q''_j(t)\,\Delta t\,\Delta x^2.
 \end{equation}
 
-The independent case-local Python oracle implements these equations directly;
-it imports no ELMFIRE code and has no runtime source-tree dependency. The
+The independent case-specific Python reference calculation implements these equations directly;
+it imports no ELMFIRE code and has no execution source-tree dependency. The
 pinned source currently omits $\eta$, uses 0.3 rather than 0.35 radiation,
 omits the 0.65 DFC factor and grid corrections, and uses cell area in $C_h$.
 
 \section{Derivation of expected behavior}
 
 The four source curves deliberately sample every breakpoint.  The base curve
-uses $(t_e,t_f,t_d,H)=(4,8,12,100)$ in SI units; the peak variant doubles
+uses $(t_e,t_f,t_d,H)=(4,8,12,100)$ in SI units; the peak simulation condition doubles
 $H$, the short curve uses $(2,4,6,100)$, and the long-plateau curve uses
 $(4,10,14,100)$.  Because every heat term is linear in HRRPUA, doubling $H$
 must double the HRR and both heat-flux maps at every dump.
@@ -106,7 +100,7 @@ $c\in\{0.25,0.5,0.75,1\}$.
 The sum from a left and a right source must equal the two-source result cell
 by cell and dump by dump.  Likewise, the final accumulated rasters must equal
 the sum of every one-second transient raster times $\Delta t\Delta x^2$.
-Finally, two variants change the spatial nonburnable-fraction raster from zero
+Finally, two simulation conditions change the spatial nonburnable-fraction raster from zero
 to one while retaining the same building-fuel-model table. The fully
 nonburnable target must receive zero DFC and radiation; equality would expose
 the current source's table-only behavior.
@@ -121,8 +115,8 @@ the current source's table-only behavior.
 
 The peer-reviewed WU--E papers support the transient design-fire, target heat,
 and multi-source coupling concepts \cite{PurnomoPCI2024,PurnomoIJWF2024}.
-The detailed formulation above is documented directly. The report retains the source nomenclature: \texttt{T\_EARLY}, \texttt{T\_FULLDEV}, and
-\texttt{T\_DECAY} are absolute transition times.
+The detailed formulation above is stated explicitly. The ends of growth,
+fully developed burning, and decay are specified as absolute transition times.
 
 \section{Verification metrics and acceptance criteria}
 
@@ -135,41 +129,38 @@ For nonzero reference array $R$ and output array $E$, the principal metric is
 The sums cover all 16 scheduled dump times and every raster cell.  A zero-reference
 array uses absolute $L_1$ error, so a supposedly suppressed component cannot
 pass through a zero denominator.  Nodata, non-finite values, unexpected
-shapes, duplicate files, and a dump manifest other than exactly 1 through
+shapes, duplicate result fields, and output times other than exactly 1 through
 16 seconds are rejected.  The prescribed HRR curves include $t=0$, but
-ELMFIRE's first scheduled output occurs after one \texttt{DTDUMP} interval.
-A successful-exit completion marker must match a
-recomputed SHA-256 fingerprint of the current concrete namelist, all runtime
-rasters, and both case-local fuel tables; output filenames alone are never
-sufficient evidence.  The marker binds the resolved executable,
-case/evaluator artifacts, captured standard output/error streams, and complete
-output-file snapshot by SHA-256.  The operator
-remains responsible for mapping that binary to the stated source revision.
+ELMFIRE's first scheduled output occurs after one scheduled output interval.
+A confirmed successful completion must have matching SHA-256 identities for
+the simulation settings, spatial inputs, both fuel-property tables, reference
+and analysis methods, ELMFIRE program, simulation record, and all results.
+Output labels alone are not sufficient evidence. The relationship between the
+identified model program and the stated source revision must be established
+separately.
 
 \begin{center}
-
 
 \begin{longtable}{@{}P{0.22\textwidth}P{0.30\textwidth} P{0.17\textwidth}P{0.17\textwidth}@{}}
 \toprule
 Expected property & Observable and metric & Criterion & Failure sensitivity\\
 \midrule
-HRR breakpoints & Full HRR raster stack versus oracle & $\nLone\le0.005$ & timing, curve row, peak\\
-Spatial heat fields & Full DFC/radiation stacks versus oracle & each $\nLone\le0.005$ & coefficients, cutoff, kernel\\
+HRR breakpoints & Full HRR raster stack versus reference calculation & $\nLone\le0.005$ & timing, curve row, peak\\
+Spatial heat fields & Full DFC/radiation stacks versus reference calculation & each $\nLone\le0.005$ & coefficients, cutoff, kernel\\
 Exact parameter response & Scaled-pair raster errors & each $\le10^{-5}$ & spatial $n_b$, absorptivity, or $c^{-2}$\\
 Time accumulation & Transient sums versus final totals & $\nLone\le0.005$ & update/dump ordering\\
 Source aggregation & Pair versus sum of two singles & $\le10^{-5}$ & aggregation defect\\
-Isolation & TOA and off-source HRR & zero extra cells & unintended propagation\\
+Isolation & time of arrival (TOA) and off-source HRR & zero extra cells & unintended propagation\\
 \bottomrule
 \end{longtable}
 \end{center}
 
-Overall PASS requires every metric and all 19 variants.  Incomplete, stale,
+Overall PASS requires every metric and all 19 simulation conditions.  Incomplete, stale,
 ambiguous, or malformed evidence yields NOT EVALUABLE, never PASS.
 
 \section{Simulation configuration and predicted outcome}
 
 \begin{center}
-
 
 \begin{longtable}{@{}P{0.22\textwidth}P{0.30\textwidth}P{0.42\textwidth}@{}}
 \toprule
@@ -206,10 +197,10 @@ integrate exactly into the final received-heat fields.
 
 \section{Actual simulation results}
 
-The current workflow state is
+The current analysis procedure state is
 \textbf{\WorkflowStatus}; the scientific decision is
 \textbf{\VerificationStatus}, with \CompletedVariantCount{} of
-\RequiredVariantCount{} required variants having evaluable runtime evidence.
+\RequiredVariantCount{} required simulation conditions having evaluable execution evidence.
 Reason: \VerificationReason.  The common executed-binary SHA-256 is
 \ReadableHash{\ExecutedBinarySHA}.
 
@@ -217,18 +208,17 @@ Reason: \VerificationReason.  The common executed-binary SHA-256 is
 \begin{figure}[p]
   \centering
   \includegraphics[width=\textwidth]{heat_response_comparison.pdf}
-  \caption{Representative whole-domain ELMFIRE result, independent oracle,
+  \caption{Representative whole-domain ELMFIRE result, independent reference calculation,
   and difference.  This figure is generated only from completed output.}
 \end{figure}
-}{\fbox{\parbox{0.96\textwidth}{Actual-result figure unavailable because the
-required ELMFIRE variants have not been evaluated.}}}
+}{\noindent\fbox{\parbox{0.96\textwidth}{Actual-result figure unavailable because the
+required ELMFIRE simulation conditions have not been evaluated.}}}
 
 \section{Calculated metrics and verification decision}
 
 \input{readable_results.tex}
 
-
-\textbf{Current decision: \VerificationStatus.}  NOT RUN is a workflow state,
+\textbf{Current decision: \VerificationStatus.}  NOT RUN is a analysis procedure state,
 not evidence of verification and never maps to PASS.
 
 \section{Technical interpretation}
@@ -250,11 +240,11 @@ input and aggregation paths without substituting planned values for output.
 
 This case verifies deterministic source HRR and heat-transfer mechanics for a
 fixed model-2 ellipse.  It does not verify physical calibration, flame-shape
-regressions across wind and geometry (CASE43), ignition thresholds, ROS,
+regressions across wind and geometry (CASE43), ignition thresholds, rate of spread (ROS),
 wildland--urban transitions, embers, fuel consumption, or convergence.  Its
 intended spatial-property interpretation is tested against the pinned source
-revision. No ELMFIRE
-source file is copied or imported at runtime.
+revision. The reference calculation is evaluated independently of the
+ELMFIRE simulation.
 
 \begin{thebibliography}{9}
 \bibitem{PurnomoPCI2024} D. M. J. Purnomo et al., ``Reconstructing modes of destruction in wildland--urban interface fires using a semi-physical level-set model,'' \emph{Proceedings of the Combustion Institute}, 40 (2024), 105755. \href{https://doi.org/10.1016/j.proci.2024.105755}{doi:10.1016/j.proci.2024.105755}.

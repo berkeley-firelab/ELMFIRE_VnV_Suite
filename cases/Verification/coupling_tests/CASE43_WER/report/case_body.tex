@@ -1,8 +1,8 @@
 \section{Verification purpose}
 
-This case verifies the coupled response from WU-E source wind and building
+This case verifies the coupled response from Wildland--Urban ELMFIRE (WU--E) source wind and building
 geometry through the model-2 ellipse and heat-flux routines to the
-transient direct-flame-contact and radiation rasters.  It is capable of
+transient direct-flame-contact (DFC) and radiation rasters.  It is capable of
 exposing an incorrect wind-unit conversion, a wrong branch predicate, a
 regression-coefficient or ellipse-construction error, a wind-direction sign or
 raster-orientation error, failure of the separation clamp, and disagreement
@@ -10,24 +10,17 @@ between constant and raster building-parameter input paths.
 
 One initially burning structure is held stationary by a zero spread-adjustment
 raster.  Spotting, terrain, moisture variation, and secondary propagation are
-disabled. Twenty-three deterministic variants exercise both source-wind branch
+disabled. Twenty-three deterministic simulation conditions exercise both source-wind branch
 boundaries, Hamada parameters (A) and (D), four right-angle rotations, and
 constant/raster equivalence, plus the intended source fuel-reach factors 1 for
-structures and 1/3 for vegetation. The oracle implements the intended downscaled
+structures and 1/3 for vegetation. The reference calculation implements the intended downscaled
 WU--E formulation.  The pinned source is the system under test, so a mismatch
 is reported rather than copied into the expected result.
 
-\textbf{Verification question.} Do all required variants reproduce the
-intended HRRPUA and full-domain DFC/radiation maps within normalized
+\textbf{Verification question.} Do all required simulation conditions reproduce the
+intended heat-release rate (HRR) per unit area (HRRPUA) and full-domain DFC/radiation maps within normalized
 $L_1$ error \HeatMapTolerance, preserve the paired clamp, rotation, and
 constant/raster invariants, and create no additional burning cell?
-
-
-\paragraph{Reading the notation.}
-WU--E denotes the Wildland--Urban ELMFIRE model. HRR is heat-release rate;
-HRRPUA is heat-release rate per unit area. DFC means direct flame contact,
-TOA means time of arrival, and ROS means rate of spread. FTP is the material
-fire-thermal property used in the intended heat-to-spread law.
 
 \ReportOverview
 
@@ -98,25 +91,23 @@ The physical heat-affecting zone is $HAZ=100$ m and its search radius is
 $\lceil HAZ/\Delta x\rceil$. Radiation is complementary to DFC through
 $(1-f_d)$. The source instead uses a continuous angular ellipse, 0.3 heat
 factors, cell-area normalization, and a cell-count band; these are explicit
-deviation targets. The
-canonical namelist contains standalone tokens; preprocessing expands them into
-concrete case-local paths and variant values.
+deviation targets. Preprocessing assigns the prescribed parameter values
+independently to each simulation condition.
 
 \section{Derivation of expected behavior}
 
 The ellipse-regression coefficients and branch predicates were independently
-transcribed from the pinned WU-E spread-rate snapshot identified on the title page; the
-complete file hashes are recorded in \texttt{case.yaml}.  The mapped namelist,
-spread-rate, and level-set files were byte-identical to that commit even though
-the inspected working tree contained other modified files and untracked
-directories.  Purnomo et al. describe the wind-responsive urban flame ellipse
+transcribed from the specified WU-E spread-rate formulation. The reviewed
+configuration interpretation, spread-rate calculation, and level-set formulation
+were identical to the specified ELMFIRE source revision; this identity claim
+does not extend to all other model components. Purnomo et al. describe the wind-responsive urban flame ellipse
 and heat-transfer coupling in the peer-reviewed WU--E publications
 \cite{PurnomoPCI2024,PurnomoIJWF2024}.  The detailed equations above document
 the intended implemented model directly. The executable snapshot is evaluated against, rather than substituted
 for, this formulation.
 
 At $V=10$ and $V=17.3~\si{\metre\per\second}$, equality belongs to the quadratic
-branch.  The immediate neighboring variants on each side must instead use the
+branch.  The immediate neighboring simulation conditions on each side must instead use the
 linear low- or high-wind coefficients.  The $D=75~\si{\metre}$ field must be
 identical to $D=50~\si{\metre}$.  A raster parameter field equal to the constants
 must produce the same heat maps.  With all other inputs invariant, rotating
@@ -132,7 +123,7 @@ the HRR transient.
 \begin{figure}[p]
   \centering
   \includegraphics[width=\textwidth]{expected_response.pdf}
-  \caption{Intended-model oracle for the branch, characteristic building
+  \caption{Intended-model reference calculation for the branch, characteristic building
   dimension, and separation sweeps. These are predicted values, not ELMFIRE output.}
 \end{figure}
 
@@ -152,20 +143,18 @@ to be zero after ELMFIRE's step-level reset.  A 0.5-percent map tolerance permit
 precision raster output while remaining much smaller than any intended branch
 or parameter response.  Paired algebraic invariants use $10^{-5}$; rotation
 uses the primary 0.5-percent tolerance because trigonometric evaluation occurs
-in single precision.  Each variant must also have a successful-exit completion
-marker whose SHA-256 fingerprint matches the current concrete namelist, every
-runtime input raster, and both case-local fuel tables.  The marker also binds
-the executed binary, case/evaluator artifacts, captured standard output/error
-streams, and complete output-file snapshot by SHA-256.  Because ELMFIRE's first
-scheduled dump occurs after one \texttt{DTDUMP} interval, the dump manifest
+in single precision. Each simulation condition must have a confirmed successful
+completion with matching SHA-256 identities for the simulation settings,
+spatial inputs, both fuel-property tables, reference and analysis methods,
+ELMFIRE program, simulation record, and all results. Because ELMFIRE's first
+scheduled dump occurs after one scheduled output interval, the dump simulation specification
 must contain exactly 60 and
 120 seconds, with a unique final record at the
-configured stop; filenames alone cannot establish a valid run.  The completion
-record stores the resolved executable path; mapping that binary to the stated
-source revision remains an operator provenance duty.
+configured stop. Output labels alone cannot establish a valid simulation.
+The model-program identity is retained, but its relationship to the stated
+source revision must be established separately.
 
 \begin{center}
-
 
 \begin{longtable}{@{}P{0.23\textwidth}P{0.30\textwidth} P{0.18\textwidth}P{0.15\textwidth}@{}}
 \toprule
@@ -175,20 +164,19 @@ Piecewise source curve & All HRR transient rasters; normalized $L_1$ & $\le0.005
 Ellipse heat kernel & Full DFC and radiation maps at peak HRRPUA & each $\le0.005$ & branches, coefficients, orientation\\
 $D$ clamp and input paths & Pairwise full-map normalized $L_1$ & each $\le10^{-5}$ & clamp or I/O divergence\\
 Rotation covariance & Rotated DFC-plus-radiation maps & $\le0.005$ & angle, sign, or raster orientation\\
-Vegetation-source factor & Full DFC/radiation maps for the forest-source variant & each $\le0.005$ & unused 1/3 factor or initial-source HRR suppression\\
-No propagation & Final TOA and off-source HRR cells & zero additional cells & confounding source creation\\
+Vegetation-source factor & Full DFC/radiation maps for the forest-source simulation condition & each $\le0.005$ & unused 1/3 factor or initial-source HRR suppression\\
+No propagation & Final time of arrival (TOA) and off-source HRR cells & zero additional cells & confounding source creation\\
 \bottomrule
 \end{longtable}
 \end{center}
 
-All 23 variants and all required fields must be present. Overall PASS requires
+All 23 simulation conditions and all required fields must be present. Overall PASS requires
 every metric to pass; missing, duplicate, malformed, stale, or mistimed
 evidence produces NOT EVALUABLE.
 
 \section{Simulation configuration and predicted outcome}
 
 \begin{center}
-
 
 \begin{longtable}{@{}P{0.22\textwidth}P{0.30\textwidth}P{0.42\textwidth}@{}}
 \toprule
@@ -197,7 +185,7 @@ Parameter & Configured value & Isolation role\\
 Grid & \CaseGridSize, \CaseCellSize\ m cells & full heat-kernel domain\\
 CRS & EPSG:32610 & explicit metric coordinates\\
 Time & $\Delta t=1$ s, stop 120 s, dump 60 s & exact peak-HRR dump\\
-Initial source & one central FBFM91 cell & stationary WU-E source\\
+Initial source & one central fire behavior fuel model (FBFM) 91 cell & stationary WU-E source\\
 Background & nonburnable FBFM93, adjustment 0 & prevents propagation\\
 Spotting/terrain & disabled/flat & removes confounders\\
 Model selector & WUI model type 2 & UMD/UCB implementation\\
@@ -215,21 +203,21 @@ without adding a physical source during the experiment.
   \centering
   \includegraphics[width=\textwidth]{input_configuration.pdf}
   \caption{Whole-domain prepared configuration generated from the
-  \texttt{rotation\_wd270} GeoTIFF inputs.  The single negative PHI cell is the
+  the 270-degree wind-direction condition GeoTIFF inputs.  The single negative PHI cell is the
   initial WU-E source; FBFM93 and zero adjustment prevent secondary spread.}
 \end{figure}
 
 The predicted output is a fixed-source HRR history and wind-oriented DFC and
-radiation fields.  Branch-adjacent variants may jump because the source itself
+radiation fields.  Branch-adjacent simulation conditions may jump because the source itself
 uses distinct regressions; the test checks that behavior rather than imposing
 continuity absent from the implementation.
 
 \section{Actual simulation results}
 
-The current workflow state is
+The current analysis procedure state is
 \textbf{\WorkflowStatus}; the scientific decision is
 \textbf{\VerificationStatus}, with \CompletedVariantCount{} of
-\RequiredVariantCount{} required variants having evaluable runtime evidence.
+\RequiredVariantCount{} required simulation conditions having evaluable execution evidence.
 Reason: \VerificationReason.  The common executed-binary SHA-256 is
 \ReadableHash{\ExecutedBinarySHA}.
 
@@ -237,18 +225,17 @@ Reason: \VerificationReason.  The common executed-binary SHA-256 is
 \begin{figure}[p]
   \centering
   \includegraphics[width=\textwidth]{heat_map_comparison.pdf}
-  \caption{Representative whole-domain ELMFIRE result, independent oracle, and
-  difference.  This figure is generated only from completed case-local output.}
+  \caption{Representative whole-domain ELMFIRE result, independent reference calculation, and
+  difference.  This figure is generated only from completed case-specific output.}
 \end{figure}
-}{\fbox{\parbox{0.96\textwidth}{Actual-result figure unavailable because the
-required ELMFIRE variants have not been evaluated.}}}
+}{\noindent\fbox{\parbox{0.96\textwidth}{Actual-result figure unavailable because the
+required ELMFIRE simulation conditions have not been evaluated.}}}
 
 \section{Calculated metrics and verification decision}
 
 \input{readable_results.tex}
 
-
-\textbf{Current decision: \VerificationStatus.}  NOT RUN is a workflow state,
+\textbf{Current decision: \VerificationStatus.}  NOT RUN is a analysis procedure state,
 not evidence of verification and never maps to PASS.
 
 \section{Technical interpretation}

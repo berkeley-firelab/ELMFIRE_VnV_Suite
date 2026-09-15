@@ -7,6 +7,8 @@ are outputs/input_statistics.json and reproducible PDF figures.
 
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import hashlib
 import json
 import math
@@ -221,6 +223,7 @@ def observation_statistics(
 
 def save_figure(fig: plt.Figure, name: str) -> None:
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIGURE_DIR / name, format="pdf", bbox_inches="tight")
     plt.close(fig)
 
@@ -234,32 +237,32 @@ def create_figures(
 ) -> None:
     fig, axes = plt.subplots(2, 2, figsize=(10.0, 7.6))
     panels = [
-        ("dem", "Elevation"),
-        ("slp", "Slope"),
-        ("fbfm40b", "Fuel-model code"),
-        ("ignition_mask", "Ignition mask"),
+        ("dem", "Elevation (m)"),
+        ("slp", "Slope (degrees)"),
+        ("fbfm40b", "Fuel-model classification"),
+        ("ignition_mask", "Ignition eligibility (dimensionless)"),
     ]
     for axis, (key, title) in zip(axes.ravel(), panels):
         image = axis.imshow(
             samples[key], cmap="terrain" if key == "dem" else "viridis", interpolation="nearest"
         )
-        fig.colorbar(image, ax=axis, shrink=0.82)
-        axis.set(title=title, xlabel="sample column", ylabel="sample row")
+        fig.colorbar(image, ax=axis, shrink=0.82, label=title)
+        axis.set(title=title, xlabel="Sample column (index)", ylabel="Sample row (index)")
     fig.suptitle(f"{CASE_DIR.name}: active landscape and ignition inputs")
     save_figure(fig, "input_overview.pdf")
 
     fig, axes = plt.subplots(2, 3, figsize=(11.0, 6.8))
     labels = {
-        "ws": "Wind speed",
-        "wd": "Wind direction",
-        "m1": "1-h moisture",
-        "m10": "10-h moisture",
-        "m100": "100-h moisture",
+        "ws": "20-ft wind speed (mph)",
+        "wd": "Wind direction (degrees)",
+        "m1": "1-h dead-fuel moisture (%)",
+        "m10": "10-h dead-fuel moisture (%)",
+        "m100": "100-h dead-fuel moisture (%)",
     }
     for axis, key in zip(axes.ravel(), labels):
         values = samples[key]
         axis.hist(values[np.isfinite(values)], bins=40, color="#35618f", alpha=0.9)
-        axis.set(title=labels[key], ylabel="sample count")
+        axis.set(title=labels[key], xlabel=labels[key], ylabel="Sample count")
     axes.ravel()[-1].axis("off")
     fig.suptitle(f"{CASE_DIR.name}: distributions over the 25 active weather bands")
     save_figure(fig, "weather_summary.pdf")
@@ -267,14 +270,14 @@ def create_figures(
     fig, axes = plt.subplots(3, 1, figsize=(9.5, 8.0), sharex=True)
     hours = np.arange(len(series["ws"])) * (weather_interval_s / 3600.0)
     axes[0].plot(hours, series["ws"], marker="o", ms=3, label="wind speed")
-    axes[0].set_ylabel("domain mean")
+    axes[0].set_ylabel("Mean wind speed (mph)")
     axes[0].legend()
     axes[1].plot(hours, series["wd"], marker="o", ms=3, color="#8c4f2b", label="wind direction")
-    axes[1].set_ylabel("degrees")
+    axes[1].set_ylabel("Arithmetic mean direction (degrees)")
     axes[1].legend()
     for key, label in (("m1", "1-h"), ("m10", "10-h"), ("m100", "100-h")):
         axes[2].plot(hours, series[key], label=label)
-    axes[2].set(xlabel="hours from first weather band", ylabel="percent")
+    axes[2].set(xlabel="Time from first weather sample (h)", ylabel="Dead-fuel moisture (%)")
     axes[2].legend(ncol=3)
     fig.suptitle(f"{CASE_DIR.name}: domain-mean weather evolution")
     save_figure(fig, "weather_time_series.pdf")
@@ -285,11 +288,11 @@ def create_figures(
         latitude = [row[1] for row in observations]
         elapsed = [(row[2] - event_start).total_seconds() / 3600.0 for row in observations]
         scatter = ax.scatter(longitude, latitude, c=elapsed, s=8, cmap="plasma", alpha=0.7)
-        fig.colorbar(scatter, ax=ax, label="hours from configured event start")
+        fig.colorbar(scatter, ax=ax, label="Time from configured event start (h)")
     ax.set(
         title=f"{CASE_DIR.name}: VIIRS detections retained for comparison",
-        xlabel="longitude",
-        ylabel="latitude",
+        xlabel="Longitude (degrees east)",
+        ylabel="Latitude (degrees north)",
     )
     save_figure(fig, "observation_summary.pdf")
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """Postprocess the two-dimensional spatial-resolution sweep."""
+
+from report_language import polish_figure, report_text
 import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
@@ -279,6 +281,7 @@ def write_figure(case_dir, case, manifest, ros_by_dx, terminal_evidence_by_dx):
     fig.suptitle("Two-dimensional spatial-resolution verification", y=0.99)
     figure_dir = case_dir / "figures"
     figure_dir.mkdir(exist_ok=True)
+    polish_figure(fig)
     fig.savefig(figure_dir / FIGURE_FILENAME, bbox_inches="tight")
     plt.close(fig)
 
@@ -307,7 +310,7 @@ def write_macros(case_dir, status, rows, completed, requested, dx10_reference=No
         lines.append("{} & {} & {} & {} \\\\".format(tex(row["metric"]), tex(
             row["limit"]), tex(row["calculated"]), tex(row["status"])))
     lines.append("}")
-    (case_dir / "report" / "metrics_macros.tex").write_text("\n".join(lines) + "\n")
+    (case_dir / "report" / "metrics_macros.tex").write_text(report_text("\n".join(lines) + "\n"))
 
 
 def main():

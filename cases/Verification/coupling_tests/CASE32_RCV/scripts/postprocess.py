@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Compare the rotated ELMFIRE solution with an exact raster rotation."""
 from __future__ import annotations
+
+from report_language import polish_figure
 import json
 from pathlib import Path
 import matplotlib
@@ -90,6 +92,7 @@ def main():
         ax.set_title(title)
         fig.colorbar(im, ax=ax, shrink=0.75)
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG / "verification_summary.pdf", bbox_inches="tight")
     plt.close(fig)
     with rasterio.open(CASE_DIR / "variants/original/inputs/phi.tif") as src:
@@ -98,6 +101,7 @@ def main():
     ax.imshow(phi, origin="upper", cmap="gray")
     ax.set_title("Asymmetric initial level-set mask")
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG / "input_configuration.pdf", bbox_inches="tight")
     plt.close(fig)
     payload = {

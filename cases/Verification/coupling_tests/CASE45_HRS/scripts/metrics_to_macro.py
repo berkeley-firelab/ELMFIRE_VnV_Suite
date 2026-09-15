@@ -2,6 +2,8 @@
 """Validate CASE45 metrics and convert them into fail-visible report macros."""
 from __future__ import annotations
 
+from report_language import report_text
+
 import json
 from pathlib import Path
 
@@ -139,7 +141,7 @@ def main() -> None:
         "}",
         "",
     ]
-    DESTINATION.write_text("\n".join(content), encoding="utf-8")
+    DESTINATION.write_text(report_text("\n".join(content)), encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from report_language import report_text
+
 import json
 from pathlib import Path
 
@@ -66,7 +68,7 @@ def main() -> None:
         "}",
         "",
     ]
-    MACROS_PATH.write_text("\n".join(body), encoding="utf-8")
+    MACROS_PATH.write_text(report_text("\n".join(body)), encoding="utf-8")
     print(f"[OK] wrote {MACROS_PATH}")
 
 

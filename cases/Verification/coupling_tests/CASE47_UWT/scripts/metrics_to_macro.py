@@ -2,6 +2,8 @@
 """Render authoritative CASE47 JSON results as report-safe LaTeX macros."""
 from __future__ import annotations
 
+from report_language import report_text
+
 import json
 import math
 from pathlib import Path
@@ -193,7 +195,7 @@ def main() -> None:
         "}",
         "",
     ]
-    (CASE_DIR / "report/metrics_macros.tex").write_text("\n".join(lines), encoding="utf-8")
+    (CASE_DIR / "report/metrics_macros.tex").write_text(report_text("\n".join(lines)), encoding="utf-8")
 
 
 if __name__ == "__main__":

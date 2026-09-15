@@ -2,6 +2,8 @@
 """Fail-closed evaluation of CASE47's implementation characterization."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import csv
 import hashlib
 import json
@@ -549,6 +551,7 @@ def plot_results(rows: list[dict[str, object]]) -> None:
             for i, value in enumerate(values):
                 if not np.isfinite(value):
                     ax.annotate("no arrival", (0, i), xytext=(5, 0), textcoords="offset points", va="center")
+        polish_figure(fig)
         fig.savefig(CASE_DIR / f"figures/{filename}.pdf", metadata=PDF_METADATA)
         plt.close(fig)
 
@@ -579,6 +582,7 @@ def plot_results(rows: list[dict[str, object]]) -> None:
     ax.set_xlabel("Easting (m)")
     ax.set_ylabel("Northing (m)")
     ax.set_aspect("equal")
+    polish_figure(fig)
     fig.savefig(
         CASE_DIR / "figures/whole_domain_result.pdf",
         metadata={**PDF_METADATA, "Title": "CASE47_UWT whole-domain output"},

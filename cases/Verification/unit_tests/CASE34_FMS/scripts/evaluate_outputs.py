@@ -2,6 +2,8 @@
 """Read case-local ELMFIRE rasters and evaluate an analytical sweep."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import csv
 import json
 import math
@@ -461,11 +463,11 @@ def plot(case_dir: Path, results: dict[str, object]) -> None:
         group_handles.append(
             Line2D([], [], color=color, marker="s", linestyle="none", label=group)
         )
-    axes[0].set(xlabel=results.get("x_label", "sweep value"), ylabel="ROS (m/min)")
-    axes[1].set(xlabel=results.get("x_label", "sweep value"), ylabel="Reaction intensity (kW/m2)")
+    axes[0].set(xlabel=results.get("x_label", "sweep value"), ylabel="Rate of spread (m/min)")
+    axes[1].set(xlabel=results.get("x_label", "sweep value"), ylabel="Reaction intensity (kW/m$^2$)")
     method_handles = [
         Line2D([], [], color="black", marker="D", markerfacecolor="none",
-               markeredgewidth=1.6, linestyle="none", label="Hand calculation"),
+               markeredgewidth=1.6, linestyle="none", label="Independent calculation"),
         Line2D([], [], color="black", marker="o", linestyle="none", label="ELMFIRE"),
     ]
     model_legend = axes[0].legend(
@@ -480,6 +482,7 @@ def plot(case_dir: Path, results: dict[str, object]) -> None:
     for axis in axes:
         axis.grid(alpha=0.25)
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(figure_dir / "sweep_response.pdf", bbox_inches="tight")
     plt.close(fig)
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Convert CASE48_WGC metrics JSON into fail-visible, report-safe macros."""
 
+from report_language import report_text
+
 import json
 import math
 from pathlib import Path
@@ -168,7 +170,7 @@ def main() -> None:
         "\\newcommand{\\MetricRows}{%", *rows, "}", "",
     ]
     (CASE_DIR / "report" / "metrics_macros.tex").write_text(
-        "\n".join(lines), encoding="utf-8"
+        report_text("\n".join(lines)), encoding="utf-8"
     )
 
 

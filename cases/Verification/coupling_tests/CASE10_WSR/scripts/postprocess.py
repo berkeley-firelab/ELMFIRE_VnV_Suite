@@ -6,6 +6,8 @@ cells by physical structure, computes declared pass/fail metrics, and always
 writes a complete metrics table and a report-ready vector figure.
 """
 
+from report_language import polish_figure, report_text
+
 import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
@@ -573,6 +575,7 @@ def plot_reference_figures(case_dir, case, profiles):
             if handles:
                 axis.legend(fontsize=7)
         fig.suptitle(labels[role])
+        polish_figure(fig)
         fig.savefig(case_dir / "figures" / f"{role}_reference.pdf", dpi=FIGURE_DPI)
         plt.close(fig)
 
@@ -643,6 +646,7 @@ def plot_figure(case_dir, case, manifest, profiles, rows):
     ax.set_xticks([0, 1], ["not evaluated", "acceptance"])
     ax.set_title("(d) Verification decision summary")
     ax.invert_yaxis()
+    polish_figure(fig)
     fig.savefig(case_dir / "figures" / "wui_structure_resolution.pdf", dpi=FIGURE_DPI)
     plt.close(fig)
 
@@ -722,7 +726,7 @@ def write_artifacts(case_dir, case, manifest, profiles, rows, native_status, ove
         "}",
     ]
     (case_dir / "report" / "metrics_macros.tex").write_text(
-        "\n".join(macros) + "\n", encoding="utf-8"
+        report_text("\n".join(macros) + "\n"), encoding="utf-8"
     )
 
 

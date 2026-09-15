@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from report_language import polish_figure, report_text
+
 from dataclasses import replace
 import importlib.util
 import json
@@ -167,7 +169,7 @@ def _write_metrics_macros(report_dir: Path, payload: dict) -> None:
     lines.append(r"\newcommand{\MetricRows}{%")
     lines.extend(metric_rows)
     lines.append("}")
-    (report_dir / "metrics_macros.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (report_dir / "metrics_macros.tex").write_text(report_text("\n".join(lines) + "\n"), encoding="utf-8")
 
 
 def _write_summary_figure(fig_path: Path, payload: dict) -> None:
@@ -194,7 +196,7 @@ def _write_summary_figure(fig_path: Path, payload: dict) -> None:
             table_rows.append([label, metric["name"], target, measured, decision])
         table = ax.table(
             cellText=table_rows,
-            colLabels=["Variant", "Metric", "Target", "Measured", "Status"],
+            colLabels=["Condition", "Metric", "Target", "Measured", "Status"],
             cellLoc="left",
             colLoc="left",
             loc="center",
@@ -205,6 +207,7 @@ def _write_summary_figure(fig_path: Path, payload: dict) -> None:
     else:
         ax.text(0.5, 0.5, "No metrics are available.", ha="center", va="center")
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(fig_path, format="pdf", bbox_inches="tight")
     plt.close(fig)
 
@@ -247,20 +250,21 @@ def _write_whole_domain_figure(case_dir: Path, figure_dir: Path, variants) -> No
         cmap="viridis",
     )
     ax.set(
-        xlabel="Easting",
-        ylabel="Northing",
-        title=f"{selected_label}: {selected.name} (whole domain)",
+        xlabel="Easting (m)",
+        ylabel="Northing (m)",
+        title=f"{case_dir.name}: whole-domain simulated field",
     )
-    fig.colorbar(image, ax=ax, label="ELMFIRE raster value")
+    fig.colorbar(image, ax=ax, label=("Fire arrival time (s)" if selected.name.startswith("time_of_arrival_") else "Simulated field (units described in caption)"))
     ax.text(
         0.01,
         0.01,
-        f"source: {selected.relative_to(case_dir)}; CRS: {crs}",
+        f"Coordinate reference system: {crs}",
         transform=ax.transAxes,
         fontsize=7,
         bbox={"facecolor": "white", "alpha": 0.75, "edgecolor": "none"},
     )
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(figure_dir / "whole_domain_result.pdf", format="pdf", bbox_inches="tight")
     plt.close(fig)
 

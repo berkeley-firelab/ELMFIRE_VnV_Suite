@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import csv
 import hashlib
 import json
@@ -582,6 +584,7 @@ def plot_results(spec: dict, groups: dict[str, list[dict]]) -> None:
     axes[0, 0].legend(fontsize=12)
     axes[0, 1].legend(fontsize=12)
     axes[1, 1].legend(fontsize=12)
+    polish_figure(fig)
     fig.savefig(FIG_DIR / "convergence.pdf", bbox_inches="tight",
                 metadata={"CreationDate": None, "ModDate": None})
     plt.close(fig)
@@ -598,6 +601,7 @@ def plot_results(spec: dict, groups: dict[str, list[dict]]) -> None:
     fig.colorbar(image, ax=ax, label="Time of arrival (s)")
     ax.set(xlabel="Easting (m)", ylabel="Northing (m)",
            title=rf"High-HRR TOA ($\Delta t={finest['dt_s']:g}$ s)")
+    polish_figure(fig)
     fig.savefig(FIG_DIR / "domain_result.pdf", bbox_inches="tight",
                 metadata={"CreationDate": None, "ModDate": None})
     plt.close(fig)

@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import csv
 import json
 from pathlib import Path
@@ -198,6 +200,7 @@ def save_figures(
     for axis in axes:
         axis.grid(alpha=0.3)
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG_DIR / "verification_summary.pdf", bbox_inches="tight")
     plt.close(fig)
 
@@ -208,6 +211,7 @@ def save_figures(
            title=f"Peak ELMFIRE DFC field at t={times_dfc[peak_index]:g} s")
     fig.colorbar(image, ax=ax, label=r"DFC heat flux (kW m$^{-2}$)")
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG_DIR / "whole_domain_result.pdf", bbox_inches="tight")
     plt.close(fig)
 

@@ -7,6 +7,8 @@ extracts leading-edge/ROS histories directly from every dumped level-set field,
 and evaluates each variant's accumulation plateau. It then writes JSON, LaTeX
 macros, and vector PDFs. It never runs ELMFIRE.
 """
+
+from report_language import polish_figure, report_text
 from spatial_evidence import generate_spatial_evidence
 from pathlib import Path
 import csv
@@ -258,6 +260,7 @@ def write_reference_figure(profiles, figures):
                   ha="left", va="top", fontweight="bold")
         axis.grid(alpha=0.2)
         axis.legend(fontsize=7)
+    polish_figure(fig)
     fig.savefig(figures / "steady_transport_reference.pdf")
     plt.close(fig)
 
@@ -522,7 +525,7 @@ def main():
     lines = [
         rf"\expandafter\def\csname metric@{key}\endcsname{{{latex_value(value)}}}" for key,
         value in flat.items()]
-    (report / "metrics_macros.tex").write_text("\n".join(lines) + "\n")
+    (report / "metrics_macros.tex").write_text(report_text("\n".join(lines) + "\n"))
     if all(name in profiles for name in (
             "transport_impulse", "wildland_no_delay",
             "transport_impulse_accumulation", "wildland_no_delay_accumulation")):

@@ -7,6 +7,8 @@ consumption ratios, profile-convergence errors, surface-TOA invariance,
 nonnegativity checks, the Boolean decision, LaTeX macros, and a vector PDF.
 It never runs ELMFIRE. Arrays are [row, column]; the two-cell halo is excluded.
 """
+
+from report_language import polish_figure, report_text
 import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
@@ -187,6 +189,7 @@ def write_reference_figures(case, by_key, history_by_dx):
         handles, _ = axis.get_legend_handles_labels()
         if handles:
             axis.legend(fontsize=8)
+    polish_figure(fig)
     fig.savefig(FIG_DIR / "firebrand_consumption_state.pdf", format="pdf")
     plt.close(fig)
 
@@ -223,6 +226,7 @@ def write_reference_figures(case, by_key, history_by_dx):
     for axis in axes:
         axis.grid(alpha=0.2)
         axis.legend(fontsize=8)
+    polish_figure(fig)
     fig.savefig(FIG_DIR / "firebrand_consumption_convergence.pdf", format="pdf")
     plt.close(fig)
 
@@ -370,6 +374,7 @@ def main():
                     title="Retained active population", ylim=(0, max(1.05, values.max() * 1.08)))
         axes[2].legend(fontsize=8)
         axes[2].grid(axis="y", alpha=0.25)
+        polish_figure(fig)
         fig.savefig(FIG_DIR / "firebrand_consumption_verification.pdf", format="pdf")
         plt.close(fig)
         history_by_dx = {
@@ -415,7 +420,7 @@ def main():
         safe = re.sub(r"[^A-Za-z0-9]+", "", key)
         lines.append(
             f"\\expandafter\\def\\csname metric@{safe}\\endcsname{{{macro_value(value)}}}")
-    (REPORT_DIR / "metrics_macros.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (REPORT_DIR / "metrics_macros.tex").write_text(report_text("\n".join(lines) + "\n"), encoding="utf-8")
     print(
         f"[OK] evaluated {metrics['evaluated_variants']}/{required} variants: {metrics['status']}")
 

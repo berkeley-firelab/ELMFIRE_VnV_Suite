@@ -43,3 +43,9 @@ Require evidence or a user decision for at least:
 Inspect the target ELMFIRE source for accepted keys, defaults, enums and units.
 An old namelist proves historical use, not compatibility or continued semantic
 equivalence.
+
+## Reader-facing descriptions
+
+Apply [report_language.md](report_language.md). Describe input quantities, sources,
+transformations, uncertainty, and semantic output selection without filenames,
+paths, script names, or software-development jargon in reports and figures.

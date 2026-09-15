@@ -2,6 +2,8 @@
 """Regenerate every deterministic CASE44 variant and reference-only figure."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import json
 import re
 import shutil
@@ -245,6 +247,7 @@ def plot_inputs(representative: dict[str, object]) -> None:
         axis.tick_params(axis="x", rotation=30)
     fig.suptitle("CASE44 prepared inputs")
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
+    polish_figure(fig)
     fig.savefig(FIGURE_DIR / "input_configuration.pdf", bbox_inches="tight",
                 metadata={"CreationDate": None, "ModDate": None})
     plt.close(fig)
@@ -255,21 +258,22 @@ def plot_expected() -> None:
     fig, axes = plt.subplots(3, 1, figsize=(7.2, 8.0), constrained_layout=True)
     for name, curve in CURVES.items():
         axes[0].plot(times, [hrr_transient(time, curve) for time in times], marker="o", ms=2.5, label=name.replace("_", " "))
-    axes[0].set(xlabel="Time after ignition (s)", ylabel=r"HRRPUA (kW m$^{-2}$)", title="Source design-fire curves")
+    axes[0].set(xlabel="Time after ignition (s)", ylabel="Heat-release rate\nper unit area\n(kW m$^{-2}$)", title="Source design-fire curves")
     axes[0].legend(fontsize=12)
 
     targets = ["nbf_0", "base", "nbf_0p5", "nbf_1"]
     x_values = [float(TARGET_MODELS[name]["nonburnable_fraction"]) for name in targets]
-    axes[1].plot(x_values, [1.0 - value for value in x_values], "o-", label="DFC multiplier")
-    axes[1].plot(x_values, [(1.0 - value) * 0.8 for value in x_values], "s--", label="radiation table multiplier")
+    axes[1].plot(x_values, [1.0 - value for value in x_values], "o-", label="Direct-flame-contact multiplier")
+    axes[1].plot(x_values, [(1.0 - value) * 0.8 for value in x_values], "s--", label="Radiative heat-transfer multiplier")
     axes[1].set(xlabel="Spatial nonburnable fraction (-)", ylabel="Coefficient (-)", title="Spatial target response")
     axes[1].legend(fontsize=12)
 
     adjustment = np.array([0.25, 0.5, 0.75, 1.0])
     axes[2].plot(adjustment, adjustment ** -2, "o-")
-    axes[2].set(xlabel="HRR_ELLIPSE_ADJ (-)", ylabel=r"Relative $C_h$ (-)", title="Inverse-square normalization")
+    axes[2].set(xlabel="Heat-release ellipse scale factor (-)", ylabel="Relative heat-area\ncoefficient, $C_h$ (-)", title="Inverse-square normalization")
     for axis in axes:
         axis.grid(alpha=0.25)
+    polish_figure(fig)
     fig.savefig(
         FIGURE_DIR / "expected_response.pdf", bbox_inches="tight",
         metadata={"CreationDate": None, "ModDate": None},

@@ -1,44 +1,34 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \texttt{\CaseID}.  This manufactured coupling test verifies the
-WU--E model's conversion of heat received by an urban cell into its local
-level-set rate of spread.  It exercises \texttt{UMD\_UCB\_BLDG\_SPREAD} and the
-subsequent directional velocity construction in
-\texttt{COMPUTE\_SPREAD\_VELOCITIES}. The intended oracle uses a fixed
-material \texttt{FTP\_CRIT}; it is sensitive to energy or unit normalization,
+This manufactured coupling test verifies the
+Wildland--Urban ELMFIRE (WU--E) model's conversion of heat received by an urban cell into its local
+level-set rate of spread (ROS). It exercises the heat-driven building-spread
+formulation and subsequent construction of the directional spread velocity.
+The intended reference calculation uses a fixed critical material fire-thermal
+property (FTP); it is sensitive to energy or unit normalization,
 ellipse partitioning, normal-vector orientation, an artificial 30,000-kJ or
 35-mph discontinuity, and failure to honor the material table. The source
-revision reviewed for the contract is
+revision reviewed for the verification specification is
 \SourceCommit.
 
-The design review did not use a globally clean checkout.  The five reviewed
-files enumerated in \texttt{case.yaml} were byte-identical to that commit;
-their SHA-256 digests are recorded there.  At review time
-\texttt{elmfire.f90}, \texttt{elmfire\_io.f90}, and
-\texttt{elmfire\_subs.f90} were modified and untracked entries were also
-present.  Those paths were outside the reviewed file set.  No case runtime
-script inspects the checkout, and the recorded commit does not by itself
-authenticate a subsequently supplied executable.
+The five reviewed model components were identical to that source revision.
+The simulation, output, and initialization procedures contained other changes
+outside the reviewed components. Consequently, the design review establishes
+the provenance of the reference formulation, not the identity of every
+component in a subsequently supplied ELMFIRE version.
 
 One burning urban source and one adjacent, initially positive urban receiver
 form the measured pair in a nonburnable domain.  Four disconnected urban guard
 cells keep the tagged-list termination guard inactive but remain far from the
 front and are not observables.  Per-step energy, wind, receiver normal,
-design-fire amplitude, and table \texttt{FTP\_CRIT} are varied; spotting,
+design-fire amplitude, and table critical material fire-thermal property are varied; spotting,
 crown fire, terrain, moisture gradients, and stochastic forcing are disabled.
 This is implementation verification, not evidence that the empirical response
-is physically valid.  The verification question is: for all 12 variants, does
+is physically valid.  The verification question is: for all 12 simulation conditions, does
 the executable's receiver-cell spread-rate raster agree within
 \ROSTolerance{} relative error with the independently recomputed mapping driven
-by its own recorded DFC-plus-radiation stimulus, while also satisfying the
+by its own recorded direct flame contact (DFC)-plus-radiation stimulus, while also satisfying the
 continuity, directional, amplitude, and FTP-response comparisons?
-
-
-\paragraph{Reading the notation.}
-WU--E denotes the Wildland--Urban ELMFIRE model. HRR is heat-release rate;
-HRRPUA is heat-release rate per unit area. DFC means direct flame contact,
-TOA means time of arrival, and ROS means rate of spread. FTP is the material
-fire-thermal property used in the intended heat-to-spread law.
 
 \ReportOverview
 
@@ -75,7 +65,7 @@ offset \(e\).  The three response weights are
  f_h=a+e,\qquad f_s=2b,\qquad f_b=a-e,
 \]
 so the nominal head, side, and back velocities are
-\(V_i=Uf_i/(f_h+f_s+f_b)\).  The case-local evaluator then applies the same
+\(V_i=Uf_i/(f_h+f_s+f_b)\).  The case-specific evaluator then applies the same
 closed ellipse-normal construction, rather than treating these three labels as
 three scalar shortcuts.  In full, for front normal
 \(\boldsymbol n=(n_x,n_y)\) and direction-of-maximum-spread unit vector
@@ -109,10 +99,10 @@ are east (head), west (back), and north (side); raster rows run north to south
 while the stored mathematical normal is expressed in east/north coordinates.
 
 The upstream heat values are recorded stimuli for this case; CASE43--44 verify
-their governing equations. Here \texttt{BLDG\_AREA}=20 denotes the source's
+their governing equations. Here characteristic building dimension=20 denotes the source's
 linear characteristic building dimension in metres, not an area in square
 metres. The input generator chooses design-fire amplitudes deterministically,
-but the downstream oracle always uses the heat actually written by ELMFIRE.
+but the downstream reference calculation always uses the heat actually written by ELMFIRE.
 For traceability, the pinned source currently uses the following non-normative
 normalization while constructing that stimulus:
 \[
@@ -140,16 +130,16 @@ recorded heat.
 
 The energy triplet is constructed at \(29900\), \(30000\), and \(30100\) kJ.
 The generator uses an explicit IEEE-754 binary32 transcription of the reviewed
-default-\texttt{REAL} operation sequence to select decimal table amplitudes;
+default-single-precision arithmetic operation sequence to select decimal table amplitudes;
 the planned realization is exact at all three values, including equality, and
-is recorded in each variant manifest. Executable heat output remains required
+is recorded in each simulation specification. Executable heat output remains required
 to establish the realized stimulus. With fixed FTP, local speed divided by
 recorded energy must be continuous across 30,000 kJ. Likewise, the 34.9,
 35.0, and 35.1-mph cases include the small physical ellipse change but no
 artificial divisor jump. A discontinuity at either boundary identifies the
 known source-only branches.
 
-The terminal spread-rate raster is populated only from \texttt{LIST\_BURNED},
+The terminal spread-rate raster is populated only from the set of cells recorded as burned,
 so an arbitrary positive receiver would not be observable.  The prepared
 receiver value is instead $\phi_r=0.001>0$. Both source raster readers
 unconditionally add a perturbation $10^{-3}(0.5-R)$, with $R\in[0,1)$;
@@ -173,65 +163,64 @@ where $v_n$ is normal velocity and $U$ bounds the velocity magnitude, both
 in metres per second. The bound covers input-noise gradients and discards
 second-stage inward transport. It is an intended-law setup check; actual
 arrival remains independently required. All twelve receivers must enter
-\texttt{LIST\_BURNED} at exactly 1~s, with a finite terminal speed.
+the set of cells recorded as burned at exactly 1~s, with a finite terminal speed.
 Four positive guard cells
 keep more than two nodes tagged, and a scheduled ignition at 5~s---strictly
 after the 4~s stop---keeps the first-step stall predicate false without ever
 altering the simulated state.
 
 At fixed geometry, doubling versus halving \(H_p\) gives a heat-flux ratio of
-four. The two \texttt{FTP\_CRIT} variants use 3000 and 6000
+four. The two critical material fire-thermal property simulation conditions use 3000 and 6000
 $\si{\kilo\joule\per\square\metre}$ and are otherwise equivalent. Their heat
 fields must match, while their spread speeds must have the inverse FTP ratio
 $V_{3000}/V_{6000}=2$. The
-\texttt{wind\_equal\_35}, \texttt{normal\_back}, and
-\texttt{normal\_side} variants share 35-mph wind and the same designed received
+equal-energy condition with 35-mph wind, the back-facing receiver, and
+the side-facing receiver simulation conditions share 35-mph wind and the same designed received
 energy; they are the matched head, back, and side comparison, leaving only the
 prescribed receiver normal to select the directional response.
 
-This is a recorded-input oracle: the emitted/received heat field at the exact
+This is a recorded-input reference calculation: the emitted/received heat field at the exact
 receiver-arrival dump is a measured stimulus, while only the downstream
 heat-to-ROS calculation is the object of the numerical comparison.  It
 therefore avoids claiming that one executable
 output independently verifies another upstream heat calculation.  Ellipse
 axes, \(E\) as held in working storage, \(F\), absolute \(U\), component
-velocities, and \texttt{LOW} are internal-only quantities.  They are calculated
+velocities, and ellipse length-to-width ratio are internal-only quantities.  They are calculated
 by the evaluator but cannot be asserted as separately observed executable
 outputs.
 
 \section{Verification metrics and acceptance criteria}
 
-The postprocessor first recomputes the SHA-256 fingerprint of every generated
-runtime namelist, GeoTIFF, and local table.  Each variant must also have a
-matching completion marker written only after a successful ELMFIRE exit.  That
-marker binds the runtime fingerprint, hashed \texttt{expected.json}, evaluator
-hash, exact variant metadata, resolved executable path and hash, stdout/stderr
-snapshot, and complete output-file snapshot.  All 12 markers must identify one
-binary path/hash/size tuple.  Any later change invalidates the run evidence.
+Before evaluation, the simulation settings, spatial inputs, fuel properties,
+reference calculations, and analysis method must match those associated with
+the completed simulation. Their recorded SHA-256 identities are checked,
+together with the full simulation record and model results. All 12 simulation
+conditions must have completed using the same identified ELMFIRE program.
+Any subsequent change to this evidence invalidates the comparison.
 
-With \texttt{DUMP\_EVERY\_STEP}, the exact ledger is dump indices 1--5 at
-times 0, 1, 2, 3, and 4~s, with only index 5 final.  Transient heat filenames
-use those dump indices.  In contrast, terminal TOA and spread-rate filenames
-use the numeric time stamp \texttt{0000004}; the evaluator never mistakes final
-dump index 5 for that time stamp.  It selects DFC plus radiation at the unique
-dump whose time equals the receiver's required 1-s TOA, and compares the
-resulting independent local-speed oracle with the terminal receiver speed
-captured when that cell entered \texttt{LIST\_BURNED}.  The exact-stop transient
-heat values must be reset to zero.  A missing or stale marker, fingerprint or
+With output at every timestep, the exact ledger is dump indices 1--5 at
+times 0, 1, 2, 3, and 4~s, with only index 5 final. Transient heat fields
+are identified by output index, whereas terminal arrival-time and spread-rate
+fields are identified by physical time, 4 s. The final output index 5 is not
+interpreted as an elapsed time. Evaluation selects DFC plus radiation at the unique
+dump whose time equals the receiver's required 1-s time of arrival (TOA), and compares the
+resulting independent local-speed reference calculation with the terminal receiver speed
+captured when that cell entered the set of cells recorded as burned.  The exact-stop transient
+heat values must be reset to zero.  A missing or stale marker, input identity record or
 snapshot mismatch, nodata, nonfinite, missing, duplicate, stale, or off-time
-artifact makes the case NOT EVALUABLE.
+supporting result makes the case NOT EVALUABLE.
 
 \begin{center}
 
 \begin{longtable}{@{}P{0.19\textwidth}P{0.21\textwidth}P{0.25\textwidth}P{0.24\textwidth}@{}}\toprule
 Property & Observable and metric & Selection rationale & Acceptance basis\\\midrule
 Heat-to-ROS mapping & maximum relative receiver-speed error & Tests the downstream formula using recorded heat & \(\leq0.005\), allowing float raster serialization\\
-Receiver observability & TOA and finite terminal speed for every receiver & Proves the compared value was serialized from \texttt{LIST\_BURNED} & TOA exactly 1~s within \(10^{-6}\)~s; all speeds finite\\
+Receiver observability & TOA and finite terminal speed for every receiver & Proves the compared value was serialized from the set of cells recorded as burned & TOA exactly 1~s within \(10^{-6}\)~s; all speeds finite\\
 Fixed-FTP energy continuity & normalized speed for 29900/30000/30100 & Detects the non-normative source energy branch & spread \(\leq0.005\); energy within 0.2\% of design\\
 Wind continuity & errors for 34.9/35.0/35.1 mph & Detects the non-normative 35-mph divisor & all speed errors \(\leq0.005\)\\
-HRR amplitude & recorded double/half heat ratio & Direct metamorphic check with no assumed absolute output & \(4.00\pm0.04\)\\
+heat-release rate (HRR) amplitude & recorded double/half heat ratio & Direct metamorphic check with no assumed absolute output & \(4.00\pm0.04\)\\
 Directional mapping & maximum error for the matched 35-mph head/back/side set & Detects orientation and ellipse partition defects & \(\leq0.005\)\\
-\texttt{FTP\_CRIT} inverse response & speed ratio for 3000/6000 & Requires the material table to control spread & \(2.00\pm0.01\)\\
+critical material fire-thermal property inverse response & speed ratio for 3000/6000 & Requires the material table to control spread & \(2.00\pm0.01\)\\
 \bottomrule\end{longtable}
 \end{center}
 PASS requires complete evidence and every row to pass.  Any calculated breach is
@@ -239,13 +228,17 @@ FAIL; absent or ambiguous evidence is NOT EVALUABLE and never a pass.
 
 \section{Simulation configuration and predicted outcome}
 
+The Courant--Friedrichs--Lewy (CFL) number measures the distance
+advected during one timestep relative to the grid spacing and
+constrains the time discretization.
+
 \begin{center}
 
 \begin{longtable}{@{}P{0.17\textwidth}P{0.29\textwidth}P{0.10\textwidth}P{0.31\textwidth}@{}}\toprule
 Parameter & Configured value & Units & Isolation role\\\midrule
 Grid & \(25\times25\), EPSG:32610 & -- & source well away from boundary\\
 Cell width & 20 & m & fixed energy normalization and CFL-safe local response\\
-Fuel geometry & source, adjacent receiver, four diagonal guard cells are FBFM 91; FBFM 93 elsewhere & category & observable pair plus nonburning termination guards\\
+Fuel geometry & source, adjacent receiver, four diagonal guard cells are fire behavior fuel model (FBFM) 91; FBFM 93 elsewhere & category & observable pair plus nonburning termination guards\\
 Initial \(\phi\) & source \(-0.45\), receiver 0.001 (side tangential stencil also 0.001), guards/background (+1) & -- & first-heated-step receiver crossing with guards far from the front\\
 Building characteristic dimension/separation & 20 / 10 & m & fixed linear ellipse inputs\\
 Wind direction & from 270 & degree & eastward DMS axis\\
@@ -259,19 +252,19 @@ Other mechanisms & spotting/crown/stochastic off & -- & removes confounders\\
 \bottomrule\end{longtable}
 \end{center}
 
-Figure~\ref{fig:hrs-input} is generated directly from the representative
-\texttt{energy\_equal} GeoTIFFs and the generated variant manifest.  The bar
+Figure~\ref{fig:hrs-input} shows the prescribed fields for the representative
+equal-energy condition. The bar
 panel is explicitly a design summary, not simulation output.
 \begin{figure}[p]
 \centering
 \IfFileExists{../figures/input_configuration.pdf}{\includegraphics[width=\textwidth]{input_configuration.pdf}}{\fbox{MISSING prepared-input figure}}
 \caption{Whole-domain prepared fuel and initial-level-set fields. The separate energy figure shows the
-designed energy sweep.  Coordinates are metres in EPSG:32610; the source files
-are under \texttt{variants/energy\_equal/inputs}.}
+designed energy sweep. Coordinates are metres in EPSG:32610; the fields
+represent the equal-energy condition.}
 \label{fig:hrs-input}
 \end{figure}
 The predicted output is receiver TOA exactly 1~s and a finite terminal
-receiver speed copied into \texttt{LIST\_BURNED} on that step. Its magnitude
+receiver speed recorded when the cell becomes burned on that step. Its magnitude
 changes continuously with heat and follows the matched head/back/side
 ellipse-normal mapping. The FTP pair is predicted to differ by a factor of two;
 the terminal time-stamped heat field is predicted to be zero after reset and is
@@ -280,38 +273,37 @@ not substituted for the arrival-step stimulus.
 \IfFileExists{../figures/input_stimulus.pdf}{%
 \begin{figure}[p]\centering
 \includegraphics[width=\textwidth]{input_stimulus.pdf}
-\caption{Prescribed receiver energy for all twelve variants, read from the generated input manifest. The dashed line marks the source energy-branch diagnostic, not an acceptance threshold.}
+\caption{Prescribed receiver energy for all twelve simulation conditions, read from the generated input simulation specification. The dashed line marks the source energy-branch diagnostic, not an acceptance threshold.}
 \end{figure}}{}
 
 \section{Actual simulation results}
 
-Workflow status is \textbf{\WorkflowStatus}; \CompletedVariants{} of
-\RequiredVariants{} required variants have complete black-box evidence.  The
-machine-generated reason is ``\StatusReason''.  The common executed-binary
-SHA-256 is \ReadableHash{\ExecutedBinarySHA}; ``--'' means no completed run supplied
-that evidence.  For every completed variant, \texttt{outputs/metrics.json}
-records the selected dump ledger, arrival-step DFC and radiation files,
-time-stamped terminal TOA and spread-rate files, completion marker, input and
-oracle identities, log snapshot, and output snapshot.  Preprocessing sets the
-scientific state to NOT EVALUABLE and the workflow state to NOT RUN before any
-executable is invoked, so an old response curve or report cannot survive as
-current evidence.
+Analysis procedure status is \textbf{\WorkflowStatus}; \CompletedVariants{} of
+\RequiredVariants{} required simulation conditions have complete black-box evidence.  The
+reported reason is ``\StatusReason''. The common model-program SHA-256
+identity is \ReadableHash{\ExecutedBinarySHA}; ``--'' means no completed
+simulation supplied that evidence. For each completed condition, the analysis
+retains the actual output times, heat fields at receiver arrival, terminal
+arrival-time and spread-rate fields, and matching input and reference
+identities. Previous results are excluded when inputs are regenerated:
+the scientific state becomes NOT EVALUABLE and the execution state becomes
+NOT RUN until new evidence is available.
 \IfFileExists{../figures/response_summary.pdf}{%
 \begin{figure}[p]\centering
 \includegraphics[width=\textwidth]{response_summary.pdf}
-\caption{Measured receiver spread rates and independent predictions for all twelve variants. Each observation is tied to its selected raster in \texttt{outputs/metrics.json}. Separate figures show the measured heat stimulus and the whole-domain result.}
-\end{figure}}{\begin{center}\fbox{No ELMFIRE result figure: workflow has not been run.}\end{center}}
+\caption{Simulated receiver spread rates and independent predictions for all twelve simulation conditions. The predictions recompute the heat-to-spread relation using the simulated heat stimulus. This comparison isolates the receiver response from differences in the supplied heating; separate figures show the heat stimulus and the spatial result.}
+\end{figure}}{\begin{center}\fbox{No ELMFIRE result figure: analysis procedure has not been run.}\end{center}}
 
 \IfFileExists{../figures/heat_stimulus.pdf}{%
 \begin{figure}[p]\centering
 \includegraphics[width=\textwidth]{heat_stimulus.pdf}
-\caption{Measured receiver energy at the selected arrival-step dump. Each value comes from the DFC and radiation files recorded in the metrics. The dashed line is a source-branch diagnostic.}
+\caption{Simulated receiver energy at the selected arrival-step output, calculated from the recorded direct-flame-contact and radiative heat fields. The dashed line identifies the energy-branch transition in the reviewed formulation; it is not an acceptance threshold.}
 \end{figure}}{}
 
 \IfFileExists{../figures/domain_result.pdf}{%
 \begin{figure}[p]\centering
 \includegraphics[width=\textwidth]{domain_result.pdf}
-\caption{Whole-domain terminal spread rate for wind\_equal\_35 at 4 s, read from the selected ELMFIRE raster. Symbols mark the source and receiver; nodata is blank.}
+\caption{Whole-domain terminal spread rate for 35 mph wind at 4 s, read from the selected ELMFIRE raster. Symbols mark the source and receiver; nodata is blank.}
 \end{figure}}{}
 
 \section{Calculated metrics and verification decision}
@@ -319,8 +311,8 @@ current evidence.
 \input{readable_results.tex}
 
 The authoritative case decision sourced from
-\texttt{outputs/metrics.json} is \textbf{\VerificationStatus}.  NOT RUN and
-INCOMPLETE are workflow states; NOT EVALUABLE is their non-passing scientific
+calculated verification and validation metrics is \textbf{\VerificationStatus}.  NOT RUN and
+INCOMPLETE are analysis procedure states; NOT EVALUABLE is their non-passing scientific
 decision.
 
 \section{Technical interpretation}
@@ -346,10 +338,10 @@ urban receiver under a compact deterministic sweep.  It does not independently
 verify the upstream heat-flux model, ignition delay over multiple cells, accumulated exposure across
 timesteps, building-to-building community spread, or convergence.  Internal
 working variables listed above remain inferred from the reviewed formulation,
-not observed.  The case binds one resolved executable path and SHA-256 to all
-variant inputs, logs, oracle metadata, and output snapshots, but a binary hash
-does not prove that the binary was built from the pinned review commit.  The
-result supplies code-verification evidence only.
+not observed. All accepted results must share one recorded model-program
+identity and matching input and reference identities. This consistency does
+not establish that the program was compiled from the reviewed source revision.
+The result provides numerical verification, not physical validation.
 
 \begin{thebibliography}{9}
 \bibitem{PurnomoPCI2024} D. M. J. Purnomo et al., ``Reconstructing modes of destruction in wildland--urban interface fires using a semi-physical level-set model,'' \emph{Proceedings of the Combustion Institute}, 40 (2024), 105755. \href{https://doi.org/10.1016/j.proci.2024.105755}{doi:10.1016/j.proci.2024.105755}.

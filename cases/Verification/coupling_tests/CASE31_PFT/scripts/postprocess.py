@@ -2,6 +2,8 @@
 """Evaluate planarity, fuel-transition response, wind response, and barriers."""
 
 from __future__ import annotations
+
+from report_language import polish_figure
 import csv
 import json
 from pathlib import Path
@@ -377,6 +379,7 @@ def main() -> None:
         ax.set_title(name.replace("_", " "))
         fig.colorbar(im, ax=ax, shrink=0.72, label="arrival time (s)")
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG / "verification_summary.pdf", bbox_inches="tight")
     plt.close(fig)
     with rasterio.open(
@@ -388,6 +391,7 @@ def main() -> None:
     ax.set_title("Gapped nonburnable fuel break")
     fig.colorbar(im, ax=ax, label="FBFM code")
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG / "input_configuration.pdf", bbox_inches="tight")
     plt.close(fig)
     print(f"[OK] CASE31_PFT: {payload['overall_status']}")

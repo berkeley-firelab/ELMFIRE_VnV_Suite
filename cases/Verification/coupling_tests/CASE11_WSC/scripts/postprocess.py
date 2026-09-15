@@ -7,6 +7,8 @@ within-structure firebrand-load distortion, and writes standalone report
 artifacts. It never runs ELMFIRE.
 """
 
+from report_language import polish_figure, report_text
+
 import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
@@ -362,6 +364,7 @@ def plot_surface_coupled_reference(case_dir, case, profiles):
         handles, _ = axis.get_legend_handles_labels()
         if handles:
             axis.legend(fontsize=8)
+    polish_figure(fig)
     fig.savefig(case_dir / "figures" / "surface_coupled_reference.pdf",
                 dpi=FIGURE_DPI)
     plt.close(fig)
@@ -418,6 +421,7 @@ def plot_results(case_dir, case, profiles):
     axes[1].set_ylim(bottom=0.0)
     axes[1].grid(alpha=0.25)
     axes[1].legend(fontsize=8)
+    polish_figure(fig)
     fig.savefig(
         case_dir /
         "figures" /
@@ -484,7 +488,7 @@ def write_artifacts(case_dir, case, manifest, profiles, rows, diagnostics, overa
     report_dir = case_dir / "report"
     report_dir.mkdir(exist_ok=True)
     (report_dir / "metrics_macros.tex").write_text(
-        "\n".join(macros) + "\n", encoding="utf-8"
+        report_text("\n".join(macros) + "\n"), encoding="utf-8"
     )
 
 

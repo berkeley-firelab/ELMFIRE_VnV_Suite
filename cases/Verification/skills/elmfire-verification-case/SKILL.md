@@ -42,6 +42,12 @@ Read [case_contract.md](references/case_contract.md) for the detailed layout and
 [report_structure.md](references/report_structure.md) for the scientific
 argument.
 
+## Reader-facing language
+
+Read and follow [report_language.md](references/report_language.md) for all report
+prose, generated text, and figure labels. Operational names in these instructions
+are for construction and maintenance only; they must not appear in reports.
+
 ## Require source and sufficient design evidence
 
 Require the user to provide the explicit path to the ELMFIRE source root that
@@ -148,7 +154,8 @@ or invent the fields. Show the initial level-set or ignition geometry together
 with the fuel, terrain, moisture, weather, canopy, or other field that controls
 the experiment. For a sweep, identify the representative variant or show a
 comparison that makes the varied input explicit. Label coordinates, units,
-categories, and the source artifact so the configuration can be audited.
+categories, and a scientific description of the input quantity and its construction.
+Do not display the source filename or path.
 
 When a verification case is derived from a published ELMFIRE guide or another
 scientific reference, preserve its scientifically relevant discussion and

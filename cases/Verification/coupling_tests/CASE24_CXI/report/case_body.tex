@@ -1,8 +1,8 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \texttt{\CaseID}. This case exercises simultaneous spatial fuel variation, opposing slopes, and steady wind to reveal integration failures that isolated cases may miss. The decision checks the independently derived domain-maximum head spread while preserving the Guide configuration and central ignition.
+This case exercises simultaneous spatial fuel variation, opposing slopes, and steady wind to reveal integration failures that isolated cases may miss. The decision checks the independently derived domain-maximum head spread while preserving the Guide configuration and central ignition.
 
-The scientific setup and historical expected response are reconstructed from Section~3.2 of the supplied \emph{ELMFIRE Guide}. The Guide is used as reference provenance, not as an instruction or a substitute for evidence. Configuration statements below are checked against the generated GeoTIFFs and namelist; current results and decisions come only from case-local outputs and generated metrics. Where the generated experiment differs from the historical example, the report states that difference explicitly.
+The scientific setup and historical expected response are reconstructed from Section~3.2 of the supplied \emph{ELMFIRE Guide}. The Guide is used as reference provenance, not as an instruction or a substitute for evidence. Configuration statements below are checked against the generated GeoTIFFs and namelist; current results and decisions come only from case-specific outputs and generated metrics. Where the generated experiment differs from the historical example, the report states that difference explicitly.
 
 \section{Mathematical formulation and numerical implementation}
 
@@ -41,7 +41,7 @@ tabulated relative tolerance.
 
 \section{Verification metrics and acceptance criteria}
 
-The required metric is the maximum finite spread rate over the completed domain. It must agree with the independently derived 12.896233 m/min southwest-quadrant head response within the Guide harness default 10 percent tolerance. The case is NOT EVALUABLE only when required output is missing; otherwise this quantitative metric decides PASS or FAIL.
+The required metric is the maximum finite spread rate over the completed domain. It must agree with the independently derived 12.896233 m/min southwest-quadrant head response within the Guide prescribed 10 percent tolerance. The case is NOT EVALUABLE only when required output is missing; otherwise this quantitative metric decides PASS or FAIL.
 
 \section{Simulation configuration and predicted outcome}
 
@@ -62,44 +62,42 @@ Evidence & prepared inputs; final case outputs & --- & Separates configuration p
 \end{tabular}
 \end{center}
 
-Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+Figure~\ref{fig:input-configuration} shows the prescribed spatial condition used in this experiment. The displayed field represents the initial level-set geometry or a controlling fuel, terrain, moisture, wind, or canopy quantity, as identified by the figure labels. The plotted values come from the prepared simulation inputs, not from the expected response.
 
 \begin{figure}[H]
   \centering
   \IfFileExists{../figures/input_configuration.pdf}{%
     \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
-  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
-  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  }{\fbox{\parbox{0.88\textwidth}{Prepared-input evidence is unavailable. The prescribed configuration is described in the text; this absence does not establish that it was simulated.}}}
+  \caption{Prepared input conditions from the prescribed spatial fields. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
   \label{fig:input-configuration}
 \end{figure}
 
 \section{Actual simulation results}
 
-The required evidence is generated only from case-local ELMFIRE outputs. The current postprocessing status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} required metric rows pass across \VariantCount{} variant(s). A missing output is reported as NOT RUN or NOT EVALUABLE and is not interpreted as verification evidence.
-
+The required evidence is generated only from case-specific ELMFIRE outputs. The current postprocessing status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} required metric rows pass across \VariantCount{} simulation condition(s). A missing output is reported as NOT RUN or NOT EVALUABLE and is not interpreted as verification evidence.
 
 \begin{figure}[H]
   \centering
   \IfFileExists{../figures/whole_domain_result.pdf}{%
     \includegraphics[width=0.82\textwidth,height=0.58\textheight,keepaspectratio]{whole_domain_result.pdf}%
-  }{\fbox{\parbox{0.85\textwidth}{No case-local whole-domain ELMFIRE raster is available.}}}
-  \caption{Final whole-domain ELMFIRE time of arrival for the displayed variant, in seconds. The figure annotation records the selected case-local GeoTIFF path and coordinate reference system; the generated metrics table, not visual appearance, determines acceptance.}
+  }{\fbox{\parbox{0.85\textwidth}{No case-specific whole-domain ELMFIRE raster is available.}}}
+  \caption{Final whole-domain ELMFIRE time of arrival for the displayed simulation condition, in seconds. The coordinate reference system is stated in the figure. The calculated metrics, not visual appearance, determine acceptance.}
 \end{figure}
-
 
 \section{Calculated metrics and verification decision}
 
 \begin{center}
 \begin{tabular}{@{}llll@{}}
 \toprule
-Variant / metric & Expected & Calculated & Status \\
+Simulation condition / metric & Expected & Calculated & Status \\
 \midrule
 \MetricRows
 \bottomrule
 \end{tabular}
 \end{center}
 
-The displayed decision is \textbf{\VerificationStatus}. A present case-local metrics JSON controls the table; missing required output remains NOT EVALUABLE.
+The displayed decision is \textbf{\VerificationStatus}. A present case-specific calculated metrics controls the table; missing required output remains NOT EVALUABLE.
 
 \section{Technical interpretation}
 

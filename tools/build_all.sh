@@ -41,18 +41,17 @@ compile_missing_case_reports() {
     fi
 
     if [[ "$primary_succeeded" -ne 1 || ! -f "$report_dir/case_report.pdf" ]]; then
-      echo "[WARN] Normal case report build failed; retrying with result graphics in draft mode: $case_dir" >&2
-      # A case that has not been evaluated may legitimately lack generated
-      # result figures. Graphicx draft mode keeps the scientific narrative and
-      # visibly marks the absent graphics without inventing evidence. -g is
-      # required because latexmk remembers the preceding failed invocation.
+      echo "[WARN] Normal case report build failed; retrying with explicit missing-figure notices: $case_dir" >&2
+      # Draft graphics expose filenames and suppress available evidence too.
+      # Keep existing figures and replace only missing ones with a scientific
+      # evidence notice. This presentation fallback never changes metrics.
       if ! (
         cd "$report_dir"
         latexmk -g -lualatex -silent -interaction=nonstopmode -halt-on-error \
-          -usepretex='\PassOptionsToPackage{draft}{graphicx}' \
+          -usepretex='\AtBeginDocument{\let\OriginalIncludeGraphics\includegraphics\renewcommand{\includegraphics}[2][]{\IfFileExists{#2}{\OriginalIncludeGraphics[#1]{#2}}{\IfFileExists{../figures/#2}{\OriginalIncludeGraphics[#1]{#2}}{\fbox{\parbox{0.85\linewidth}{Required figure unavailable. The narrative does not replace missing scientific evidence.}}}}}}' \
           case_report.tex
       ); then
-        echo "[WARN] Case report build failed even in draft-graphics mode: $case_dir" >&2
+        echo "[WARN] Case report build failed with missing-figure notices: $case_dir" >&2
         failures=1
         continue
       fi

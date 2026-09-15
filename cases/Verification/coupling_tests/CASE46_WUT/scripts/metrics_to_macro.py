@@ -2,6 +2,8 @@
 """Strictly validate CASE46 metrics before rendering report macros."""
 from __future__ import annotations
 
+from report_language import report_text
+
 import json
 import re
 from pathlib import Path
@@ -198,9 +200,9 @@ def main() -> None:
             r"\newcommand{\MetricRows}{INVALID metrics payload & -- & -- & INVALID \\}",
             "",
         ]
-        DESTINATION.write_text("\n".join(fallback), encoding="utf-8")
+        DESTINATION.write_text(report_text("\n".join(fallback)), encoding="utf-8")
         raise SystemExit(f"CASE46 metrics rejected: {exc}")
-    DESTINATION.write_text(render(payload), encoding="utf-8")
+    DESTINATION.write_text(report_text(render(payload)), encoding="utf-8")
 
 
 if __name__ == "__main__":

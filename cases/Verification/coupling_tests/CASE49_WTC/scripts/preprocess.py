@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import hashlib
 import json
 import math
@@ -259,6 +261,7 @@ def plot_inputs(spec: dict, representative: dict) -> None:
         axis.set_xlabel("Easting (m)")
         axis.set_ylabel("Northing (m)")
     (CASE_DIR / "figures").mkdir(parents=True, exist_ok=True)
+    polish_figure(fig)
     fig.savefig(
         CASE_DIR / "figures/input_configuration.pdf",
         bbox_inches="tight",

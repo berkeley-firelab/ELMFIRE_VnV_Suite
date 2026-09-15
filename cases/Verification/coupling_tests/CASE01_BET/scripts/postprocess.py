@@ -2,6 +2,8 @@
 """Postprocess the unit-width biomass-emission verification."""
 from __future__ import annotations
 
+from report_language import polish_figure, report_text
+
 import json
 import math
 import re
@@ -127,6 +129,7 @@ def write_pdf_figure(results):
     axes[-1].set_xticks(np.arange(0.0, xmax + 1.0, 50.0))
     axes[-2].set_xlabel("Downwind distance [m]")
     figure.supylabel(r"Accumulated firebrands [pcs/m$^2$]")
+    polish_figure(figure)
     figure.savefig(
         FIGURE_DIR / "emission_time_resolution.pdf", format="pdf"
     )
@@ -287,7 +290,7 @@ def main():
         f"\\expandafter\\def\\csname metric@{re.sub(r'[^A-Za-z0-9]+','',key)}\\endcsname"
         f"{{{str(value).replace('_',chr(92)+'_')}}}" for key,
         value in macro_values.items()]
-    (REPORT_DIR / "metrics_macros.tex").write_text("\n".join(lines) + "\n")
+    (REPORT_DIR / "metrics_macros.tex").write_text(report_text("\n".join(lines) + "\n"))
     print(f"[OK] evaluated {len(computed)}/{len(clean)} variants: {status}")
 
 

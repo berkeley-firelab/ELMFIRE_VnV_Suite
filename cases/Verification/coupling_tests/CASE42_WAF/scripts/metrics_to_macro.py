@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """Convert the authoritative metrics JSON into report-safe LaTeX rows."""
+
+from report_language import report_text
 import json
 from pathlib import Path
 
@@ -47,7 +49,7 @@ def main() -> None:
         f"\\newcommand{{\\PassingMetricCount}}{{{sum(item.get('status') == 'PASS' for item in metrics)}}}",
         "\\newcommand{\\MetricRows}{%", *rows, "}", "",
     ]
-    (CASE_DIR / "report/metrics_macros.tex").write_text("\n".join(lines), encoding="utf-8")
+    (CASE_DIR / "report/metrics_macros.tex").write_text(report_text("\n".join(lines)), encoding="utf-8")
 
 
 if __name__ == "__main__":

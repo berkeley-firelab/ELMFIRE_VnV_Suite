@@ -2,6 +2,8 @@
 """Fail-closed comparison of CASE43 ELMFIRE rasters with the local oracle."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import csv
 import json
 import math
@@ -280,6 +282,7 @@ def plot_comparison(result: dict[str, object]) -> None:
         fig.colorbar(image, ax=axis, shrink=0.80, label=r"Heat flux (kW m$^{-2}$)")
         axis.set(title=title, xlabel="Raster column", ylabel="Raster row")
     fig.suptitle(f"CASE43 full-domain heat map at t={result['selected_time_s']:g} s ({result['id']})")
+    polish_figure(fig)
     fig.savefig(
         CASE_DIR / "figures" / "heat_map_comparison.pdf", bbox_inches="tight",
         metadata={"CreationDate": None, "ModDate": None},

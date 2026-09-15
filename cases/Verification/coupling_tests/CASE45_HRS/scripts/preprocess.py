@@ -7,6 +7,8 @@ opens an ELMFIRE source file.  ``variants`` is wholly disposable.
 """
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import json
 import math
 import shutil
@@ -557,6 +559,7 @@ def make_input_figure(specs: list[dict[str, object]]) -> None:
             fig.colorbar(im, ax=ax, label=r"$\phi$ (–)", shrink=0.75)
         ax.set(title=title, xlabel="Easting (m)", ylabel="Northing (m)")
     fig.suptitle("Prepared inputs: energy_equal")
+    polish_figure(fig)
     fig.savefig(CASE_DIR / "figures/input_configuration.pdf", metadata=PDF_METADATA)
     plt.close(fig)
     fig, ax = plt.subplots(figsize=(7.2, 5.5), constrained_layout=True)
@@ -567,6 +570,7 @@ def make_input_figure(specs: list[dict[str, object]]) -> None:
     ax.invert_yaxis()
     ax.set(xlabel="Designed receiver energy per step (MJ)", title="Prescribed heat stimulus")
     ax.legend(loc="lower right")
+    polish_figure(fig)
     fig.savefig(CASE_DIR / "figures/input_stimulus.pdf", metadata=PDF_METADATA)
     plt.close(fig)
 

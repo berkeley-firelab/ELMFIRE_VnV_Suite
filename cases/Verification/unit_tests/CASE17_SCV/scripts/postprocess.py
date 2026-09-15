@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import json
 from pathlib import Path
 
@@ -68,6 +70,7 @@ def plot_domain(path: Path, title: str, output_path: Path) -> None:
     ax.set(xlabel="Easting (m)", ylabel="Northing (m)", title=title)
     fig.colorbar(image, ax=ax, label="ELMFIRE field value")
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(output_path, format="pdf", bbox_inches="tight")
     plt.close(fig)
 
@@ -102,6 +105,7 @@ def convergence_plot(step: np.ndarray, error: np.ndarray, xlabel: str, output_pa
     ax.grid(True, which="both", alpha=0.3)
     ax.legend()
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(output_path, format="pdf", bbox_inches="tight")
     plt.close(fig)
 

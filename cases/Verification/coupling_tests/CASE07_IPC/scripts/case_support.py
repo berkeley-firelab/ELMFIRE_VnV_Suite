@@ -6,6 +6,8 @@ Preprocessing reads case.json and writes deterministic GeoTIFF inputs in SI unit
 Postprocessing reads ELMFIRE GeoTIFF outputs, computes reference comparisons,
 and writes metrics.json, LaTeX macros, and vector PDF figures. It never runs ELMFIRE.
 """
+
+from report_language import polish_figure, report_text
 from pathlib import Path
 import json, re
 
@@ -100,6 +102,7 @@ def pdf_line(path, xs, ys, label):
     ax.set_ylabel(label)
     ax.grid(True, alpha=0.25)
     ax.legend()
+    polish_figure(fig)
     fig.savefig(path, format="pdf")
     plt.close(fig)
 
@@ -143,5 +146,5 @@ def postprocess(case_dir):
         safe=re.sub(r'[^A-Za-z0-9]+','',k)
         latex_value = str(v).replace("_", "\\_")
         lines.append(f"\\expandafter\\def\\csname metric@{safe}\\endcsname{{{latex_value}}}")
-    (rep/"metrics_macros.tex").write_text("\n".join(lines)+"\n",encoding="utf-8")
+    (rep/"metrics_macros.tex").write_text(report_text("\n".join(lines)+"\n"),encoding="utf-8")
     print("[OK] postprocessed " + c["id"])

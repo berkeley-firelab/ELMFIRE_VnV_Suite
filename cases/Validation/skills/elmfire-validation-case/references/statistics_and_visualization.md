@@ -75,3 +75,9 @@ Baseline values must come from observations, an experiment, an independently
 defined benchmark, a previously frozen model baseline, or a predeclared
 acceptance rule. If no justified threshold exists, calculate and interpret the
 metrics but classify the case as `CHARACTERIZED`, not `PASS`.
+
+## Reader-facing descriptions
+
+Apply [report_language.md](report_language.md). Describe input quantities, sources,
+transformations, uncertainty, and semantic output selection without filenames,
+paths, script names, or software-development jargon in reports and figures.

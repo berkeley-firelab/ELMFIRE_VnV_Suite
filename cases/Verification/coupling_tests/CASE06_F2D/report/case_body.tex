@@ -1,7 +1,5 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \CaseID
-
 This case verifies that Eulerian spotting produces a genuinely two-dimensional, firebrand-driven fireline under a manufactured two-component, space--time wind. It exercises emission, vector transport, deposition, direct spot ignition, and level-set propagation together.
 
 The test exposes loss of either wind component, incorrect direction conversion, one-dimensional source geometry, missing secondary ignitions, non-monotone burned area, and stale transient output. Success requires nested perimeters near 30, 60, 90, and 120~s that advance in both directions and exceed the surface-only reach.
@@ -35,7 +33,7 @@ Because the wind has positive mean components, successive fronts must progress d
 \[
 x_{\rm surf}(120)=x_0+R_s(120)=\SI{90.2}{m}.
 \]
-A front substantially beyond this location, together with nonzero ember-ignition cells, demonstrates that firebrands rather than the surface headfire alone control the long-range advance. Accordingly, the principal expected result is a family of nested two-dimensional contours rather than a one-dimensional TOA curve.
+A front substantially beyond this location, together with nonzero ember-ignition cells, demonstrates that firebrands rather than the surface headfire alone control the long-range advance. Accordingly, the principal expected result is a family of nested two-dimensional contours rather than a one-dimensional time of arrival (TOA) curve.
 
 % BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
 The largest generated transport speed is
@@ -69,7 +67,7 @@ quantitative as at least \(40~\mathrm{m}=4\Delta x\).
 % END EXPLICIT EXPECTED-RESULT DERIVATION
 
 \section{Verification metrics and acceptance criteria}
-The postprocessor selects transient \texttt{phi} rasters within \SI{2}{s} of all four target times and excludes the two-cell halo. It calculates: (i) completeness of all four contours; (ii) the fraction $|B_j\setminus B_{j+1}|/|B_j|$, limited to 0.02; (iii) downwind leading-edge advance, required to be at least \SI{20}{m} in every interval; (iv) final crosswind span, required to be at least \SI{40}{m}; and (v) firebrand excess advance $x_{\max}(120)-x_{\rm surf}(120)$, required to be at least \SI{30}{m} with at least one ember-ignition cell. The overall result is PASS only when every component passes.
+The postprocessor selects transient level-set field rasters within \SI{2}{s} of all four target times and excludes the two-cell halo. It calculates: (i) completeness of all four contours; (ii) the fraction $|B_j\setminus B_{j+1}|/|B_j|$, limited to 0.02; (iii) downwind leading-edge advance, required to be at least \SI{20}{m} in every interval; (iv) final crosswind span, required to be at least \SI{40}{m}; and (v) firebrand excess advance $x_{\max}(120)-x_{\rm surf}(120)$, required to be at least \SI{30}{m} with at least one ember-ignition cell. The overall result is PASS only when every component passes.
 
 \subsection{Justification of metric quantification}
 
@@ -87,7 +85,7 @@ prescribe a detailed perimeter shape that the manufactured problem does not
 supply.  At least one ember-ignition cell is an exact mechanism check, and all
 four times are required to support the claimed two-dimensional evolution.
 
-\subsection{Predeclared acceptance contract}
+\subsection{Predeclared acceptance criteria}
 
 Table~\ref{tab:acceptance-contract} summarizes the metrics fixed before
 inspection of the calculated results. Numerical values and component statuses
@@ -102,7 +100,7 @@ are reported separately in Section~7.
 \toprule
 Metric & Output, region, and aggregation & Acceptance criterion\\
 \midrule
-Perimeter completeness & Unique transient \path{phi} raster selected within \SI{2}{s} of 30, 60, 90, and \SI{120}{s}. & 4 of 4 target times \\
+Perimeter completeness & Unique transient level-set field raster selected within \SI{2}{s} of 30, 60, 90, and \SI{120}{s}. & 4 of 4 target times \\
 Nesting violation & Maximum \(|B_j\setminus B_{j+1}|/|B_j|\) over consecutive physical burned masks. & \(\le0.02\) \\
 Downwind progression & Increase in maximum burned-cell \(x\) between consecutive target times. & \(\ge\SI{20}{m}\) every interval \\
 Final crosswind span & \(\max(y)-\min(y)\) of the final physical burned mask. & \(\ge\SI{40}{m}\) \\
@@ -115,8 +113,8 @@ Overall decision & Conjunction of completeness, nesting, progression, span, and 
 \section{Simulation configuration and predicted outcome}
 
 Figure~\ref{fig:input-configuration} records the prepared spatial inputs for the base two-dimensional run.
-The postprocessor reads these panels from the variant-local GeoTIFF files, removes the
-two-cell numerical buffer, and retains map coordinates in metres.  The left panel shows
+These panels show the prepared spatial fields, remove the
+two-cell numerical buffer, and retain map coordinates in metres.  The left panel shows
 the most informative fuel or structure layout available for the case; the right panel
 shows the cells selected by the non-positive initial level-set field, making a localized
 ignition or firebrand-emission source explicit.
@@ -124,11 +122,15 @@ ignition or firebrand-emission source explicit.
 \begin{figure}[H]
 \centering
 \EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
-\caption{Whole-domain prepared input configuration for the representative variant.  The
+\caption{Whole-domain prepared input configuration for the representative simulation condition.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
 \label{fig:input-configuration}
 \end{figure}
+
+The Courant--Friedrichs--Lewy (CFL) number measures the distance
+advected during one timestep relative to the grid spacing and
+constrains the time discretization.
 
 \begin{table}[htbp]
 \centering
@@ -144,7 +146,7 @@ Simulation step & \SI{0.491026}{s} & wind CFL approximately 0.5\\
 Initial ignition & $(5,5)$ m & localized upwind source\\
 Surface headfire & enabled & primary moving source\\
 Generation & PER-AREA, 10 pcs m\textsuperscript{-2} s\textsuperscript{-1} & deterministic ember supply\\
-Accumulation / ignition & Eulerian / direct & tested implementation path\\
+Accumulation / ignition & Eulerian / direct & tested physical and numerical processes\\
 Crosswind PDF & $\mu_y=0$, $\sigma_y=\SI{0.1}{m}$ & narrow $k_{\max}=0$ limit\\
 Output times & 30, 60, 90, 120 s & transient perimeter comparison\\
 \bottomrule
@@ -155,7 +157,7 @@ Before inspecting results, the predicted output is four nested contours elongate
 \section{Actual simulation results}
 
 Figure~\ref{fig:domain-result} shows the representative accumulated firebrand density from the base two-dimensional run.
-It is read from the actual ELMFIRE output named in the panel, masks nodata, and excludes
+The displayed field is taken from the simulated results, masks missing values, and excludes
 the two-cell numerical buffer.  Counts are divided by physical cell area, giving pcs m$^{-2}$ and exposing the full lateral as well as downwind distribution.
 
 \begin{figure}[H]
@@ -167,10 +169,8 @@ profiles, convergence plots, ensemble statistics, and calculated acceptance metr
 \label{fig:domain-result}
 \end{figure}
 
-
 The selected transient perimeter times were
-\Metric{completedperimetertimess}~s. Exact filenames are recorded in
-\path{outputs/metrics.json}.
+\Metric{completedperimetertimess}~s. The identities of the selected fields are retained with the calculated metrics.
 Figure~\ref{fig:perimeters} first presents the evolving zero-level contours,
 which are the principal two-dimensional reference observable.
 

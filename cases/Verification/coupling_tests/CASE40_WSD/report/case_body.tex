@@ -1,5 +1,6 @@
 \section{Verification purpose}
-This coupling case verifies how ELMFIRE combines Rothermel wind and slope factors into a direction of maximum spread (DMS), head speed, and fire ellipse.  Wind direction rotates through \AngleSet{} relative to upslope while magnitudes remain fixed.  It can expose degree/radian errors, wind-from/wind-to reversal, aspect reversal, swapped raster axes, scalar addition in place of vector addition, or incorrect ellipse construction.  The question is whether all variants meet the DMS, head-ROS, length/width, and intensity limits.
+
+This coupling case verifies how ELMFIRE combines Rothermel wind and slope factors into a direction of maximum spread (DMS), head speed, and fire ellipse.  Wind direction rotates through \AngleSet{} relative to upslope while magnitudes remain fixed.  It can expose degree/radian errors, wind-from/wind-to reversal, aspect reversal, swapped raster axes, scalar addition in place of vector addition, or incorrect ellipse construction.  The question is whether all simulation conditions meet the DMS, head rate of spread (ROS), length/width, and intensity limits.
 
 \section{Mathematical formulation and numerical implementation}
 Let upslope azimuth be zero and wind-to azimuth be $\alpha$.  The dimensionless forcing vector is
@@ -7,7 +8,7 @@ Let upslope azimuth be zero and wind-to azimuth be $\alpha$.  The dimensionless 
 so $\theta_{DMS}=\operatorname{atan2}(\phi_x,\phi_y)$ and $R_H=R_0(1+|\boldsymbol\phi|)$.  ELMFIRE derives an effective wind from $|\boldsymbol\phi|$ and uses its Rothermel length-to-width relation, capped at eight.  Because these quantities are defined on the sloping surface, the preprocessor makes the initial circle and the postprocessor measures distances in slope-surface coordinates rather than mixing them with map-plane northing.  The scalar factors follow Andrews (2018), RMRS-GTR-371; vectoring and ellipse propagation exercise ELMFIRE's level-set implementation.
 
 \section{Derivation of expected behavior}
-Aligned wind and slope add; opposed forcing subtracts in vector space and the stronger component sets direction.  At intermediate angles, the expected DMS lies between the two forcing directions, not generally at the arithmetic mean of angles.  The case-local oracle independently evaluates $\phi_s$, $\phi_w$, their vector magnitude and azimuth, head ROS, effective wind, and length/width.
+Aligned wind and slope add; opposed forcing subtracts in vector space and the stronger component sets direction.  At intermediate angles, the expected DMS lies between the two forcing directions, not generally at the arithmetic mean of angles.  The case-specific reference calculation independently evaluates $\phi_s$, $\phi_w$, their vector magnitude and azimuth, head ROS, effective wind, and length/width.
 
 % BEGIN EXPLICIT METRIC DERIVATION
 Let upslope define zero azimuth and let \(\alpha\) be the generated
@@ -47,10 +48,10 @@ The other metrics are relative errors in \(R_h\), \(L/W\), and
 % END EXPLICIT METRIC DERIVATION
 
 \section{Verification metrics and acceptance criteria}
-Maximum circular DMS error is \DirectionTolerance{}, maximum head-ROS relative error is 0.05, maximum length/width relative error is 0.10, and maximum intensity relative error is 0.01.  DMS is inferred from the farthest one percent of the burned footprint, subject to at least 100 burned cells and at least five farthest-front samples. Head ROS is a TOA regression in a narrow predicted-axis corridor with at least ten samples. Length/width uses full-footprint slope-surface extents projected along and across the DMS. Reaction intensity is the median over valid burned cells and requires at least 90 percent coverage of that footprint. These complementary metrics distinguish direction, speed, shape, and output completeness.  Every variant is required.
+Maximum circular DMS error is \DirectionTolerance{}, maximum head-ROS relative error is 0.05, maximum length/width relative error is 0.10, and maximum intensity relative error is 0.01.  DMS is inferred from the farthest one percent of the burned footprint, subject to at least 100 burned cells and at least five farthest-front samples. Head ROS is a time of arrival (TOA) regression in a narrow predicted-axis corridor with at least ten samples. Length/width uses full-footprint slope-surface extents projected along and across the DMS. Reaction intensity is the median over valid burned cells and requires at least 90 percent coverage of that footprint. These complementary metrics distinguish direction, speed, shape, and output completeness.  Every simulation condition is required.
 
 \section{Simulation configuration and predicted outcome}
-Fuel model 2 is used on a \SI{1400}{m} square, \SI{10}{m} grid with a \SI{30}{m}-radius signed-distance ignition clipped to $[-1,1]$.  Slope is requested as 50\% and generated as the integer 27-degree value used by ELMFIRE (50.95\% effective rise/run), with upslope north; target midflame wind is \SI{4}{mph}.  Dead moistures are 5/7/9\%, live-herb moisture is 60\%, and live-woody moisture is 90\% in both every generated namelist and the independent oracle. Wind-from azimuth is generated so the wind-to vector has the required relative angle. Each variant uses the largest conservative whole-second timestep no greater than the 5\%-of-cell target that divides the fixed 1800 s duration exactly. This retains CFL margin and prevents a shortened final step from triggering ELMFIRE's stalled-front timestamp defect. Crown fire, spotting, WUI, stochastic wind, and acceleration are disabled.  The footprint should rotate smoothly and change head extension as the vectors move from aligned to opposed. The evaluator accepts only unique TOA and reaction-intensity rasters identified by a final dump record. A stalled-final record is accepted only when subtracting the configured meteorology interval reconstructs the 1800 s stop time within one configured timestep.
+Fuel model 2 is used on a \SI{1400}{m} square, \SI{10}{m} grid with a \SI{30}{m}-radius signed-distance ignition clipped to $[-1,1]$.  Slope is requested as 50\% and generated as the integer 27-degree value used by ELMFIRE (50.95\% effective rise/run), with upslope north; target midflame wind is \SI{4}{mph}.  Dead moistures are 5/7/9\%, live-herb moisture is 60\%, and live-woody moisture is 90\% in both every generated namelist and the independent reference calculation. Wind-from azimuth is generated so the wind-to vector has the required relative angle. Each simulation condition uses the largest conservative whole-second timestep no greater than the 5\%-of-cell target that divides the fixed 1800 s duration exactly. This retains Courant--Friedrichs--Lewy (CFL) margin and prevents a shortened final step from triggering ELMFIRE's stalled-front timestamp defect. Crown fire, spotting, WUI, stochastic wind, and acceleration are disabled.  The footprint should rotate smoothly and change head extension as the vectors move from aligned to opposed. The evaluator accepts only unique TOA and reaction-intensity rasters identified by a final dump record. A stalled-final record is accepted only when subtracting the configured meteorology interval reconstructs the 1800 s stop time within one configured timestep.
 
 \begin{center}\begin{tabular}{p{0.22\textwidth}p{0.24\textwidth}p{0.12\textwidth}p{0.32\textwidth}}\toprule
 Parameter & Configured value & Units & Role \\
@@ -61,19 +62,19 @@ Relative angles & \AngleSet & degrees & Vector-coupling sweep \\
 Time control & generated whole-second divisor; stop 1800 & s & Exact timestep multiple \\
 \bottomrule\end{tabular}\end{center}
 
-Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+Figure~\ref{fig:input-configuration} shows the prescribed spatial condition used in this experiment. The displayed field represents the initial level-set geometry or a controlling fuel, terrain, moisture, wind, or canopy quantity, as identified by the figure labels. The plotted values come from the prepared simulation inputs, not from the expected response.
 
 \begin{figure}[H]
   \centering
   \IfFileExists{../figures/input_configuration.pdf}{%
     \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
-  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
-  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  }{\fbox{\parbox{0.88\textwidth}{Prepared-input evidence is unavailable. The prescribed configuration is described in the text; this absence does not establish that it was simulated.}}}
+  \caption{Prepared input conditions from the prescribed spatial fields. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
   \label{fig:input-configuration}
 \end{figure}
 
 \section{Actual simulation results}
-The generated record contains \CompletedVariantCount{} of \RequiredVariantCount{} variants and reports \textbf{\VerificationStatus}. The generated diagnostic is: \textit{\VerificationReason}.
+The available results cover \CompletedVariantCount{} of \RequiredVariantCount{} simulation conditions and reports \textbf{\VerificationStatus}. The generated diagnostic is: \textit{\VerificationReason}.
 \IfFileExists{../figures/vector_response.pdf}{\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{vector_response.pdf}\caption{Expected and measured DMS azimuth and head ROS.}\end{figure}}{}
 
 \section{Calculated metrics and verification decision}

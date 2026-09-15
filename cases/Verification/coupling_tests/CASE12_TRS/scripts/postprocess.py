@@ -6,6 +6,8 @@ computes the declared comparison metrics, and writes standalone report
 artifacts. It never launches ELMFIRE.
 """
 
+from report_language import polish_figure, report_text
+
 import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
@@ -555,6 +557,7 @@ def plot_temporal_profiles(case_dir, case, manifest, profiles):
         elif not axis.lines:
             axis.text(0.5, 0.5, "Current matching outputs not available",
                       ha="center", va="center", transform=axis.transAxes)
+    polish_figure(fig)
     fig.savefig(
         case_dir /
         "figures" /
@@ -589,6 +592,7 @@ def plot_ignition_error_convergence(case_dir, profiles):
     ax.set_title("Mean ignition-time sensitivity")
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(fontsize=8)
+    polish_figure(fig)
     fig.savefig(case_dir / "figures" / "temporal_resolution_error.pdf", dpi=FIGURE_DPI)
     plt.close(fig)
 
@@ -646,8 +650,8 @@ def write_artifacts(case_dir, case, manifest, profiles, rows, overall, diagnosti
     ]
     (case_dir /
      "report" /
-     "metrics_macros.tex").write_text("\n".join(macros) +
-                                      "\n", encoding="utf-8")
+     "metrics_macros.tex").write_text(report_text("\n".join(macros) +
+                                      "\n"), encoding="utf-8")
 
 
 def main():

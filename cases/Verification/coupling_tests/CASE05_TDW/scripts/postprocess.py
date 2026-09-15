@@ -7,6 +7,8 @@ nine-point running-average ROS metrics, and writes JSON, LaTeX, and PDF output.
 It never runs ELMFIRE.
 """
 from __future__ import annotations
+
+from report_language import polish_figure, report_text
 import rasterio
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
@@ -125,6 +127,7 @@ def write_figure(times_s: np.ndarray, x_sim: np.ndarray, x_ref: np.ndarray,
     axes[1].set_ylim(bottom=0.0)
     axes[1].grid(alpha=0.25)
     axes[1].legend()
+    polish_figure(figure)
     figure.savefig(FIGURE_DIR / "time_dependent_wind_transport.pdf", format="pdf")
     plt.close(figure)
 
@@ -151,6 +154,7 @@ def write_error_figure(times_s: np.ndarray, x_sim: np.ndarray,
     for axis in axes:
         axis.grid(alpha=0.25)
         axis.legend(fontsize=8)
+    polish_figure(figure)
     figure.savefig(FIGURE_DIR / "time_dependent_wind_errors.pdf", format="pdf")
     plt.close(figure)
 
@@ -265,7 +269,7 @@ def main() -> None:
             f"{{{latex_escape(value)}}}"
         )
     (REPORT_DIR / "metrics_macros.tex").write_text(
-        "\n".join(lines) + "\n", encoding="utf-8"
+        report_text("\n".join(lines) + "\n"), encoding="utf-8"
     )
     print(f"[OK] time-dependent-wind case evaluated: {metrics['status']}")
 

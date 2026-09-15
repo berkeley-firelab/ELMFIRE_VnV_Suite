@@ -68,3 +68,9 @@ must read metrics rather than recompute them.
 
 Use explicit paths relative to the case root. A case may use standard installed
 scientific libraries, but must not require another case's Python module or data.
+
+## Presentation boundary
+
+Follow [report_language.md](report_language.md). The filenames, metadata keys, and
+implementation details in this construction reference are operational only.
+Describe their scientific meaning in reports; never display these identifiers.

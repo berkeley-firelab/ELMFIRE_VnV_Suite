@@ -1,12 +1,6 @@
 \section{Verification purpose}
-This case verifies time-step convergence of the intended fixed-FTP WU-E heat accumulation and urban propagation law on one fixed uniform-community grid. It refines the configured step through \TimeStepSet{} for low- and high-HRR families. The 30,000-kJ source branch is retained only as a plotted deviation diagnostic and is not an acceptance boundary.
 
-
-\paragraph{Reading the notation.}
-WU--E denotes the Wildland--Urban ELMFIRE model. HRR is heat-release rate;
-HRRPUA is heat-release rate per unit area. DFC means direct flame contact,
-TOA means time of arrival, and ROS means rate of spread. FTP is the material
-fire-thermal property used in the intended heat-to-spread law.
+This case verifies time-step convergence of the intended Wildland--Urban ELMFIRE (WU--E) heat-accumulation and urban-propagation law with a fixed material fire-thermal property (FTP) on one fixed uniform-community grid. It refines the configured step through \TimeStepSet{} for families with low and high heat-release rate (HRR). The 30,000-kJ source branch is retained only as a plotted deviation diagnostic and is not an acceptance boundary.
 
 \ReportOverview
 
@@ -14,11 +8,11 @@ fire-thermal property used in the intended heat-to-spread law.
 The uniform-community and separation context follows the published WU--E
 parametric study \cite{PurnomoIJWF2024}. The detailed intended equations are
 documented directly here.
-Executable semantics were checked against \path{elmfire_spread_rate.f90}
-and \path{elmfire_level_set.f90} at source revision
-\texttt{a2dfbcdf7220}.  Those mapped files were byte-identical to the revision;
-unrelated pre-existing edits elsewhere meant the checkout as a whole was dirty.
-For received heat flux $q=q_{\mathrm{DFC}}+q_{\mathrm{rad}}$, ELMFIRE forms
+Executable semantics were checked against ELMFIRE spread-rate calculation
+and ELMFIRE level-set formulation at source revision
+\texttt{a2dfbcdf7220}.  The reviewed components were identical to that revision; this identity claim
+does not extend to other modified model components.
+For received heat flux from direct flame contact (DFC) and radiation, $q=q_{\mathrm{DFC}}+q_{\mathrm{rad}}$, ELMFIRE forms
 \begin{equation}
  E=q\,\Delta t\,\Delta x^2.
 \end{equation}
@@ -42,16 +36,16 @@ For a time-convergent observable $Q_{\Delta t}$,
  {\lVert Q_{\Delta t}-Q_{\Delta t/2}\rVert}.
 \end{equation}
 The low-HRR family supplies a lower-amplitude heat-integration sequence. The
-high-HRR family supplies the TOA observables used for propagation convergence.
+high-HRR family supplies the time of arrival (TOA) observables used for propagation convergence.
 Both must have positive finite sampled heat; neither is classified by an
 energy branch in the intended model. ELMFIRE feedback level 1
 records every solver-step start time.  The evaluator requires the exact expected
 step count and increments within the log's 0.1 s print precision; any adaptive
-reduction or incomplete log makes the variant NOT EVALUABLE.
+reduction or incomplete log makes the simulation condition NOT EVALUABLE.
 
 % BEGIN EXPLICIT METRIC DERIVATION
 On the fixed $\Delta x=20$ m grid, the sampled heat-field diagnostic for every
-transient dump and physical FBFM91 cell is
+transient dump and physical fire behavior fuel model (FBFM) 91 cell is
 \[
  E_{i,n}^{*}=(q_{\mathrm{DFC},i,n}+q_{\mathrm{rad},i,n})
  \Delta t_{\mathrm{configured}}(20)^2.
@@ -62,11 +56,11 @@ only. For the high-HRR landmark vector $\mathbf{t}$,
  e_t=\frac{\lVert\mathbf{t}_{1}-\mathbf{t}_{0.5}\rVert_2}
  {\max(\lVert\mathbf{t}_{0.5}\rVert_2,10^{-12})},
 \]
-with analogous scalar changes for fitted ROS and total received heat.  Observed order uses the 2, 1, and 0.5 s results.
+with analogous scalar changes for fitted rate of spread (ROS) and total received heat.  Observed order uses the 2, 1, and 0.5 s results.
 % END EXPLICIT METRIC DERIVATION
 
 \section{Verification metrics and acceptance criteria}
-All eight exact-stop, current-fingerprint variants are required, with generated namelists, tables, and rasters matching the case contract, complete transient stacks on the common 20 s dump schedule, and a complete logged solver-step sequence. Both HRR families must have positive finite sampled heat. Every expected logged start time from 0 through $t_{stop}-\Delta t$ must be present within 0.051 s, accommodating the log's 0.1 s print precision. For the two finest high-HRR variants, landmark-TOA and community-ROS changes must be at most 5\%; total-heat change in each heat family must also be at most 5\%. A resolvable nonzero sequence must have temporal order at least 0.5; a roundoff-flat three-level sequence is the explicit alternative, while a flat finest pair after a nonzero coarse change fails as possible stagnation. High-HRR TOA fits require $R^2\geq0.95$.
+All eight exact-stop, input-matched simulation conditions are required, with generated namelists, tables, and rasters matching the case specification, complete transient stacks on the common 20 s dump schedule, and a complete logged solver-step sequence. Both HRR families must have positive finite sampled heat. Every expected logged start time from 0 through $t_{stop}-\Delta t$ must be present within 0.051 s, accommodating the log's 0.1 s print precision. For the two finest high-HRR simulation conditions, landmark-TOA and community-ROS changes must be at most 5\%; total-heat change in each heat family must also be at most 5\%. A resolvable nonzero sequence must have temporal order at least 0.5; a roundoff-flat three-level sequence is the explicit alternative, while a flat finest pair after a nonzero coarse change fails as possible stagnation. High-HRR TOA fits require $R^2\geq0.95$.
 
 These are preregistered diagnostic criteria rather than literature-provided
 uncertainties.  A 5-percent finest-pair limit is large enough to accommodate
@@ -77,7 +71,7 @@ fragmentary propagation profiles before a single ROS is reported.  The limits
 are not tuned after execution.
 
 \section{Simulation configuration and predicted outcome}
-The \SI{240}{m} by \SI{80}{m} community uses a fixed \TemporalGrid{} grid of FBFM~91, a \SI{40}{m} initially burning upwind strip, \SI{20}{m} linear characteristic building dimension, and \SI{10}{m} separation. The \SI{15}{mph} wind is from the west. Building models 14 and 15 share a 30--270--300 s piecewise-linear design fire but use peaks of 20 and \SI{800}{kW.m^{-2}}, respectively. Runs end at \TemporalStopTime{}. Firebrands, crown fire, stochastic wind, and suppression are disabled.
+The \SI{240}{m} by \SI{80}{m} community uses a fixed \TemporalGrid{} grid of fire behavior fuel model (FBFM)~91, a \SI{40}{m} initially burning upwind strip, \SI{20}{m} linear characteristic building dimension, and \SI{10}{m} separation. The \SI{15}{mph} wind is from the west. Building models 14 and 15 share a 30--270--300 s piecewise-linear design fire but use peaks of 20 and \SI{800}{kW.m^{-2}}, respectively. Runs end at \TemporalStopTime{}. Firebrands, crown fire, stochastic wind, and suppression are disabled.
 
 \begin{center}
 \begin{longtable}{P{0.22\textwidth}P{0.21\textwidth}P{0.13\textwidth}P{0.32\textwidth}}
@@ -105,23 +99,21 @@ Figure~\ref{fig:wtc-input} is mechanically rendered from the prepared GeoTIFFs a
 \end{figure}
 
 \section{Actual simulation results}
-The workflow state is \textbf{\WorkflowStatus}; the scientific decision is
+The analysis procedure state is \textbf{\WorkflowStatus}; the scientific decision is
 \textbf{\VerificationStatus}, with \CompletedVariantCount{} of
-\RequiredVariantCount{} required variants.  Reason: \VerificationReason.
-The executed binary SHA-256 is \ReadableHash{\ExecutedBinarySHA}.  For a completed
-record, \texttt{outputs/metrics.json} enumerates every exact selected raster path
-under \texttt{source\_files} and every bound run receipt under
-\texttt{completion\_receipt}; each receipt authenticates the executable,
-stdout/stderr, and complete output snapshot.
+\RequiredVariantCount{} required simulation conditions.  Reason: \VerificationReason.
+The executed binary SHA-256 is \ReadableHash{\ExecutedBinarySHA}.  For each completed simulation, the selected fields retain their actual output
+times and matching model, input, and simulation-record identities. All results
+must belong to those completed simulations.
 \ifnum\CompletedVariantCount>0
-\IfFileExists{../figures/convergence.pdf}{\begin{figure}[p]\centering\includegraphics[width=\textwidth]{convergence.pdf}\caption{Exact common-time response of heat, sampled FBFM91 energy, ROS, and TOA from paths recorded in \texttt{outputs/metrics.json}; convergence limits are 5\%.}\end{figure}}{}
-\IfFileExists{../figures/domain_result.pdf}{\begin{figure}[p]\centering\includegraphics[width=\textwidth]{domain_result.pdf}\caption{High-HRR exact-$t=300$ s TOA for $\Delta t=0.5$ s; the exact source raster is recorded in \texttt{outputs/metrics.json}.}\end{figure}}{}
+\IfFileExists{../figures/convergence.pdf}{\begin{figure}[p]\centering\includegraphics[width=\textwidth]{convergence.pdf}\caption{Exact common-time response of heat, sampled FBFM91 energy, ROS, and TOA from completed, input-matched simulations; convergence limits are 5\%.}\end{figure}}{}
+\IfFileExists{../figures/domain_result.pdf}{\begin{figure}[p]\centering\includegraphics[width=\textwidth]{domain_result.pdf}\caption{High-HRR exact-$t=300$ s TOA for $\Delta t=0.5$ s; the exact source raster is recorded in calculated verification and validation metrics.}\end{figure}}{}
 \fi
 
 \section{Calculated metrics and verification decision}
 \input{readable_results.tex}
 
-The overall scientific decision is \textbf{\VerificationStatus}.  Missing or stale products are NOT EVALUABLE; NOT RUN is retained only as a workflow state and cannot pass.  An incomplete propagation profile or a logged departure from the configured step produces NOT EVALUABLE rather than an invented convergence rate.
+The overall scientific decision is \textbf{\VerificationStatus}.  Missing or stale products are NOT EVALUABLE; NOT RUN is retained only as a analysis procedure state and cannot pass.  An incomplete propagation profile or a logged departure from the configured step produces NOT EVALUABLE rather than an invented convergence rate.
 
 \section{Technical interpretation}
 

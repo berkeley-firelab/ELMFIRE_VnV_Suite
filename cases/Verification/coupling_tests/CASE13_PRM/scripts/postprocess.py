@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """Evaluate the parametric response response maps."""
+
+from report_language import polish_figure, report_text
 import numpy as np
 from pathlib import Path
 import csv
@@ -98,6 +100,7 @@ def write_input_figure(case_dir, case, manifest):
     )
     figure_dir = case_dir / "figures"
     figure_dir.mkdir(exist_ok=True)
+    polish_figure(figure)
     figure.savefig(
         figure_dir / INPUT_FIGURE_FILENAME,
         bbox_inches="tight", pad_inches=0.06,
@@ -331,6 +334,7 @@ def write_figure(case_dir, case, results):
         handles, labels = ax.get_legend_handles_labels()
         if handles and len(handles) <= 12:
             ax.legend(fontsize=7, loc="best")
+    polish_figure(fig)
     fig.savefig(figure_dir / FIGURE_FILENAME, bbox_inches="tight")
     plt.close(fig)
 
@@ -353,7 +357,7 @@ def write_macros(case_dir, status, rows, completed, requested):
         lines.append("{} & {} & {} & {} \\\\".format(tex(row["metric"]), tex(
             row["limit"]), tex(row["calculated"]), tex(row["status"])))
     lines.append("}")
-    (case_dir / "report" / "metrics_macros.tex").write_text("\n".join(lines) + "\n")
+    (case_dir / "report" / "metrics_macros.tex").write_text(report_text("\n".join(lines) + "\n"))
 
 
 def main():

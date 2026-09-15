@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Convert case-local metrics into report-safe LaTeX macros."""
 from __future__ import annotations
+
+from report_language import report_text
 import json
 from pathlib import Path
 
@@ -52,7 +54,7 @@ def main() -> None:
         "}",
         "",
     ]
-    (CASE_DIR / "report/metrics_macros.tex").write_text("\n".join(lines))
+    (CASE_DIR / "report/metrics_macros.tex").write_text(report_text("\n".join(lines)))
 
 
 if __name__ == "__main__":

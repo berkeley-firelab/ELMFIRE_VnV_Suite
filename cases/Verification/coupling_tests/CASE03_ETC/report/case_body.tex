@@ -1,15 +1,22 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \CaseID
-
 This case verifies convergence of Eulerian firebrand transport in a uniform one-dimensional wind. Surface propagation is suppressed and deposited firebrands ignite immediately, so the leading edge isolates generation, transport, deposition, and level-set ignition updates.
 
-The test exposes grid- or CFL-dependent advection speed, lost transient output, and inconsistent front extraction. Success requires the measured leading-edge rate to approach the prescribed wind speed over the accepted grid and CFL range.
+The test exposes grid- or Courant--Friedrichs--Lewy (CFL)-dependent advection speed, lost transient output, and inconsistent front extraction. Success requires the measured leading-edge rate to approach the prescribed wind speed over the accepted grid and CFL range.
 
 \section{Mathematical formulation and numerical implementation}
 
 \begin{sloppypar}
-This sweep reconstructs the wind-CFL convergence experiment~\cite{Qin2025}. \texttt{READ\_SPOTTING} selects \texttt{PER-AREA}, \texttt{EULERIAN}, and \texttt{DIRECT}; \texttt{SPOTTING} creates the source, \texttt{EMBER\_\allowbreak TRAJECTORY\_\allowbreak EULERIAN} advances it, and \texttt{EULERIAN\_\allowbreak SPOTTING\_\allowbreak MAIN} converts the arriving ember state into a new ignition while updating \texttt{TIME\_\allowbreak OF\_\allowbreak ARRIVAL} and the level set. Because surface spread is suppressed, sustained propagation must traverse that complete code path. The wind-CFL sweep changes only the dimensionless ratio of wind displacement per step to cell size while the physical domain and areal source remain fixed. Consequently, a transport-stencil, timestep, direct-ignition, or TOA update error appears as resolution- or CFL-dependent leading-edge speed. The comparison to the wind speed is an idealized numerical reference and does not claim that real firebrands travel deterministically at the ambient wind speed.
+This sweep reconstructs the wind-Courant-number convergence experiment~\cite{Qin2025}.
+Area-proportional firebrand production, Eulerian transport and accumulation,
+and immediate ignition couple the arriving firebrands to the fire arrival time
+and level-set field. Because surface spread is suppressed, sustained propagation
+requires all these processes. The sweep changes only wind displacement per step
+relative to cell size, with fixed physical domain and areal production. Errors
+in transport, timestep scaling, immediate ignition, or arrival-time updates can
+therefore appear as grid- or Courant-number-dependent leading-edge speed. The
+wind-speed reference is an idealized numerical expectation, not a claim that
+real firebrands travel deterministically at the ambient wind speed.
 
 \end{sloppypar}
 
@@ -42,7 +49,7 @@ the 300--1500 m comparison interval predicts
 \]
 At the 260-s stop the characteristic displacement is
 \(6.71(260)=1744.6~\mathrm{m}\), plus the generated half-cell initial
-coordinate where absolute position is needed.  Thus every required variant
+coordinate where absolute position is needed.  Thus every required simulation condition
 has the exact normalized reference
 \(\overline{ROS}/U=1\) and \(E_U=|1-1|=0\); the implemented allowance is
 \(E_U\leq0.10\).
@@ -66,15 +73,14 @@ and the downstream boundary.  Raster shape, cell size, buffer exclusion,
 dump-to-time matching, front-observation count, rate-interval count, and a
 diagnostic least-squares coefficient of determination are recorded for every
 result.  A CSV trajectory preserves each dump time, selected \(\phi\) raster,
-leading-edge location, and stepwise ROS.
+leading-edge location, and stepwise rate of spread (ROS).
 
-Every variant with $CFL_{wind}\leq0.8$ passes when
+Every simulation condition with $CFL_{wind}\leq0.8$ passes when
 \begin{equation}
   \left|ROS/u_{wind}-1\right|\leq 0.10.
 \end{equation}
 The higher-CFL points are retained to expose the onset of temporal
 transport error but do not determine overall pass/fail status.
-
 
 \subsection{Justification of metric quantification}
 
@@ -88,11 +94,11 @@ than the largest single-cell position uncertainty divided by the
 produced by a stalled front or by advancing trackers for only a fraction of a
 solver step.  Time-weighting the rates over \SI{300}{m}--\SI{1500}{m} further
 prevents an isolated grid crossing from controlling the decision.  Requiring
-all 20 stable-regime variants guards against compensating resolution and
+all 20 stable-regime simulation conditions guards against compensating resolution and
 timestep errors; incomplete trajectories cannot establish convergence and are
 therefore non-passing.
 
-\subsection{Predeclared acceptance contract}
+\subsection{Predeclared acceptance criteria}
 
 Table~\ref{tab:acceptance-contract} summarizes the metrics fixed before
 inspection of the calculated results. Numerical values and component statuses
@@ -107,18 +113,18 @@ are reported separately in Section~7.
 \toprule
 Metric & Output, region, and aggregation & Acceptance criterion\\
 \midrule
-Required-output completeness & Transient \path{phi} rasters, dump times, and at least one valid front-rate interval between 300 and \SI{1500}{m}. & All 20 variants with \(CFL_{wind}\le0.8\) \\
-Normalized mean-ROS error & \(E_U=|\overline{ROS}/u_{wind}-1|\), where \(\overline{ROS}\) is displacement divided by elapsed time over the comparison interval. & \(E_U\le0.10\) for every required variant \\
-Overall decision & All required variants must be complete and satisfy the normalized-speed limit; higher-CFL variants are diagnostic only. & PASS iff all required components pass \\
+Required-output completeness & Transient level-set field rasters, dump times, and at least one valid front-rate interval between 300 and \SI{1500}{m}. & All 20 simulation conditions with \(CFL_{wind}\le0.8\) \\
+Normalized mean-ROS error & \(E_U=|\overline{ROS}/u_{wind}-1|\), where \(\overline{ROS}\) is displacement divided by elapsed time over the comparison interval. & \(E_U\le0.10\) for every required simulation condition \\
+Overall decision & All required simulation conditions must be complete and satisfy the normalized-speed limit; higher-CFL simulation conditions are diagnostic only. & PASS iff all required components pass \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Simulation configuration and predicted outcome}
 
-Figure~\ref{fig:input-configuration} records the prepared spatial inputs for \texttt{dx10\_cfl0p2}.
-The postprocessor reads these panels from the variant-local GeoTIFF files, removes the
-two-cell numerical buffer, and retains map coordinates in metres.  The left panel shows
+Figure~\ref{fig:input-configuration} records the prepared spatial inputs for a 10 m grid and wind Courant number 0.2.
+These panels show the prepared spatial fields, remove the
+two-cell numerical buffer, and retain map coordinates in metres.  The left panel shows
 the most informative fuel or structure layout available for the case; the right panel
 shows the cells selected by the non-positive initial level-set field, making a localized
 ignition or firebrand-emission source explicit.
@@ -126,7 +132,7 @@ ignition or firebrand-emission source explicit.
 \begin{figure}[H]
 \centering
 \EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
-\caption{Whole-domain prepared input configuration for the representative variant.  The
+\caption{Whole-domain prepared input configuration for the representative simulation condition.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
 \label{fig:input-configuration}
@@ -142,10 +148,10 @@ disabled.
 
 The current spotting interface uses the following explicit model selections:
 \begin{itemize}
-  \item generation: \texttt{PER-AREA};
-  \item spotting distance: \texttt{EMPIRICAL};
-  \item accumulation: \texttt{EULERIAN};
-  \item ignition: \texttt{DIRECT}.
+  \item generation: area-proportional;
+  \item spotting distance: empirical;
+  \item accumulation: Eulerian;
+  \item ignition: immediate.
 \end{itemize}
 The customized downwind distribution has $\mu=2.18$, $\sigma=1.23$, and
 $P_\varepsilon=0.01$.  Every ignited cell emits for \SI{10}{s}.  The configured areal generation rate is resolution-independent:
@@ -156,18 +162,18 @@ ELMFIRE therefore emits \(N=GR_A\,\Delta x^2\,\Delta t\) firebrands from one bur
 
 \subsection{Resolution sweep and predicted trend}
 Four grid spacings, $\Delta x=5$, 10, 20, and \SI{30}{m}, are crossed with
-wind-based CFL values 0.2, 0.4, 0.5, 0.6, 0.8, 1.0, and 1.2, for 28 variants.  Each
+wind-based CFL values 0.2, 0.4, 0.5, 0.6, 0.8, 1.0, and 1.2, for 28 simulation conditions.  Each
 time step is prescribed by
 \begin{equation}
   \Delta t=CFL_{wind}\frac{\Delta x}{u_{wind}}.
 \end{equation}
-Because timestep variation is the verification variable, these fractional values are not rounded. For each member preprocessing uses \(N=\lceil260/\Delta t\rceil\) and writes \(t_{stop}=N\Delta t\), recording the requested 260~s, aligned stop, and integer step count in the manifest. All variants retain the same physical domain; only the number of active and
+Because timestep variation is the verification variable, these fractional values are not rounded. For each member preprocessing uses \(N=\lceil260/\Delta t\rceil\) and writes \(t_{stop}=N\Delta t\), recording the requested 260~s, aligned stop, and integer step count in the simulation specification. All simulation conditions retain the same physical domain; only the number of active and
 buffer cells changes.
 
 \section{Actual simulation results}
 
-Figure~\ref{fig:domain-result} shows the representative transported level-set field from \texttt{dx10\_cfl0p2}.
-It is read from the actual ELMFIRE output named in the panel, masks nodata, and excludes
+Figure~\ref{fig:domain-result} shows the representative transported level-set field from a 10 m grid and wind Courant number 0.2.
+The displayed field is taken from the simulated results, masks missing values, and excludes
 the two-cell numerical buffer.  The zero contour identifies the transported front, while the signed field exposes domain-wide numerical structure away from the extracted centerline.
 
 \begin{figure}[H]
@@ -253,10 +259,10 @@ mistaken for the effective transport speed.
 Quantity & Value \\
 \midrule
 Overall status & \Metric{status} \\
-Prepared variants & \Metric{numvariants} \\
-Variants with simulation results & \Metric{numvariantscomputed} \\
-Required variants & \Metric{numrequiredvariants} \\
-Required variants evaluated & \Metric{numrequiredvariantscomputed} \\
+Prepared simulation conditions & \Metric{numvariants} \\
+Simulation conditions with simulation results & \Metric{numvariantscomputed} \\
+Required simulation conditions & \Metric{numrequiredvariants} \\
+Required simulation conditions evaluated & \Metric{numrequiredvariantscomputed} \\
 Reference wind speed [m/s] & \Metric{referencewindmps} \\
 Maximum relative error & \Metric{maxrelativeerror} \\
 Acceptance CFL limit & \Metric{acceptancecflmax} \\
@@ -275,10 +281,12 @@ corresponding to a
 relative error of \Metric{coarsecflofiveRelativeerror}.  This is slightly
 larger than the allowed 0.10.  The $\Delta x=\SI{10}{m}$ representative case
 remains within tolerance and is used above to explain the extraction
-procedure. All 28 current-fingerprint variants completed and the generated controls match the declared wind, grid, and CFL sweep. The isolated coarse-grid excess is therefore a numerical transport/level-set discrepancy in the current source behavior, not an incomplete run or an admissible configuration correction.
+procedure. All 28 input-matched simulation conditions completed and the generated controls match the declared wind, grid, and CFL sweep. The isolated coarse-grid excess is therefore a numerical transport/level-set discrepancy in the current source behavior, not an incomplete run or an admissible configuration correction.
 
 \section{Scope and limitations}
-From this case directory, configure \texttt{ELMFIRE\_BIN} and run \texttt{./run\_case.sh}. The runner preprocesses the manifest, executes every variant sequentially with isolated outputs and logs, postprocesses the results, and compiles the standalone report.
+Each prescribed condition is simulated and analyzed independently. The
+comparison depends on complete results for the stated grid and timestep sweep,
+not on whether a simulation or report preparation procedure finishes.
 
 \begin{thebibliography}{9}
 \bibitem{Qin2025}

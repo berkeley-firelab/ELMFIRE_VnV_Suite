@@ -8,6 +8,8 @@ comparison time.
 
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import json
 import re
 from pathlib import Path
@@ -41,6 +43,7 @@ CONFIG = load_configuration()
 
 def save_figure(fig: plt.Figure, name: str) -> None:
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIGURE_DIR / name, format="pdf", bbox_inches="tight")
     plt.close(fig)
 
@@ -204,7 +207,7 @@ def plot_comparison(probability: np.ndarray, observed: np.ndarray, predicted: np
     fig, axes = plt.subplots(1, 2, figsize=(11.0, 5.0))
     image = axes[0].imshow(probability, cmap="inferno", vmin=0.0, vmax=1.0)
     axes[0].contour(observed.astype(float), levels=[0.5], colors="cyan", linewidths=1.0)
-    fig.colorbar(image, ax=axes[0], label="ensemble burn probability")
+    fig.colorbar(image, ax=axes[0], label="Ensemble burn probability (dimensionless)")
     axes[0].set_title("Probability; cyan = VIIRS-derived hull")
     agreement = np.zeros(predicted.shape, dtype=np.uint8)
     agreement[predicted & observed] = 1
@@ -212,9 +215,9 @@ def plot_comparison(probability: np.ndarray, observed: np.ndarray, predicted: np
     agreement[~predicted & observed] = 3
     cmap = plt.matplotlib.colors.ListedColormap(["white", "#4daf4a", "#e41a1c", "#377eb8"])
     axes[1].imshow(agreement, cmap=cmap, vmin=0, vmax=3, interpolation="nearest")
-    axes[1].set_title("Agreement: green TP, red FP, blue FN")
+    axes[1].set_title("Green: overlap; red: simulated only; blue: observed only")
     for axis in axes:
-        axis.set(xlabel="grid column", ylabel="grid row")
+        axis.set(xlabel="Grid column (index)", ylabel="Grid row (index)")
     fig.suptitle(str(CONFIG["title"]))
     save_figure(fig, "validation_comparison.pdf")
 
@@ -230,7 +233,7 @@ def plot_arrival(arrival: np.ndarray, valid: np.ndarray) -> None:
     fig, ax = plt.subplots(figsize=(8.2, 6.0))
     image = ax.imshow(median, cmap="viridis")
     fig.colorbar(image, ax=ax, label="conditional median arrival time (h)")
-    ax.set(title=f"{CONFIG['title']}: arrival time where at least one member burns", xlabel="grid column", ylabel="grid row")
+    ax.set(title=f"{CONFIG['title']}: arrival time where at least one member burns", xlabel="Grid column (index)", ylabel="Grid row (index)")
     save_figure(fig, "arrival_time_summary.pdf")
 
 
@@ -244,8 +247,8 @@ def plot_area_growth(arrival: np.ndarray, pixel_area_m2: float) -> dict[str, lis
     high = np.percentile(areas, 95, axis=0)
     fig, ax = plt.subplots(figsize=(8.5, 5.2))
     hours = times / 3600.0
-    ax.fill_between(hours, low, high, alpha=0.25, color="#35618f", label="5--95% members")
-    ax.plot(hours, median, color="#17395c", label="ensemble median")
+    ax.fill_between(hours, low, high, alpha=0.25, color="#35618f", label="5th--95th percentiles")
+    ax.plot(hours, median, color="#17395c", label="Ensemble median")
     ax.set(xlabel="simulation time (h)", ylabel="burned area (km$^2$)", title=f"{CONFIG['title']}: burned-area growth")
     ax.legend()
     save_figure(fig, "burned_area_growth.pdf")

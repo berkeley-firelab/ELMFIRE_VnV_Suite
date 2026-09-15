@@ -2,6 +2,8 @@
 """Measure leading-edge transport speed from every transient phi raster."""
 from __future__ import annotations
 
+from report_language import polish_figure, report_text
+
 import csv
 import json
 import math
@@ -288,6 +290,7 @@ def write_figure(results: list[dict]) -> None:
     axis.set_ylabel(r"Time-averaged $ROS/u_{wind}$ [-]")
     axis.grid(True, color="0.85", linewidth=0.7)
     axis.legend(loc="lower left", ncol=2, fontsize=8)
+    polish_figure(figure)
     figure.savefig(FIGURE_DIR / "eulerian_transport_convergence.pdf", format="pdf")
     plt.close(figure)
 
@@ -407,6 +410,7 @@ def write_representative_figure(
         rf"Representative case: $\Delta x={variant['dx_m']:g}$ m, "
         rf"$CFL_{{wind}}={variant['wind_cfl']:.1f}$"
     )
+    polish_figure(figure)
     figure.savefig(FIGURE_DIR / "representative_front_extraction.pdf", format="pdf")
     plt.close(figure)
 
@@ -554,7 +558,7 @@ def main() -> None:
         f"\\expandafter\\def\\csname metric@{re.sub(r'[^A-Za-z0-9]+', '', key)}\\endcsname"
         f"{{{latex_escape(value)}}}" for key,
         value in macros.items()]
-    (REPORT_DIR / "metrics_macros.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (REPORT_DIR / "metrics_macros.tex").write_text(report_text("\n".join(lines) + "\n"), encoding="utf-8")
     print(f"[OK] evaluated {len(computed)}/{len(results)} variants: {status}")
 
 

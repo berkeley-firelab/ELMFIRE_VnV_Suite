@@ -2,6 +2,8 @@
 """Measure head direction, head ROS, ellipse ratio, and reaction intensity."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import csv
 import json
 import math
@@ -397,6 +399,7 @@ def main() -> None:
         axes[1].set(xlabel="wind-to-upslope angle (degrees)", ylabel="head ROS (m/min)")
         for axis in axes: axis.grid(alpha=0.25); axis.legend()
         fig.tight_layout(); (CASE_DIR/"figures").mkdir(exist_ok=True)
+        polish_figure(fig)
         fig.savefig(CASE_DIR/"figures/vector_response.pdf", bbox_inches="tight"); plt.close(fig)
     print(f"[OK] CASE40_WSD: {result['overall_status']}")
 

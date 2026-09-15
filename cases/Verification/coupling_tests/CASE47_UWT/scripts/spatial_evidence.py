@@ -2,6 +2,8 @@
 """Create report-ready input evidence from generated CASE47 rasters."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -118,6 +120,7 @@ def main() -> None:
     )
     output = CASE_DIR / "figures/input_configuration.pdf"
     output.parent.mkdir(exist_ok=True)
+    polish_figure(fig)
     fig.savefig(
         output,
         metadata={

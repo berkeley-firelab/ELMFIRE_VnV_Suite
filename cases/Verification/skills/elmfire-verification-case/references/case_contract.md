@@ -47,7 +47,7 @@ independently of case metadata.
 
 ## Input generation
 
-Generate deterministic rasters and namelists locally. Explain grid origin, resolution, row direction, geotransform, projection, units, nodata handling, ignition placement, and buffer cells wherever applicable. Record enough metadata to reconstruct the run. Preprocessing or an immediately invoked case-local evidence step must also generate a report-ready whole-domain input-configuration figure from those prepared artifacts. At minimum it must visualize PHI or ignition and one field that controls the experiment. It must remain generatable before ELMFIRE outputs exist, identify the chosen variant and source rasters, and never read or alter a sibling case or invent a substitute field.
+Generate deterministic rasters and namelists locally. Explain grid origin, resolution, row direction, geotransform, projection, units, nodata handling, ignition placement, and buffer cells wherever applicable. Record enough metadata to reconstruct the run. Preprocessing or an immediately invoked case-local evidence step must also generate a report-ready whole-domain input-configuration figure from those prepared artifacts. At minimum it must visualize PHI or ignition and one field that controls the experiment. It must remain generatable before ELMFIRE outputs exist, identify the prescribed simulation condition and scientific meaning and construction of the input fields without displaying filenames, and never read or alter a sibling case or invent a substitute field.
 
 ### Generated variant ownership
 
@@ -123,3 +123,9 @@ mkdir -p "$CASE_DIR/outputs" "$CASE_DIR/figures" "$CASE_DIR/logs"
 ```
 
 Add explicit variant invocations when the contract requires them. Finish by invoking `compile_case.sh`. The runner coordinates; scientific logic belongs in readable Python scripts and ELMFIRE configuration.
+
+## Presentation boundary
+
+Follow [report_language.md](report_language.md). The filenames, metadata keys, and
+implementation details in this construction reference are operational only.
+Describe their scientific meaning in reports; never display these identifiers.

@@ -1,43 +1,37 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \texttt{\CaseID}.  This case verifies the discrete
-wildland-to-urban (WTU) transition of WU--E at a contiguous interface and at
-an isolated urban receiver. Its primary oracle is heat/FTP ignition with a
-finite exposure time. The seven-run matrix also characterizes the optional
+This case verifies the discrete
+wildland-to-urban (WTU) transition of Wildland--Urban ELMFIRE (WU--E) at a contiguous interface and at
+an isolated urban receiver. Its primary reference calculation compares accumulated heat with the material
+fire-thermal property (FTP), requiring a finite exposure time before ignition. The seven-run matrix also characterizes the optional
 fireline-intensity shortcut and is intended to expose reversed fuel
 eligibility, excessive reach, topology dependence, a missing heat path, or an
-incorrect arrival timestamp. The scientific verdict is separate from workflow state:
+incorrect arrival timestamp. The scientific verdict is separate from analysis procedure state:
 before execution the former is NOT EVALUABLE and the latter is NOT RUN.
 
-The implementation under test is pinned to \SourceCommit. The five WU--E source
-files listed under \texttt{reviewed\_file\_sha256} in \texttt{case.yaml} were
-byte-identical to that revision during review.  Dump behavior was reviewed from
-the pinned \texttt{elmfire\_io.f90} git blob; its exact SHA-256 is recorded in
-\texttt{case.yaml}.  No byte-identity claim is made for that file's separately
-modified working-checkout copy.  Runtime scripts do not inspect a source
-checkout.
+The ELMFIRE formulation under examination corresponds to \SourceCommit.
+Five reviewed WU--E components matched that revision exactly. Output timing
+was reviewed separately from the output procedure at the stated revision,
+with its SHA-256 identity retained in the case specification. A separately
+modified copy of that procedure was not asserted to match the revision.
+These design-review statements do not by themselves establish the identity
+of a later simulation.
 
-The optional-shortcut preflight is honestly NOT EVALUABLE. The namelist assigns the
-value 2 to \texttt{INTERFACE\_MODEL\_TYPE}, but the active branch tests integer
-\texttt{CRITICAL\_HF\_WUI==2}; no deterministic assignment of that integer was
-found.  The similarly named real \texttt{CRITICL\_HF\_WUI} is a different
-variable. The primary heat/FTP verdict does not depend on this selector. The
-optional shortcut rows become PASS or FAIL only when a content-bound preflight
-demonstrates a true selector gate, required and deterministically assigned
-value 2, and a nonempty reviewed assignment location.
-
-
-\paragraph{Reading the notation.}
-WU--E denotes the Wildland--Urban ELMFIRE model. HRR is heat-release rate;
-HRRPUA is heat-release rate per unit area. DFC means direct flame contact,
-TOA means time of arrival, and ROS means rate of spread. FTP is the material
-fire-thermal property used in the intended heat-to-spread law.
+The optional shortcut is NOT EVALUABLE in the compatibility review. The
+configuration selects interface model 2, but the active transition condition
+tests whether a separate integer control equals 2. No deterministic assignment
+of that control was found. The real-valued critical heat-flux threshold is a
+different quantity and cannot establish the integer control's value. The
+primary heat/FTP decision does not depend on this selection. The optional
+shortcut comparisons become PASS or FAIL only after a review matched to the
+model revision establishes an enabled selection condition and documents where
+the required integer value 2 is assigned deterministically.
 
 \ReportOverview
 
 \section{Mathematical formulation and numerical implementation}
 
-The intended WTU path deposits DFC and radiation from a burning wildland cell
+The intended WTU path deposits direct flame contact (DFC) and radiation from a burning wildland cell
 onto an urban receiver, accumulates
 \[
  Q_j(t+\Delta t)=Q_j(t)+[q''_{DFC,j}(t)+q''_{rad,j}(t)]\Delta t,
@@ -45,10 +39,10 @@ onto an urban receiver, accumulates
 and ignites after the fixed material threshold $F_{TP,crit}$ is met. Thus a
 sufficiently heated target must have a finite delay
 $\tau_{WTU}=t_{ign,target}-t_{ign,source}>0$. The same heat/FTP law then
-produces urban ROS; no 30,000-kJ branch is part of this oracle.
+produces urban rate of spread (ROS); no 30,000-kJ branch is part of this reference calculation.
 
-As an optional implementation extension, for source \((i_s,j_s)\) and target \((i_t,j_t)\), the reviewed source condition
-in \path{build/source/elmfire_spread_rate.f90:665-678} is
+As an optional extension, for source \((i_s,j_s)\) and target \((i_t,j_t)\),
+the reviewed fireline-intensity transition condition is
 \[
  r=\sqrt{(i_t-i_s)^2+(j_t-j_s)^2},\qquad
  \mathcal I=(f_s\ne91)\land(f_t=91)\land(r\le1)
@@ -56,20 +50,20 @@ in \path{build/source/elmfire_spread_rate.f90:665-678} is
 \]
 The comparison is strict.  A true branch sets the target's WTU flag and skips
 the ordinary DFC and radiation calculation for that target.  In both Runge--Kutta
-stages, \path{build/source/elmfire_level_set.f90:2549-2595} forces its
+stages, the level-set update forces its
 \(\phi=-1\).  The newly burned-cell loop then records
 \(\mathrm{TOA}=T\).  Initialization assigns every input \(\phi\le0\) source
-cell TOA zero.
+cell time of arrival (TOA) zero.
 
-The FBFM01 source has five-percent dead one-hour moisture, zero wind, and zero
+The fire behavior fuel model (FBFM) 01 source has five-percent dead one-hour moisture, zero wind, and zero
 slope.  The input-design calculation uses
 \[
  t_r=384/\sigma,\qquad \FLIN=t_r I_R R(0.3048),
 \]
 then searches adjacent IEEE-754 binary32 adjustment values so the reviewed
-default-\texttt{REAL} operation order brackets 999, 1000, and 1001
-\si{\kilo\watt\per\metre}.  This is only an input oracle; acceptance uses the
-ELMFIRE \texttt{flin} raster.
+default-single-precision arithmetic operation order brackets 999, 1000, and 1001
+\si{\kilo\watt\per\metre}.  This is only an input reference calculation; acceptance uses the
+ELMFIRE fireline intensity raster.
 
 The peer-reviewed WU--E publications describe interface heat transfer and
 heat/FTP spread \cite{PurnomoPCI2024,PurnomoIJWF2024}. The supplied thesis supports
@@ -77,24 +71,24 @@ this scaling on PDF page 53 (printed page 31), equations (2.42)--(2.43), and
 gives vegetation heat-release context on PDF page 64 (printed page 42),
 equations (2.81)--(2.83). The intended equations are documented directly here.
 Neither published source supplies the special 1000 \si{\kilo\watt\per\metre} branch,
-selector linkage, forced \(\phi\), or dump-name oracle; those come exclusively
+selector linkage, forced \(\phi\), or dump-name reference calculation; those come exclusively
 from the pinned source.
 
 \section{Derivation of expected behavior}
 
-For the primary oracle, positive DFC-plus-radiation must be observed at the
+For the primary reference calculation, positive DFC-plus-radiation must be observed at the
 sufficient-heat adjacent and isolated receivers and ignition must occur after
-a positive exposure delay. The initial-wildland-source HRR suppression is diagnostic, but later
+a positive exposure delay. The initial-wildland-source heat-release rate (HRR) suppression is diagnostic, but later
 propagation within the vegetative patch may create new heat-emitting sources.
 The complete receiver history, not the initial-source state alone, determines
 this observation.
 
-For the optional shortcut, the contiguous variants request source FLIN of 999, 1000, and 1001
+For the optional shortcut, the contiguous simulation conditions request source FLIN of 999, 1000, and 1001
 \si{\kilo\watt\per\metre} at an immediately adjacent FBFM91 band.  Only 1001
 may transition.  Isolated targets test 999 and 1001 at one-cell distance and
 1001 at two-cell distance; only the one-cell 1001 target may transition.  A
 zero-adjustment target is the spontaneous-ignition control.  Thus the exact
-boolean oracle is
+boolean reference calculation is
 \[
  (0,0,1)_{\rm contiguous},\qquad(0,1,0)_{\rm isolated},\qquad0_{\rm zero}.
 \]
@@ -113,29 +107,28 @@ cannot create an ignition result.
 
 \section{Verification metrics and acceptance criteria}
 
-All seven variants must have a current exit-zero receipt binding the exact
-runtime input manifest, \path{variants/expected.json}, all seven case-local
-variant metadata files, \path{variants/variant_ids.txt}, the selector
-preflight, executable absolute
-path/hash/version, captured stdout/stderr, and a complete post-exit output-file
-snapshot.  The same executable identity must appear in every receipt, and its
-current file hash must still match.  Stale or altered artifacts are rejected.
+All seven simulation conditions require confirmed successful completion with
+matching identities for the exact simulation settings, independently calculated
+expected responses, complete set of prescribed conditions, and review of
+supported model selections. The ELMFIRE program, simulation record, and all
+results must also match the recorded identities. All seven conditions must use
+the same identified model program. Stale or altered evidence is rejected.
 
 The dump ledger is exact, not merely terminal: 61 rows have indices 1 through
 61, times 0 through 60 s, and only row 61 is final.  This follows the pinned
 loop, which dumps at current \(T=0,\ldots,59\) before incrementing time and then
-makes a final dump after reaching 60 s.  Final-only FLIN and TOA names use the
-rounded time stamp \texttt{\_0000060}; every-dump PHI names use the separate
-dump index, so terminal PHI is \texttt{\_d0000061}.  All 61 canonical PHI
-GeoTIFFs are required.  The terminal three rasters must be one-band, aligned
-25-by-25 EPSG:32610 grids with the exact nodata contract and finite non-nodata
-values.  Captured stdout must not report a propagation stall.
+makes a final dump after reaching 60 s. Final fireline-intensity and arrival-time
+fields are identified by the rounded output time, 60 s. The level-set sequence
+is indexed by output number, so its terminal field is output 61, not output 60.
+All 61 level-set fields are required. The terminal three rasters must be one-band, aligned
+25-by-25 EPSG:32610 grids with the exact missing-value definition and finite non-nodata
+values. The simulation record must not report a propagation stall.
 
 \begin{center}
 
 \begin{longtable}{@{}P{0.25\textwidth}P{0.35\textwidth}P{0.30\textwidth}@{}}\toprule
 Metric & Observable & Acceptance rule\\\midrule
-Evidence/ledger & receipts, hashes, logs, 61 dump rows and terminal names & all exact for 7/7 variants\\
+Evidence completeness & confirmed model and input identities, 61 output times, and terminal fields & all exact for 7/7 simulation conditions\\
 Source realization & source-mask FLIN and TOA & max FLIN error \(\le0.5\) \si{\kilo\watt\per\metre}; every source TOA zero\\
 State consistency & designated-target terminal PHI and TOA & \(\phi\le0\) iff TOA finite\\
 Intended WTU heat & target DFC+radiation histories & positive for sufficient-heat receivers\\
@@ -161,9 +154,9 @@ Grid & \(25\times25\), 10 m, EPSG:32610 & at least 10 cells per dimension; edge-
 Fuel topology & FBFM01 source, FBFM91 targets, FBFM93 background & explicit vegetative/urban eligibility and isolation\\
 Source requests & 0, 999, 1000, 1001 \si{\kilo\watt\per\metre} & zero control and strict threshold bracket\\
 Receiver distance & 1 or 2 cells & equality boundary and reach control\\
-Time & start 0, fixed step/max 1, stop 60 s & exact first-update and terminal ledger oracle\\
+Time & start 0, fixed step/max 1, stop 60 s & exact first-update and terminal ledger reference calculation\\
 Output & every-step PHI; final FLIN and TOA & direct state, intensity, and time observables\\
-Dormant ignition & one point at 61 s & keeps \texttt{ALREADY\_IGNITED} false through the run, preventing the vacuous zero-ignition stall test without changing 0--60 s physics\\
+Dormant ignition & one point at 61 s & keeps the prior-ignition state false through the run, preventing the vacuous zero-ignition stall test without changing 0--60 s physics\\
 Other mechanisms & spotting, crown, randomness off & removes alternate ignition mechanisms\\
 \bottomrule\end{longtable}
 \end{center}
@@ -179,21 +172,19 @@ a simulation result.
 
 \section{Actual simulation results}
 
-Workflow status is \textbf{\WorkflowStatus}; \CompletedVariants{} of
-\RequiredVariants{} variants have complete current evidence.  Selector status
+Analysis procedure status is \textbf{\WorkflowStatus}; \CompletedVariants{} of
+\RequiredVariants{} simulation conditions have complete current evidence.  Selector status
 is \textbf{\SelectorStatus}.  The generated reason is:
 \begin{quote}\VerificationReason\end{quote}
-The executed version is \texttt{\ExecutableVersion}. The full executable
-identity and the runtime and oracle hashes are preserved in the case-local
-metrics and completion receipts, so the prose need not repeat long hash strings.
+The executed version is \texttt{\ExecutableVersion}. The model-program and
+reference-calculation identities are retained with the calculated metrics.
 
-Exact primary evidence is rooted at \path{variants/expected.json},
-\path{variants/run_fingerprints.json}, and
-\path{outputs/source_selector_preflight.json}.  Each variant has a completion
-receipt and captured standard-output log; terminal FLIN/TOA use
-\texttt{\_0000060.tif}, and terminal PHI uses \texttt{\_d0000061.tif}.  The
-generated metrics JSON records the resolved path for every selected raster,
-receipt, log, and dump ledger.
+The primary comparison uses independently calculated expected responses,
+input-matched simulation results, and the review of supported model settings.
+Each simulation must have evidence of successful completion. The terminal
+fireline-intensity and arrival-time fields correspond to 60 s, while the
+terminal level-set field is the 61st output. Their identities and output times
+are retained with the calculated metrics so the selection remains traceable.
 
 \IfFileExists{../figures/transition_observations.pdf}{%
 \begin{figure}[p]\centering
@@ -213,7 +204,7 @@ only shortcut-specific rows remain NOT EVALUABLE.
 \section{Technical interpretation}
 
 The current complete run fails the source-intensity setup check. The input
-oracle specifies head-fire FLIN, whereas the terminal raster exports
+reference calculation specifies head-fire FLIN, whereas the terminal raster exports
 surface-plus-canopy intensity from the initially burned-node list. That
 export is not the same observation as the head-fire intensity assigned to the
 WUI source list. A reliable threshold comparison requires a source diagnostic
@@ -237,10 +228,10 @@ This case covers one wildland fuel/moisture state, one cell size, a 60-s window,
 contiguous and isolated targets, the strict intensity bracket, distance
 boundary, state/timing update, and zero control.  It does not validate the
 physical choice of 1000 \si{\kilo\watt\per\metre}, urban-to-wildland spread,
-community propagation or convergence. Executable
-path/hash/version prove that one binary produced all accepted outputs but do
-not prove that binary was built from \SourceCommit; the commit remains the
-documented implementation provenance. A source repair requires a newly reviewed,
+community propagation or convergence. A common model-program identity
+establishes consistency across accepted outputs but does not establish that
+the program was compiled from \SourceCommit; that source revision identifies
+the reviewed formulation. A model correction requires a newly reviewed,
 content-bound PASS preflight before this unchanged strict matrix can yield a
 shortcut-specific PASS or FAIL.
 

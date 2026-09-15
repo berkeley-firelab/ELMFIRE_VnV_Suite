@@ -1,10 +1,8 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \CaseID
+This case verifies the limiting mechanism shared by steady Eulerian transport and zero-delay wildland ignition. The isolated transport simulation condition disables surface spread and uses an areal source; wildland ignition without delay uses a fire-power-based source and additionally checks accumulated population.
 
-This case verifies the limiting mechanism shared by steady Eulerian transport and zero-delay wildland ignition. The \texttt{transport\_impulse} variant disables surface spread and uses an areal source; \texttt{wildland\_no\_delay} uses a fire-power-based source and additionally checks accumulated population.
-
-The paired design exposes failures in generation, transport, deposition, direct ignition, and time-of-arrival updates. Success requires both variants to recover wind-speed arrival behavior and the wildland variant to recover its one-metre-strip accumulation reference.
+The paired design exposes failures in generation, transport, deposition, direct ignition, and time-of-arrival (TOA) updates. Success requires both simulation conditions to recover wind-speed arrival behavior and the wildland simulation condition to recover its one-metre-strip accumulation reference.
 
 \section{Mathematical formulation and numerical implementation}
 For constant wind speed $U=6.71$~m/s and zero ignition delay, an ember-deposited
@@ -16,17 +14,17 @@ cell becomes an active source immediately. Translation invariance then gives
  \label{eq:transport}
 \end{equation}
 where $x_0$ is the first usable cell centre. The final arrival-time raster stores
-the complete cell-crossing history used for the TOA profile metric. Leading-edge
+the complete cell-crossing history used for the time of arrival (TOA) profile metric. Leading-edge
 history is evaluated independently from every dumped instantaneous level-set
 field. At the physical centre row, the postprocessor linearly interpolates every
 adjacent pair of cell-centred $\phi$ values that changes sign and retains the
 rightmost $\phi=0$ crossing. Here $x_{\rm LE,0}$ is the first extracted crossing
 at dump time $t_0$. Once the zero contour has left the physical domain, that dump
 has no observable in-domain leading edge and is excluded from the trajectory fit
-rather than being replaced by a stationary domain-edge value. Mean ROS is the
+rather than being replaced by a stationary domain-edge value. Mean rate of spread (ROS) is the
 least-squares slope through all observable dump samples.
 
-For immediate-ignition variant, a burning cell emits during its surface-fire residence time. Using
+For immediate-ignition simulation condition, a burning cell emits during its surface-fire residence time. Using
 the FLIN and spread rate written by the same executed cell gives
 \begin{equation}
  t_{\rm emission}=\frac{\Delta x}{VS},\qquad
@@ -49,9 +47,9 @@ n_i=\frac{N_i}{\Delta x(1\ {\rm m})}\quad[\mathrm{pcs\,m^{-2}}].
 The two-cell numerical halo is excluded. The complete physical raster is still
 inspected, and its all-row deposited total is retained as a conservation
 diagnostic, but it is not mixed into the one-dimensional plotted observable.
-For the PER-AREA variant, the configured source gives
+For the PER-AREA simulation condition, the configured source gives
 $n_\infty=GR\Delta x\tau_{\rm ember}/(1~\mathrm{m})$. For the PER-MW
-variant, Equation~\ref{eq:accumulation} divided by
+simulation condition, Equation~\ref{eq:accumulation} divided by
 $\Delta x(1~\mathrm{m})$ gives the run-derived density reference. A zero or
 nodata final burned-cell FLIN or VS value does not define an independent
 residence-time reference. The evaluator retains only finite cells with
@@ -62,7 +60,7 @@ rather than forming a relative error against zero.
 The discrete algorithm is: generate embers in every active source cell; distribute
 them among downwind bins; accumulate them in landing cells; apply DIRECT ignition
 with $P_{ign}=1$ and zero local/cell delay; update ember-ignition, level-set, and
-TOA states together; then advance the level-set clock. The two variants differ
+TOA states together; then advance the level-set clock. The two simulation conditions differ
 only where required by their source experiment.
 
 \section{Derivation of expected behavior}
@@ -73,7 +71,7 @@ edge extracted from $\phi$ should oscillate by at most one cell around
 $x_{\rm LE,0}+U(t-t_0)$. Its fitted slope should approach $U$. Every cell marked by the
 ember-ignition raster must have finite nonnegative TOA.
 
-In both variants, locations farther than the maximum travel distance receive
+In both simulation conditions, locations farther than the maximum travel distance receive
 contributions from a complete set of upstream emitters. Conservation then produces
 the configuration-consistent plateaus. The PER-AREA source uses
 $GR=10$~pcs~m$^{-2}$~s$^{-1}$, $\Delta x=10$~m, and
@@ -82,7 +80,7 @@ normalization. The PER-MW reference is calculated from co-located final FLIN
 and VS. The 155--195~m interval contains cells with complete upstream support.
 
 % BEGIN EXPLICIT EXPECTED-RESULT DERIVATION
-The wind-CFL upper-bound step is
+The wind Courant--Friedrichs--Lewy (CFL) upper-bound step is
 \[
  \Delta t_{\max}=0.5(10)/6.71=0.745156~\mathrm{s}.
 \]
@@ -120,23 +118,23 @@ have expected relative error zero and are tested with a 0.10 allowance.
 
 \section{Verification metrics and acceptance criteria}
 For valid centre-row cells, define $e_i=|t_i-t_{\rm ref,i}|/t_{\rm ref,i}$.
-Each variant requires at least two cells, $\bar e\le0.10$, and
+Each simulation condition requires at least two cells, $\bar e\le0.10$, and
 $\max e_i\le0.25$. Leading-edge error is the RMSE relative to
 $x_{\rm LE,0}+U(t-t_0)$ divided by $U(t_{\rm last}-t_0)$ and must not exceed
 0.10; $t_{\rm last}$ is the last dump with an in-domain $\phi=0$ crossing.
 Every scheduled time must have exactly one matching $\phi$ raster. Fitted mean-ROS relative
 error must not exceed 0.10. All ember-ignited physical cells must have finite, nonnegative TOA.
-Each variant additionally requires
+Each simulation condition additionally requires
 $|\widetilde n-n_{\rm ref}|/n_{\rm ref}\le0.10$, where
 $\widetilde n$ is the median centre-row density from Equation~\ref{eq:density}
 over the fully developed 155--195~m plateau. The corresponding analytical or
 run-derived reference is calculated independently of the ember-flux values.
-For the PER-MW variant, the same mask is applied to the observed density and
+For the PER-MW simulation condition, the same mask is applied to the observed density and
 the co-located FLIN/VS reference, with at least two finite, strictly positive
 reference cells required. Insufficient support makes the metric NOT EVALUABLE;
 a zero denominator is never treated as a failed relative-error comparison.
 Domain-wide deposited totals are also recorded as diagnostics. Exactly two
-manifest variants and one final raster of every required
+prescribed simulation conditions and one final raster of every required
 kind are mandatory. The overall decision is the conjunction of completeness and
 all component decisions; missing or stale products are non-passing.
 
@@ -155,10 +153,10 @@ from masking a systematic bias.  The plateau median is used because the
 expectation is spatially constant and the median is insensitive to one raster
 edge cell.  Ignition-state consistency has zero physical tolerance: a cell
 cannot be classified as ember ignited without a finite, nonnegative arrival
-time.  Both variants and all components are conjunctive because transport,
+time.  Both simulation conditions and all components are conjunctive because transport,
 ignition, and accumulation are separate claims of this combined test.
 
-\subsection{Predeclared acceptance contract}
+\subsection{Predeclared acceptance criteria}
 
 Table~\ref{tab:acceptance-contract} summarizes the metrics fixed before
 inspection of the calculated results. Numerical values and component statuses
@@ -173,23 +171,23 @@ are reported separately in Section~7.
 \toprule
 Metric & Output, region, and aggregation & Acceptance criterion\\
 \midrule
-Output completeness & Two manifest variants with one final TOA, ignition-state, and accumulated-firebrand product of each required kind, plus one $\phi$ raster for every scheduled dump time. & 2 of 2 variants complete; no missing $\phi$ dumps \\
+Output completeness & Two prescribed simulation conditions with one final TOA, ignition-state, and accumulated-firebrand product of each required kind, plus one $\phi$ raster for every scheduled dump time. & 2 of 2 simulation conditions complete; no missing $\phi$ dumps \\
 TOA profile error & Mean and maximum of \(|t_i-t_{ref,i}|/t_{ref,i}\) on valid centre-row physical cells. & Mean \(\le0.10\); maximum \(\le0.25\) \\
 Leading-edge error & RMSE of the rightmost interpolated $\phi=0$ crossing relative to \(x_{LE,0}+U(t-t_0)\), normalized by the observable reference displacement. & \(\mathrm{NRMSE}\le0.10\) \\
 Mean-ROS error & Relative error of fitted leading-edge ROS against \(U=\SI{6.71}{m.s^{-1}}\). & \(\le0.10\) \\
 Ignition-state consistency & Every ember-ignited physical cell has a finite, nonnegative TOA. & No inconsistent cells \\
 Accumulation reference support & Finite positive co-located FLIN/VS cells over 155--\SI{195}{m}; zeros and nodata cannot define the PER-MW residence-time reference. & At least two cells; otherwise NOT EVALUABLE \\
-Accumulation plateau error & Relative error of median one-metre-strip density over 155--\SI{195}{m} against the independent reference, using the same valid-reference mask for the PER-MW variant. & \(\le0.10\) for both variants \\
-Overall decision & Conjunction of completeness and every component for both variants. & PASS only if all pass \\
+Accumulation plateau error & Relative error of median one-metre-strip density over 155--\SI{195}{m} against the independent reference, using the same valid-reference mask for the PER-MW simulation condition. & \(\le0.10\) for both simulation conditions \\
+Overall decision & Conjunction of completeness and every component for both simulation conditions. & PASS only if all pass \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Simulation configuration and predicted outcome}
 
-Figure~\ref{fig:input-configuration} records the prepared spatial inputs for \texttt{transport\_impulse}.
-The postprocessor reads these panels from the variant-local GeoTIFF files, removes the
-two-cell numerical buffer, and retains map coordinates in metres.  The left panel shows
+Figure~\ref{fig:input-configuration} records the prepared spatial inputs for isolated transport.
+These panels show the prepared spatial fields, remove the
+two-cell numerical buffer, and retain map coordinates in metres.  The left panel shows
 the most informative fuel or structure layout available for the case; the right panel
 shows the cells selected by the non-positive initial level-set field, making a localized
 ignition or firebrand-emission source explicit.
@@ -197,7 +195,7 @@ ignition or firebrand-emission source explicit.
 \begin{figure}[H]
 \centering
 \EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
-\caption{Whole-domain prepared input configuration for the representative variant.  The
+\caption{Whole-domain prepared input configuration for the representative simulation condition.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
 \label{fig:input-configuration}
@@ -210,15 +208,15 @@ Domain & $500\times100$ & m & common physical extent\\
 Grid and halo & $10$; two cells/side & m & prescribed resolution; excluded halo\\
 Time step & $100/135=0.740741$ & s & wind CFL $0.4970<0.5$\\
 Wind & $6.71$, from $270^\circ$ & m/s & constant transport velocity\\
-Fuel/terrain & FBFM 102; flat & -- & uniform wildland control\\
-Transport variant & PER-AREA; surface off; 100 s & -- & isolates transport-impulse variant transport\\
-Wildland variant & PER-MW; surface on; 100 s & -- & immediate-ignition variant residence source\\
+Fuel/terrain & fire behavior fuel model (FBFM) 102; flat & -- & uniform wildland control\\
+Transport simulation condition & PER-AREA; surface off; 100 s & -- & isolates transport-impulse simulation condition transport\\
+Wildland simulation condition & PER-MW; surface on; 100 s & -- & immediate-ignition simulation condition residence source\\
 Transport/ignition & EMPIRICAL;\newline EULERIAN; DIRECT & -- & current spotting path\\
 Ignition response & $P_{ign}=1$; delays zero & -- & immediate limiting regime\\
 Crosswind/consumption & disabled/disabled & -- & one-dimensional conservation\\
 \bottomrule
 \end{tabular}
-\caption{Configuration shared by and distinguishing the two combined variants.}
+\caption{Configuration shared by and distinguishing the two combined simulation conditions.}
 \end{table}
 \FloatBarrier
 
@@ -227,11 +225,11 @@ dumped-$\phi$ leading-edge histories should follow
 $x_{\rm LE,0}+U(t-t_0)$ with grid-scale steps, and their
 mean ROS should be near 6.71~m/s. The two density bar profiles should rise near
 the inlet and approach their horizontal references: 600~pcs~m$^{-2}$ for the
-PER-AREA transport variant and the FLIN/VS-derived value for the wildland variant.
+PER-AREA transport simulation condition and the FLIN/VS-derived value for the wildland simulation condition.
 \section{Actual simulation results}
 
-Figure~\ref{fig:domain-result} shows the representative accumulated firebrand density from \texttt{transport\_impulse}.
-It is read from the actual ELMFIRE output named in the panel, masks nodata, and excludes
+Figure~\ref{fig:domain-result} shows the representative accumulated firebrand density from isolated transport.
+The displayed field is taken from the simulated results, masks missing values, and excludes
 the two-cell numerical buffer.  Firebrand counts are normalized by the cell length and the represented 1-m cross-stream strip, giving units of pcs m$^{-2}$.
 
 \begin{figure}[H]
@@ -243,9 +241,8 @@ profiles, convergence plots, ensemble statistics, and calculated acceptance metr
 \label{fig:domain-result}
 \end{figure}
 
-
 The runner regenerated both input stacks and postprocessed only the current
-ELMFIRE products recorded in \path{variants/manifest.json}.
+ELMFIRE products recorded in prescribed simulation conditions.
 Figure~\ref{fig:steady-reference} presents the four physical observables
 used in the steady-transport reference experiment: accumulated density, arrival
 time, leading-edge position, and instantaneous leading-edge rate of spread.
@@ -254,7 +251,7 @@ time, leading-edge position, and instantaneous leading-edge rate of spread.
 \centering
 \EvidenceFigure[width=0.98\textwidth,height=0.68\textheight,keepaspectratio]{../figures/steady_transport_reference.pdf}
 \caption{Steady-transport and immediate-ignition observables from actual
-ELMFIRE outputs. Solid colored curves identify the two controlled variants;
+ELMFIRE outputs. Solid colored curves identify the two controlled simulation conditions;
 black or color-matched reference curves show the derived analytical behavior.}
 \label{fig:steady-reference}
 \end{figure}
@@ -265,7 +262,7 @@ black or color-matched reference curves show the derived analytical behavior.}
 \begin{table}[!htbp]\centering\small
 \begin{tabular}{llll}\toprule
 Metric & Limit & Calculated & Status\\ \midrule
-Output completeness & 2 variants & \Metric{evaluatedvariants}/\Metric{requiredvariants} & \Metric{outputcompletenesspassed}\\
+Output completeness & 2 simulation conditions & \Metric{evaluatedvariants}/\Metric{requiredvariants} & \Metric{outputcompletenesspassed}\\
 Transport $\phi$ history & all scheduled dumps & \Metric{transportphidumpcount}/\Metric{transportscheduledphidumpcount} dumps; \Metric{transportphiobservablefrontcount} contours & \Metric{transportphidumpcompletenesspassed}\\
 Transport TOA mean error & $\le0.10$ & \Metric{transporttoameanrelativeerror} & \Metric{transporttoapassed}\\
 Transport leading-edge NRMSE & $\le0.10$ & \Metric{transportleadingedgenormalizedrmse} & \Metric{transportleadingedgepassed}\\
@@ -280,13 +277,13 @@ Transport deposited total & diagnostic & \Metric{transporttotalaccumulatedfirebr
 Wildland deposited total & diagnostic & \Metric{wildlandtotalaccumulatedfirebrandsdomainpcs} pcs & --\\
 Overall decision & all components pass & \Metric{verificationpassed} & \textbf{\Metric{status}}\\
 \bottomrule\end{tabular}
-\caption{Metrics read directly from \texttt{outputs/metrics.json}.}
+\caption{Calculated verification metrics for the completed simulations.}
 \end{table}
 \FloatBarrier
 
 \section{Technical interpretation}
 The combined decision distinguishes a transport defect from a source-duration or
-normalization defect. Agreement in transport-impulse variant but not immediate-ignition variant implicates the
+normalization defect. Agreement in transport-impulse simulation condition but not immediate-ignition simulation condition implicates the
 residence-time PER-MW path; disagreement in both implicates shared transport,
 direct ignition, or TOA state handling. A full-area total of \Metric{wildlandtotalaccumulatedfirebrandsdomainpcs} particles was deposited across \Metric{wildlandactivedepositionrows} active rows. A plateau-only failure cannot be hidden
 by a plausible TOA curve, and an average ROS cannot hide local TOA or product
@@ -294,13 +291,12 @@ inconsistency. The numerical values in the table and figure provide the executed
 source revision's decision rather than a qualitative visual judgment.
 
 \section{Scope and limitations}
-This is deterministic code verification of steady one-dimensional Eulerian
+This is deterministic numerical verification of steady one-dimensional Eulerian
 transport and immediate ignition. It does not validate the empirical spotting
 PDF against experiments, time-varying wind, crosswind transport, stochastic
 ignition, delayed ignition, Lagrangian tracking, or consumption. Surface spread
-is present in the immediate-ignition variant source calculation but the wind-speed leading edge is
-expected to dominate. Run \texttt{./run\_case.sh} from any working directory to
-regenerate both variants and the standalone report.
+is present in the immediate-ignition simulation condition source calculation but the wind-speed leading edge is
+expected to dominate.
 
 \begin{thebibliography}{9}
 \bibitem{Qin2025}

@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from report_language import report_text
+
 import json
 from pathlib import Path
 
@@ -98,4 +100,4 @@ for key, value in scalar_metrics(metrics).items():
     lines.append(rf"\DefineMetric{{{key}}}{{{latex(value)}}}")
 for key, value in input_metrics(inputs).items():
     lines.append(rf"\DefineInputMetric{{{key}}}{{{latex(value)}}}")
-OUTPUT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
+OUTPUT_PATH.write_text(report_text("\n".join(lines) + "\n"), encoding="utf-8")

@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\usepackage[margin=0.8in]{geometry}
+\usepackage[letterpaper,margin=0.85in]{geometry}
 \usepackage{amsmath,amssymb,booktabs,float,graphicx}
 \usepackage[detect-all]{siunitx}
 \usepackage{xcolor,hyperref}
@@ -11,7 +11,7 @@
 \IfFileExists{metrics_macros.tex}{\input{metrics_macros.tex}}{%
   \newcommand{\VerificationStatus}{NOT EVALUABLE}
   \newcommand{\WorkflowStatus}{NOT RUN}
-  \newcommand{\VerificationReason}{No current metrics artifact is available.}
+  \newcommand{\VerificationReason}{No current metrics supporting result is available.}
   \newcommand{\ExecutedBinarySHA}{--}
   \newcommand{\RequiredVariantCount}{4}
   \newcommand{\CompletedVariantCount}{0}
@@ -25,11 +25,8 @@
 \usepackage{array,longtable,caption,seqsplit,needspace}
 \usepackage[section]{placeins}
 \captionsetup{font=normalsize,labelfont=bf,justification=raggedright,singlelinecheck=false}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{0.45em}
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.18}
-\linespread{1.04}
 \setlength{\emergencystretch}{3em}
 \newcommand{\ReadableHash}[1]{\begingroup\ttfamily\expandafter\seqsplit\expandafter{#1}\endgroup}
 \input{readability_macros.tex}

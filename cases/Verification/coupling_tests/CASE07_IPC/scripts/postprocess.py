@@ -7,6 +7,8 @@ times with timestep-resolved ember-flux dumps to reconstruct interval-censored
 first-deposition times and actual ignition-delay samples. It writes quantitative
 metrics, LaTeX macros, and two vector-PDF figures. It does not run ELMFIRE.
 """
+
+from report_language import polish_figure, report_text
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 import rasterio
@@ -212,7 +214,7 @@ def write_macros(metrics):
             latex_value = str(value).replace("_", "\\_")
         lines.append(
             f"\\expandafter\\def\\csname metric@{safe}\\endcsname{{{latex_value}}}")
-    (REPORT_DIR / "metrics_macros.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (REPORT_DIR / "metrics_macros.tex").write_text(report_text("\n".join(lines) + "\n"), encoding="utf-8")
 
 
 def main():
@@ -403,6 +405,7 @@ def main():
     ax.set_ylim(0.0, 1.05)
     ax.grid(True, alpha=0.25)
     ax.legend(ncol=2, fontsize=8)
+    polish_figure(fig)
     fig.savefig(FIG_DIR / "ignition_probability_convergence.pdf", format="pdf")
     plt.close(fig)
 
@@ -432,6 +435,7 @@ def main():
                         xlim=(0.0, 30.0), ylim=(0.0, None))
     distribution_ax.grid(axis="y", alpha=0.2)
     distribution_ax.legend(fontsize=8)
+    polish_figure(distribution_fig)
     distribution_fig.savefig(FIG_DIR / "sft_delay_distribution.pdf", format="pdf")
     plt.close(distribution_fig)
 
@@ -466,6 +470,7 @@ def main():
     delay_ax.set_ylim(0, max(15.0, expected_quantile + 3.0))
     delay_ax.grid(True, alpha=.25)
     delay_ax.legend(fontsize=8)
+    polish_figure(delay_fig)
     delay_fig.savefig(FIG_DIR / "sft_delay_ensemble_convergence.pdf", format="pdf")
     plt.close(delay_fig)
 

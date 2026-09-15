@@ -1,6 +1,6 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \texttt{\CaseID}. This case verifies the observable coupling of topographic slope into directional surface-fire spread through the standard ELMFIRE executable. It is the portable successor to Adam Laird's no-wind-with-slope component scenario and retains a flat control.
+This case verifies the observable coupling of topographic slope into directional surface-fire spread through the standard ELMFIRE executable. It is the portable successor to Adam Laird's no-wind-with-slope component scenario and retains a flat control.
 
 \section{Mathematical formulation and numerical implementation}
 
@@ -8,7 +8,7 @@ ELMFIRE combines the no-wind spread rate with a slope factor before supplying a 
 
 \section{Derivation of expected behavior}
 
-The flat control has equal forcing in all azimuths and therefore equal horizontal and vertical extents. The \SlopeAngle{} variant changes only slope and aspect; it must differ from the control and its final footprint must be elongated. These are metamorphic consequences of the governing coupling and do not require duplication of ELMFIRE's internal slope formula.
+The flat control has equal forcing in all azimuths and therefore equal horizontal and vertical extents. The \SlopeAngle{} simulation condition changes only slope and aspect; it must differ from the control and its final footprint must be elongated. These are metamorphic consequences of the governing coupling and do not require duplication of ELMFIRE's internal slope formula.
 
 % BEGIN EXPLICIT METRIC DERIVATION
 For each finite arrival-time mask, the pixel extents are
@@ -36,11 +36,11 @@ normalized difference from the flat run.
 
 \section{Verification metrics and acceptance criteria}
 
-Flat-control extent anisotropy must not exceed 0.05. The slope footprint's major/minor extent ratio must be at least 1.10. Normalized mean absolute arrival-time difference between slope and flat variants must be at least 0.05. The first metric detects grid bias, while the latter two show that slope is both active and directional.
+Flat-control extent anisotropy must not exceed 0.05. The slope footprint's major/minor extent ratio must be at least 1.10. Normalized mean absolute arrival-time difference between slope and flat simulation conditions must be at least 0.05. The first metric detects grid bias, while the latter two show that slope is both active and directional.
 
 \section{Simulation configuration and predicted outcome}
 
-Both variants use a 2000 m square domain at \CellSize{}, Fuel Model 10, 3/5/6 percent dead-fuel moisture, zero wind, and a central point ignition. The slope variant uses 30 degrees and aspect 270 degrees; the control uses zero slope. The slope result is predicted to be anisotropic and measurably different from the circular control.
+Both simulation conditions use a 2000 m square domain at \CellSize{}, Fuel Model 10, 3/5/6 percent dead-fuel moisture, zero wind, and a central point ignition. The slope simulation condition uses 30 degrees and aspect 270 degrees; the control uses zero slope. The slope result is predicted to be anisotropic and measurably different from the circular control.
 
 \begin{center}\begin{tabular}{p{0.22\textwidth}p{0.22\textwidth}p{0.12\textwidth}p{0.34\textwidth}}\toprule
 Parameter & Configured value & Units & Role \\
@@ -51,26 +51,26 @@ Control & slope 0; wind 0 & degrees / mph & Rotational baseline \\
 Test & slope 30; aspect 270 & degrees & Activates directional slope coupling \\
 \bottomrule\end{tabular}\end{center}
 
-Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+Figure~\ref{fig:input-configuration} shows the prescribed spatial condition used in this experiment. The displayed field represents the initial level-set geometry or a controlling fuel, terrain, moisture, wind, or canopy quantity, as identified by the figure labels. The plotted values come from the prepared simulation inputs, not from the expected response.
 
 \begin{figure}[H]
   \centering
   \IfFileExists{../figures/input_configuration.pdf}{%
     \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
-  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
-  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  }{\fbox{\parbox{0.88\textwidth}{Prepared-input evidence is unavailable. The prescribed configuration is described in the text; this absence does not establish that it was simulated.}}}
+  \caption{Prescribed uniform 30-degree terrain slope. Coordinates are grid-cell indices on the 5 m grid.}
   \label{fig:input-configuration}
 \end{figure}
 
 \section{Actual simulation results}
 
-The generated status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} metrics pass across \VariantCount{} variants. Missing outputs produce NOT EVALUABLE.
+The generated status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} metrics pass across \VariantCount{} simulation conditions. Missing outputs produce NOT EVALUABLE.
 \begin{figure}[H]\centering\IfFileExists{../figures/verification_summary.pdf}{\includegraphics[width=\textwidth]{verification_summary.pdf}}{\fbox{No result figure is available.}}\caption{Flat-control, slope, and difference arrival-time fields.}\end{figure}
 
 \section{Calculated metrics and verification decision}
 
 \begin{center}\small\begin{tabular}{@{}llll@{}}\toprule Metric & Expected & Calculated & Status \\\midrule \MetricRows \bottomrule\end{tabular}\end{center}
-The authoritative decision is \textbf{\VerificationStatus} from \texttt{outputs/metrics.json}.
+The authoritative decision is \textbf{\VerificationStatus} from calculated verification and validation metrics.
 
 \section{Technical interpretation}
 

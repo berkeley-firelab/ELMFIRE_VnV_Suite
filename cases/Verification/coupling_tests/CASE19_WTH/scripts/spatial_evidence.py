@@ -5,6 +5,8 @@ the case metrics. This module reads prepared GeoTIFF inputs and actual ELMFIRE
 outputs; it never synthesizes a replacement result.
 """
 
+from report_language import polish_figure
+
 from pathlib import Path
 import re
 
@@ -203,7 +205,7 @@ def _plot_configuration(case_dir, run_root, preferred_variant):
     )
     add_aligned_colorbar(figure, axes[0], layout_image, label=layout_label)
     axes[0].set_title(
-        f"Prepared {layout_path.name}, band {control_band}\n{layout_label}")
+        f"Prescribed {layout_label}")
 
     ignition_cmap = ListedColormap(["#f7f7f7", "#d73027"])
     ignition_image = axes[1].imshow(
@@ -233,7 +235,7 @@ def _plot_configuration(case_dir, run_root, preferred_variant):
         axis.set_ylabel("Northing (m)")
 
     weather = []
-    for name, label, unit in (("ws.tif", "WS", "mph"), ("wd.tif", "WD", "deg")):
+    for name, label, unit in (("ws.tif", "Wind speed", "mph"), ("wd.tif", "Wind direction", "degrees")):
         weather_path = input_dir / name
         if weather_path.exists():
             values, nodata, weather_transform = _read_raster(weather_path)
@@ -245,10 +247,11 @@ def _plot_configuration(case_dir, run_root, preferred_variant):
     variant_label = (str(variant_root.relative_to(case_dir))
                      if variant_root != case_dir else "base case")
     suffix = f"; {', '.join(weather)}" if weather else ""
-    figure.suptitle(f"Whole-domain input configuration — {variant_label}{suffix}")
+    figure.suptitle(f"{case_dir.name}: whole-domain inputs\nGrid spacing {abs(transform[1]):g} by {abs(transform[5]):g} m{suffix}")
 
     output = case_dir / "figures" / "input_configuration.pdf"
     output.parent.mkdir(parents=True, exist_ok=True)
+    polish_figure(figure)
     figure.savefig(
         output, format="pdf", dpi=FIGURE_DPI,
         bbox_inches="tight", pad_inches=0.06,
@@ -300,10 +303,11 @@ def _plot_domain_result(case_dir, raster_path, field, strip_width_m):
     axis.set_ylabel("Northing (m)")
     run_root = raster_path.parent.parent
     variant = "base case" if run_root == case_dir else str(run_root.relative_to(case_dir))
-    axis.set_title(f"{title} — {variant}\n{raster_path.name}")
+    axis.set_title(f"{title} — {case_dir.name}\nGrid spacing {dx:g} by {dy:g} m")
 
     output = case_dir / "figures" / "domain_result.pdf"
     output.parent.mkdir(parents=True, exist_ok=True)
+    polish_figure(figure)
     figure.savefig(
         output, format="pdf", dpi=FIGURE_DPI,
         bbox_inches="tight", pad_inches=0.06,

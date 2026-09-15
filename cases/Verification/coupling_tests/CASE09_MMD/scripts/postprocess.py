@@ -6,6 +6,8 @@ Analytical surface-fire curves are labelled as expectations. Missing or
 incomplete model output is explicitly non-passing.
 """
 
+from report_language import polish_figure, report_text
+
 from spatial_evidence import generate_spatial_evidence
 import numpy as np
 import rasterio
@@ -312,6 +314,7 @@ def make_figure(case_dir, manifest, results):
             axis.legend(fontsize=8)
     figure_path = case_dir / FIGURE_FILENAME
     figure_path.parent.mkdir(parents=True, exist_ok=True)
+    polish_figure(fig)
     fig.savefig(figure_path, format="pdf")
     plt.close(fig)
 
@@ -370,6 +373,7 @@ def make_variant_reference_figures(case_dir, manifest, results):
             handles, _ = axis.get_legend_handles_labels()
             if handles:
                 axis.legend(fontsize=8)
+        polish_figure(fig)
         fig.savefig(case_dir / "figures" / f"{name}_reference.pdf", format="pdf")
         plt.close(fig)
 
@@ -539,7 +543,7 @@ def postprocess(case_dir):
             f"{{{latex_escape(value)}}}"
         )
     (report_dir / "metrics_macros.tex").write_text(
-        "\n".join(macro_lines) + "\n", encoding="utf-8"
+        report_text("\n".join(macro_lines) + "\n"), encoding="utf-8"
     )
     print(f"[OK] verification status: {metrics['status']}")
 

@@ -16,11 +16,11 @@
 \section*{About This Guide}
 \phantomsection
 \addcontentsline{toc}{section}{About This Guide}
-This document aggregates the standalone reports for every runnable verification
-case currently discovered under \texttt{cases/Verification}.  The opening
-summary records environment and execution configuration and reports each case's
-scientific decision from its case-local \texttt{outputs/metrics.json}; command
-completion and PDF availability are not substituted for verification evidence.
+This guide examines whether ELMFIRE reproduces prescribed physical and numerical
+responses under controlled conditions. Each case develops an expected response,
+defines quantitative comparisons and acceptance criteria, and interprets the
+available simulation results. The opening summary presents the calculated
+decisions and the computational information available during report preparation.
 
 \clearpage
 \tableofcontents
@@ -28,25 +28,22 @@ completion and PDF availability are not substituted for verification evidence.
 
 \section{How to Read This Guide}
 
-Start with the verification summary for the aggregate-build environment,
-case-declared execution configuration, and scientific decision table.  The
+Start with the verification summary for the recorded computational environment,
+declared parallel allocation, and scientific decision table. The
 case identifiers in the summary link to the corresponding case-report entries.
-The complete standalone reports follow in the stable numerical order defined
-by \path{cases/Verification/CASE_REGISTRY.md}; each retains its own scientific
+The complete case reports follow in numerical order; each presents its own scientific
 context, equations, metrics, citations, acceptance criteria, and limitations.
 
-Interpret PASS and FAIL as the decision made by the case-local postprocessor
-against that case's declared acceptance criteria.  A missing result, an unrun
-or incomplete workflow, or an unsupported capability is shown as NOT
-EVALUABLE.  Command completion and PDF availability alone do not establish a
-scientific decision.
+Interpret PASS and FAIL against each case's stated acceptance criteria. Missing
+results, incomplete simulations, or an unavailable model capability are shown
+as NOT EVALUABLE. A completed simulation or a complete narrative alone does not
+establish agreement with the expected response.
 
-The aggregate-build environment describes how this guide was assembled; it is
-not necessarily the execution environment of every included case.  Aggregating
-the compiled PDFs keeps case-local macros, labels, bibliographies, and packages
-isolated from one another.  After standalone reports change, rebuild this guide
-with \texttt{make verification-report} or rebuild both suite reports with
-\texttt{make reports}.
+The computational environment recorded during report preparation is not
+necessarily the environment used for every simulation. Within each case, read
+the formulation and derived expectation before interpreting the measured
+response. The scope and limitations distinguish the behavior demonstrated by
+the prescribed conditions from behavior that remains unverified.
 
 \input{generated/verification_summary.tex}
 

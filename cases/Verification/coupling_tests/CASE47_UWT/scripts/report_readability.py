@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """Format existing verified metrics for readable report tables; do not evaluate physics."""
+
+from report_language import report_text
 from pathlib import Path
 import json
 import re
@@ -46,12 +48,12 @@ def main():
     if not rows:
         lines.append(r"\multicolumn{2}{P{0.97\textwidth}}{No evaluable metric rows are available.}\\")
     lines += [r"\bottomrule", r"\end{longtable}"]
-    (CASE_DIR / "report/readable_results.tex").write_text("\n".join(lines) + "\n")
+    (CASE_DIR / "report/readable_results.tex").write_text(report_text("\n".join(lines) + "\n"))
     summary = (r"\newcommand{\ReportOverview}{\textbf{Current result: " + tex(payload["overall_status"]) +
                ".} " + str(payload.get("completed_variant_count", 0)) + " of " +
                str(payload.get("required_variant_count", 0)) + " required variants have evaluable evidence. " +
                r"Workflow: \textbf{" + tex(payload.get("workflow_status", "UNKNOWN")) + ".}}\n")
-    (CASE_DIR / "report/readability_macros.tex").write_text(summary)
+    (CASE_DIR / "report/readability_macros.tex").write_text(report_text(summary))
 
 
 if __name__ == "__main__":

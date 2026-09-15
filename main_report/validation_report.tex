@@ -16,11 +16,11 @@
 \section*{About This Guide}
 \phantomsection
 \addcontentsline{toc}{section}{About This Guide}
-This document aggregates the standalone reports for every runnable validation
-case currently discovered under \texttt{cases/Validation}.  The opening summary
-records environment and execution configuration and reports each case's
-scientific decision from its case-local \texttt{outputs/metrics.json}; command
-completion and PDF availability are not substituted for validation evidence.
+This guide compares ELMFIRE predictions with observations for the active
+validation cases. Each report describes the event, input data, modeling choices,
+comparison methods, and uncertainties. The opening summary presents the
+calculated decisions and the computational information available during report
+preparation. A completed simulation does not by itself establish validation.
 
 \clearpage
 \tableofcontents
@@ -28,8 +28,8 @@ completion and PDF availability are not substituted for validation evidence.
 
 \section{How to Read This Guide}
 
-Start with the validation summary for the aggregate-build environment,
-case-declared execution configuration, and scientific decision table.  The
+Start with the validation summary for the recorded computational environment,
+declared parallel allocation, and scientific decision table. The
 case identifiers in the summary link to the corresponding case-report entries.
 The common landscape-validation evidence then explains the metrics and
 limitations shared by the current cases, followed by each complete standalone
@@ -39,9 +39,9 @@ results, and limitations.
 Interpret PASS and FAIL only where a case defines a justified acceptance
 decision.  CHARACTERIZED means that descriptive metrics exist without a
 justified pass threshold.  Missing, unrun, incomplete, or otherwise
-non-decisional evidence is shown as NOT EVALUABLE.  Command completion and PDF
-availability alone do not establish validation evidence.  The aggregate-build
-environment describes how this guide was assembled; it is not necessarily the
+non-decisional evidence is shown as NOT EVALUABLE. A completed narrative alone
+does not establish validation evidence. The environment recorded during report
+preparation is not necessarily the
 execution environment of every included case.
 
 \input{generated/validation_summary.tex}
@@ -49,8 +49,9 @@ execution environment of every included case.
 \section{Common landscape-validation evidence}
 
 The current Camp, Thomas, and Tubbs landscape cases were reconstructed from the
-tracked \texttt{cases/Validation/3\_FIRES} archives.  Each is designed to
-compare a 50-member ELMFIRE ensemble with cumulative VIIRS active-fire
+supplied historical-fire datasets. Each is designed to
+compare a 50-member ELMFIRE ensemble with cumulative Visible Infrared Imaging
+Radiometer Suite (VIIRS) active-fire
 detections.  The case reports retain the event-specific input provenance,
 namelist rationale, evidence status, and unresolved limitations.
 

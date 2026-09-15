@@ -1,6 +1,6 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \texttt{\CaseID}. This unit test verifies that ELMFIRE transports a circular level-set front at a prescribed, spatially uniform normal rate. It exercises raster ingestion, the \texttt{ADJ} spread-rate multiplier, the level-set update, and \texttt{phi}/\texttt{vs} output without wind, slope, crown fire, spotting, or suppression. It can reveal rate-unit errors, incorrect signs, and failure to couple the calculated rate to front motion. This is code verification against a known solution, not comparison with a physical fire. The verification question is whether the final spread-rate and radius satisfy the two stated tolerances at \(t=360\) s.
+This isolated-process case verifies that ELMFIRE transports a circular level-set front at a prescribed, spatially uniform normal rate. It exercises raster ingestion, the spread-rate adjustment factor, the level-set update, and level-set field/spread rate output without wind, slope, crown fire, spotting, or suppression. It can reveal rate-unit errors, incorrect signs, and failure to couple the calculated rate to front motion. This is numerical verification against a known solution, not comparison with a physical fire. The verification question is whether the final spread-rate and radius satisfy the two stated tolerances at \(t=360\) s.
 
 \section{Mathematical formulation and numerical implementation}
 
@@ -8,7 +8,7 @@ ELMFIRE advances the signed level set by
 \[
  \frac{\partial\phi}{\partial t}+V_n|\nabla\phi|=0,
 \]
-with \(\phi<0\) burned and \(\phi=0\) the front. Uniform rasters and disabled directional forcing make \(V_n=R_0=\ReferenceROS\). The configured \texttt{SPREAD\_RATE\_IN\_M} option makes the \texttt{vs} output use \(\mathrm{m\,min^{-1}}\), while integration time remains seconds. Raster georeferencing supplies the mesh; no obsolete computational-domain namelist is used.
+with \(\phi<0\) burned and \(\phi=0\) the front. Uniform rasters and disabled directional forcing make \(V_n=R_0=\ReferenceROS\). The configured metric spread-rate output option makes the spread rate output use \(\mathrm{m\,min^{-1}}\), while integration time remains seconds. Raster georeferencing supplies the mesh; no obsolete computational-domain namelist is used.
 
 \section{Derivation of expected behavior}
 
@@ -36,8 +36,8 @@ number of final cells with \(\phi<0\).  Thus the acceptance substitutions are
 
 \section{Verification metrics and acceptance criteria}
 
-The maximum finite final \texttt{vs} value is compared with \(0.697992~\mathrm{m\,min^{-1}}\); a 5 percent relative tolerance catches conversion or propagation-rate errors while allowing front reconstruction effects. The equivalent burned radius
-\(r_A=\sqrt{N_b\Delta x^2/\pi}\), where \(N_b\) counts valid final cells with \(\phi<0\), is compared with 9.187952 m. Area-equivalent radius is less sensitive to pixel stair-stepping than a single axial intercept; its tolerance is two cells. Nodata cells are excluded. The lexicographically last matching final \texttt{phi} and \texttt{vs} rasters are required. The case passes iff both components pass; missing or malformed required output is NOT EVALUABLE.
+The maximum finite final spread rate value is compared with \(0.697992~\mathrm{m\,min^{-1}}\); a 5 percent relative tolerance catches conversion or propagation-rate errors while allowing front reconstruction effects. The equivalent burned radius
+\(r_A=\sqrt{N_b\Delta x^2/\pi}\), where \(N_b\) counts valid final cells with \(\phi<0\), is compared with 9.187952 m. Area-equivalent radius is less sensitive to pixel stair-stepping than a single axial intercept; its tolerance is two cells. Nodata cells are excluded. The lexicographically last matching final level-set field and spread rate rasters are required. The case passes iff both components pass; missing or malformed required output is NOT EVALUABLE.
 
 \section{Simulation configuration and predicted outcome}
 
@@ -52,23 +52,23 @@ Time control & step 1; stop 360 & s & Exact final time and timestep multiple \\
 Disabled forcing & wind, slope, crown, spotting, suppression & --- & Isolates level-set transport \\
 \bottomrule\end{tabular}\end{center}
 
-Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+Figure~\ref{fig:input-configuration} shows the prescribed spatial condition used in this experiment. The displayed field represents the initial level-set geometry or a controlling fuel, terrain, moisture, wind, or canopy quantity, as identified by the figure labels. The plotted values come from the prepared simulation inputs, not from the expected response.
 
 \begin{figure}[H]
   \centering
   \IfFileExists{../figures/input_configuration.pdf}{%
     \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
-  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
-  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  }{\fbox{\parbox{0.88\textwidth}{Prepared-input evidence is unavailable. The prescribed configuration is described in the text; this absence does not establish that it was simulated.}}}
+  \caption{Prepared input conditions from the prescribed spatial fields. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
   \label{fig:input-configuration}
 \end{figure}
 
 \section{Actual simulation results}
 
-Only case-local ELMFIRE rasters are read. Current status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} components pass.
+Only case-specific ELMFIRE rasters are read. Current status is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} components pass.
 \begin{figure}[H]\centering
-\IfFileExists{../figures/whole_domain_result.pdf}{\includegraphics[width=0.72\textwidth]{whole_domain_result.pdf}}{\fbox{No case-local whole-domain result is available.}}
-\caption{Final whole-domain signed level-set field for the completed variant at the final output time, selected from the case-local data output directory. Values are dimensionless signed-level-set values; the generated table supplies the acceptance limits.}
+\IfFileExists{../figures/whole_domain_result.pdf}{\includegraphics[width=0.72\textwidth]{whole_domain_result.pdf}}{\fbox{No case-specific whole-domain result is available.}}
+\caption{Final whole-domain signed level-set field for the completed simulation condition at the final output time, selected from the results of that simulation condition. Values are dimensionless signed-level-set values; the generated table supplies the acceptance limits.}
 \end{figure}
 
 \section{Calculated metrics and verification decision}
@@ -83,11 +83,11 @@ Metric & Expected value or limit & Calculated value & Status \\
 \bottomrule
 \end{tabular}
 \end{center}
-The authoritative overall decision is \textbf{\VerificationStatus}. The generated table is sourced directly from the case-local metrics JSON and is not recomputed in this report.
+The authoritative overall decision is \textbf{\VerificationStatus}. The generated table is sourced directly from the case-specific calculated metrics and is not recomputed in this report.
 
 \section{Technical interpretation}
 
-A spread-rate failure points to input scaling, units, or \texttt{vs} selection. A radius-only failure indicates level-set integration or front/area discretization. A missing raster is an evidence failure, not a scientific pass.
+A spread-rate failure points to input scaling, units, or spread rate selection. A radius-only failure indicates level-set integration or front/area discretization. A missing raster is an evidence failure, not a scientific pass.
 
 \section{Scope and limitations}
 

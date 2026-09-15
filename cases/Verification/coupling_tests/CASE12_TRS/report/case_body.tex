@@ -1,11 +1,10 @@
 \section{Verification purpose}
+
 This case verifies temporal-resolution sensitivity using a fixed physical
 problem and four level-set timesteps. Every curve identified as ELMFIRE output
-is regenerated from case-local simulation products.
+is regenerated from case-specific simulation products.
 
-\textbf{Case ID:} \CaseID
-
-This case verifies temporal-resolution sensitivity in a firebrand-driven WUI calculation. Spatial resolution, geometry, wind, heat-release history, firebrand physics, random seed, and output cadence are fixed; only the level-set timestep changes over a wide CFL range.
+This case verifies temporal-resolution sensitivity in a firebrand-driven WUI calculation. Spatial resolution, geometry, wind, heat-release history, firebrand physics, random seed, and output cadence are fixed; only the level-set timestep changes over a wide Courant--Friedrichs--Lewy (CFL) range.
 
 The test determines the range over which ignition chronology and structure-level spread remain timestep independent and makes loss of resolution explicit at very large steps. Success is evaluated against the finest-step baseline using load, ignition-time, and spread metrics.
 
@@ -21,7 +20,7 @@ directions. Every structure in the first upwind column is burning at \(t=0\), an
 new source can appear only after deposited firebrands complete the configured
 physical ignition process.
 
-For a structure ignited at \(t_i\), the design heat-release rate per unit area is
+For a structure ignited at \(t_i\), the design heat-release rate (HRR) per unit area is
 \[
 q''(\tau)=
 \begin{cases}
@@ -85,7 +84,7 @@ N_k=\sum_{i<k}\int_0^T GR'\,\mathrm{HRR}_i(t)
 \left[\int_{x_k}^{x_{k+1}}
  f\!\left(x-x_i\mid\mu_i(t),\sigma_i(t)\right)\,dx\right]dt .
 \]
-The inner integral is evaluated using the lognormal CDF and the time integral
+The inner integral is evaluated using the lognormal cumulative distribution function (CDF) and the time integral
 uses an independent \SI{5}{s} midpoint quadrature. ELMFIRE's final deposited
 count is divided by the physical \SI{100}{m^2} structure footprint, giving
 \(N_k/A_s\) in \si{pcs\,m^{-2}}.
@@ -93,14 +92,14 @@ count is divided by the physical \SI{100}{m^2} structure footprint, giving
 The Eulerian firebrand tracker advances with its own wind-limited substeps.
 Changing the level-set step therefore must not change the spatial resolution of
 the flight trajectory. This is the core algorithmic separation being tested.
-In the generated namelists, \texttt{SIMULATION\_DT} and
-\texttt{SIMULATION\_DTMAX} impose the four values above. The input
-\texttt{TARGET\_CFL} remains the ordinary surface-spread limiter and does not
-redefine the four wind-based temporal variants.  The global \texttt{NO\_SURFACE\_FIRE} switch remains true to suppress vegetative surface-fire propagation.  The current source independently refreshes initialized model-14 building HRR, and the nonburnable fuel-93 background provides an additional isolation of building-only spread.
+In the generated namelists, prescribed timestep and
+maximum timestep impose the four values above. The input
+target surface-spread Courant number remains the ordinary surface-spread limiter and does not
+redefine the four wind-based temporal simulation conditions.  The global vegetative surface-spread setting switch remains true to suppress vegetative surface-fire propagation.  The current source independently refreshes initialized model-14 building HRR, and the nonburnable fuel-93 background provides an additional isolation of building-only spread.
 The fractional timesteps are intrinsic to this temporal-resolution sweep.  For
 each member, preprocessing sets the generated stop to
 \(\lceil t_{\mathrm{requested}}/\Delta t\rceil\Delta t\), and records the
-requested stop, aligned stop, and integer step count in the manifest.
+requested stop, aligned stop, and integer step count in the simulation specification.
 
 \subsection{Physical ignition}
 
@@ -134,13 +133,13 @@ CFL_w&0.5&1&10&200\\\hline
 &0.279617&0.559234&5.592341&111.846815
 \end{array}
 \]
-which reproduces the variant names to their displayed precision.
+which reproduces the simulation condition names to their displayed precision.
 
 Relative to the \(\SI{42.1}{s}\) small-fuel timescale, these steps are
 \(0.00664,\ 0.0133,\ 0.1328,\) and \(2.657\) times as large.  The first
 three therefore resolve that timescale, while CFL 200 spans more than twice
 it and is expected to show temporal degradation.  The analytical convolution
-is unchanged among variants, so its ideal load error is zero.  The explicit
+is unchanged among simulation conditions, so its ideal load error is zero.  The explicit
 numerical substitutions are: baseline mean load error at most 0.01; CFL 1
 and 10 maximum load and mean ignition-time errors at most 0.001; their
 history NRMSE at most 0.05; and CFL 200 maximum load error at most 0.10.
@@ -168,7 +167,7 @@ above must not exceed 1\%; the CFL=1 and 10 maximum errors against the same
 integral must not exceed 0.1\%; and the CFL=200 maximum must remain below
 10\%. CFL=1 and 10 mean full-ignition-time errors relative to CFL=0.5 must not
 exceed 0.1\%. Accumulation-history normalized RMSE at 140--150~m must not
-exceed 5\% for CFL=1 and 10. Every variant must be complete, and every
+exceed 5\% for CFL=1 and 10. Every simulation condition must be complete, and every
 acceptance component must pass.
 
 The postprocessor also estimates first-deposition time from the first transient
@@ -176,7 +175,6 @@ output interval with nonzero accumulation. Because its resolution is the
 \SI{500}{s} dump interval rather than the firebrand trajectory substep, this is
 shown as a diagnostic corresponding to the first-deposition diagnostic, but is not used as a
 pass/fail metric.
-
 
 \subsection{Justification of metric quantification}
 
@@ -196,11 +194,11 @@ rising accumulation front are amplified pointwise even when final totals
 agree.  Normalizing by the baseline history range makes 5\% a direct bound on
 the fraction of the resolved accumulation excursion.  First-deposition time is
 kept diagnostic because its \SI{500}{s} observation interval is too coarse to
-support a defensible tighter decision.  All four variants are required so the
+support a defensible tighter decision.  All four simulation conditions are required so the
 case demonstrates both moderate-step invariance and the predicted extreme-CFL
 degradation.
 
-\subsection{Predeclared acceptance contract}
+\subsection{Predeclared acceptance criteria}
 
 Table~\ref{tab:acceptance-contract} summarizes the metrics fixed before
 inspection of the calculated results. Numerical values and component statuses
@@ -215,7 +213,7 @@ are reported separately in Section~7.
 \toprule
 Metric & Output, region, and aggregation & Acceptance criterion\\
 \midrule
-Output completeness & Current-fingerprint outputs for baseline and CFL 1, 10, and 200 variants. & 4 of 4 variants \\
+Output completeness & Current-input identity record outputs for baseline and CFL 1, 10, and 200 simulation conditions. & 4 of 4 simulation conditions \\
 Baseline load mean error & Mean structure-load relative error against the analytical load reference. & \(\le0.01\) \\
 CFL 1 load maximum error & Maximum finite structure-load relative error against its analytical reference. & \(\le0.001\) \\
 CFL 10 load maximum error & Same maximum error at CFL 10. & \(\le0.001\) \\
@@ -231,9 +229,9 @@ Overall decision & Conjunction of completeness and all eight quantitative checks
 
 \section{Simulation configuration and predicted outcome}
 
-Figure~\ref{fig:input-configuration} records the prepared spatial inputs for \texttt{cfl0p5\_dt0p28}.
-The postprocessor reads these panels from the variant-local GeoTIFF files, removes the
-two-cell numerical buffer, and retains map coordinates in metres.  The left panel shows
+Figure~\ref{fig:input-configuration} records the prepared spatial inputs for the wind Courant number 0.5 and timestep 0.28 s condition.
+These panels show the prepared spatial fields, remove the
+two-cell numerical buffer, and retain map coordinates in metres.  The left panel shows
 the most informative fuel or structure layout available for the case; the right panel
 shows the cells selected by the non-positive initial level-set field, making a localized
 ignition or firebrand-emission source explicit.
@@ -241,27 +239,26 @@ ignition or firebrand-emission source explicit.
 \begin{figure}[H]
 \centering
 \EvidenceFigure[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{../figures/input_configuration.pdf}
-\caption{Whole-domain prepared input configuration for the representative variant.  The
+\caption{Whole-domain prepared input configuration for the representative simulation condition.  The
 physical domain is shown without the numerical halo; coordinates, configured wind values,
 fuel or structure layout, and initial ignition/source geometry are identified in the panels.}
 \label{fig:input-configuration}
 \end{figure}
 
-
 \begin{table}[H]
 \centering\small
-\caption{Generated temporal-resolution variants. The time step is calculated
+\caption{Generated temporal-resolution simulation conditions. The time step is calculated
 from \(\Delta t=\mathrm{CFL}\,\Delta x/U\), not rounded to the display value.}
 \begin{tabular}{lrrr}
 \toprule
-Variant & Wind-based CFL & \(\Delta t\) (s) & \(t_{\max}\) (s)\\
+Simulation condition & Wind-based CFL & \(\Delta t\) (s) & \(t_{\max}\) (s)\\
 \midrule
 \VariantRows
 \bottomrule
 \end{tabular}
 \end{table}
 
-All variants use \(\Delta x=\Delta y=\SI{10}{m}\), alternating
+All simulation conditions use \(\Delta x=\Delta y=\SI{10}{m}\), alternating
 \SI{10}{m} structures and firebreaks, a \SI{40}{mph} wind, the same model-14
 design fire, per-MW firebrand generation, empirical structural transport,
 Eulerian accumulation, physical ignition, no ember consumption, no crosswind
@@ -270,30 +267,26 @@ CFL=0.5, 1, and 10, with visible but bounded load sensitivity at CFL=200.
 
 \subsection{Preprocessing, execution, and postprocessing}
 
-\texttt{scripts/preprocess.py} defines its customizable constants at the top,
-creates one self-contained directory per variant, writes co-registered UTM
-GeoTIFFs and case-local fuel-model tables, marks every structure footprint in
-the first upwind column with negative \(\phi\), and records the exact time step
-and an SHA-256 input fingerprint in \texttt{variants/manifest.json}. Unique
-structure IDs preserve the two-dimensional lattice while the postprocessor
-extracts a representative cross-stream row for common structure profiles.
+Each prescribed condition uses co-registered fields in a Universal Transverse
+Mercator coordinate system and the stated fuel properties. The initial level-set
+field \(\phi\) is negative within every structure footprint in the first upwind column.
+The exact timestep and input identities are recorded for each condition. Unique
+structure identities preserve the two-dimensional lattice; the profiles compare
+a representative cross-stream row.
 
-\texttt{run\_case.sh} prepares all variants, runs the executable given by the
-absolute \texttt{ELMFIRE\_BIN} path, captures per-variant logs, records the
-successful input fingerprint, invokes postprocessing, and compiles this
-standalone report. Resume mode skips a run only when its output fingerprint
-matches the current generated inputs.
+A completed result is reused only when its input identity matches the current
+prescribed configuration. Each simulation condition is evaluated independently.
 
-\texttt{scripts/postprocess.py} aggregates final ember counts and ignition times
+result analysis procedure aggregates final ember counts and ignition times
 by physical structure ID, reconstructs cumulative histories from transient
-ember rasters and \texttt{dump\_times} metadata, evaluates the analytical deposited-load relation,
+ember rasters and recorded output times metadata, evaluates the analytical deposited-load relation,
 calculates every declared metric, and produces report-ready vector figures.
 Stale pre-modification outputs are explicitly excluded.
 
 \section{Actual simulation results}
 
-Figure~\ref{fig:domain-result} shows the representative time-of-arrival field from \texttt{cfl0p5\_dt0p28}.
-It is read from the actual ELMFIRE output named in the panel, masks nodata, and excludes
+Figure~\ref{fig:domain-result} shows the representative time-of-arrival field from the wind Courant number 0.5 and timestep 0.28 s condition.
+The displayed field is taken from the simulated results, masks missing values, and excludes
 the two-cell numerical buffer.  The finest-timestep reference field anchors the profile and error comparisons and exposes domain-wide behavior that a single-row profile can hide.
 
 \begin{figure}[H]
@@ -305,8 +298,7 @@ profiles, convergence plots, ensemble statistics, and calculated acceptance metr
 \label{fig:domain-result}
 \end{figure}
 
-
-\CompletedVariantCount{} of \RequestedVariantCount{} variants currently have
+\CompletedVariantCount{} of \RequestedVariantCount{} simulation conditions currently have
 complete outputs matching the generated inputs. The verification decision is
 \textbf{\OverallStatus}.
 
@@ -352,23 +344,23 @@ Metric & Acceptance limit & Calculated & Status\\
 \end{table}
 
 The current decision is \textbf{\OverallStatus}. A pass requires all four
-current-fingerprint runs and all tabled acceptance checks. A not-run state is
+input-matched runs and all tabled acceptance checks. A not-run state is
 not evidence of agreement.
 
 This is a deterministic code-verification test of the implemented idealized WUI
 model, not field validation. The analytical load uses simulated source ignition
 times so that it isolates generation and deposition from ignition chronology.
 First-deposition timing is limited by transient output cadence because the
-current executable does not write the internal \texttt{EMBER\_TOA} array as a
+current executable does not write the internal firebrand arrival time array as a
 final raster; that diagnostic is therefore intentionally excluded from the
-decision contract.
+decision specification.
 
 \section{Technical interpretation}
-With the declared building-only switch restored, all four current-source variants produce nonzero structural heat release, firebrand transport, fingerprint-matched final rasters, and a complete metric record.  This invalidates the earlier zero-HRR and missing-output interpretations, both of which arose while diagnosing the stale executable or the temporary altered switch.
+With the declared building-only switch restored, all four current-source simulation conditions produce nonzero structural heat release, firebrand transport, input identity record-matched final rasters, and a complete metric record.  This invalidates the earlier zero-HRR and missing-output interpretations, both of which arose while diagnosing the stale executable or the temporary altered switch.
 
 The temporal history is comparatively stable at moderate step sizes: the CFL 1 and CFL 10 accumulation-history NRMSE values are 0.008466 and 0.008443, both below 0.05.  The stricter pointwise/reference components do not pass.  The analytical-load errors are 0.54345 for CFL 0.5, 0.82701 for CFL 1, 0.82690 for CFL 10, and 0.83927 for CFL 200, all above their respective limits.  The CFL 1 and CFL 10 mean ignition-time relative errors are 0.007295 and 0.01326, compared with the 0.001 limit.  The overall result is therefore \emph{FAIL}, not \emph{NOT RUN} or \emph{NOT EVALUABLE}.
 
-Because every input fingerprint, final output, and integer timestep/stop relation is valid, these discrepancies are not caused by an admissible case-configuration error.  They identify disagreement between the implemented temporal/structural spotting calculation and the predeclared analytical-load and ignition-time requirements.
+Because every input identity record, final output, and integer timestep/stop relation is valid, these discrepancies are not caused by an admissible case-configuration error.  They identify disagreement between the implemented temporal/structural spotting calculation and the predeclared analytical-load and ignition-time requirements.
 
 \section{Scope and limitations}
 The test varies only temporal resolution in a fixed academic WUI configuration. It verifies timestep sensitivity for the selected transport and ignition scales and does not establish spatial convergence or physical validation.

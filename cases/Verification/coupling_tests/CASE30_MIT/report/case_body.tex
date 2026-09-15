@@ -1,6 +1,6 @@
 \section{Verification purpose}
 
-\textbf{Case ID:} \texttt{\CaseID}. This case verifies that the standard ELMFIRE executable initializes, schedules, transports, and merges multiple point ignitions without depending on source-tree test drivers. It preserves the scientific intent of Adam Laird's dual-ignition, staggered spot-merging, and near-boundary component scenarios.
+This case verifies that the standard ELMFIRE executable initializes, schedules, transports, and merges multiple point ignitions using only prescribed physical inputs and observable model outputs. It preserves the scientific intent of Adam Laird's dual-ignition, staggered spot-merging, and near-boundary component scenarios.
 
 \section{Mathematical formulation and numerical implementation}
 
@@ -8,7 +8,7 @@ Each ignition introduces a local negative level-set region at position $(x_i,y_i
 
 \section{Derivation of expected behavior}
 
-The no-wind forcing and ignition pair are invariant under reflection about their mapped raster axes; therefore the discrete arrival-time solution has the same symmetries. Because ELMFIRE maps coordinates to one-based cells with a ceiling operation, the evaluator reflects the largest balanced row window about the actual ignition row rather than an intercell domain line. The wind variant changes only the wind rasters, so a nonzero solution difference is a metamorphic check of weather coupling. For scheduled ignition $i$, the containing raster cell should receive an arrival time within one \OutputInterval{} of $t_i$. The eight boundary sources are placed one five-cell margin inside the square domain and all must initialize.
+The no-wind forcing and ignition pair are invariant under reflection about their mapped raster axes; therefore the discrete arrival-time solution has the same symmetries. Because ELMFIRE maps coordinates to one-based cells with a ceiling operation, the evaluator reflects the largest balanced row window about the actual ignition row rather than an intercell domain line. The wind simulation condition changes only the wind rasters, so a nonzero solution difference is a metamorphic check of weather coupling. For scheduled ignition $i$, the containing raster cell should receive an arrival time within one \OutputInterval{} of $t_i$. The eight boundary sources are placed one five-cell margin inside the square domain and all must initialize.
 
 % BEGIN EXPLICIT METRIC DERIVATION
 For any two arrival-time arrays \(A\) and \(B\), the implemented comparison is
@@ -25,7 +25,8 @@ is compared with the no-wind run by the same formula and must give
 \(E\geq0.05\), demonstrating a resolved forcing response.
 For scheduled ignitions \((x,y,t)\) equal to
 \((0,600,0)\), \((0,300,1200)\), \((0,0,2400)\),
-\((0,-300,3600)\), and \((0,-600,4800)\), the timing metric is
+\((0,-300,3600)\), and \((0,-600,4800)\), the timing metric uses the
+simulated time of arrival (TOA) at each ignition location:
 \[
  E_t=\max_j|TOA(x_j,y_j)-t_j|\leq1200~\mathrm{s}.
 \]
@@ -41,35 +42,35 @@ Reflection error is the larger normalized mean absolute difference between the n
 
 \section{Simulation configuration and predicted outcome}
 
-All variants use a \GridSpacing{} square grid in EPSG:32610, Fuel Model 10, 3/5/6 percent dead-fuel moisture, and flat terrain. The variants contain two simultaneous no-wind sources, the same pair under 5 mph wind from 225 degrees, five staggered sources, and eight edge/corner sources. In the staggered variant the first source is anchored at (t=0) and the other four follow at 1200-s intervals. This common translation of the original absolute schedule preserves every relative delay while preventing versions that have no active front from advancing past a strictly future first ignition. The predicted fields are respectively symmetric merger, wind-distorted merger, correctly timed merger, and eight clipped but valid boundary fires.
+All simulation conditions use a \GridSpacing{} square grid in EPSG:32610, Fuel Model 10, 3/5/6 percent dead-fuel moisture, and flat terrain. The simulation conditions contain two simultaneous no-wind sources, the same pair under 5 mph wind from 225 degrees, five staggered sources, and eight edge/corner sources. In the staggered simulation condition the first source is anchored at (t=0) and the other four follow at 1200-s intervals. This common translation of the original absolute schedule preserves every relative delay while preventing versions that have no active front from advancing past a strictly future first ignition. The predicted fields are respectively symmetric merger, wind-distorted merger, correctly timed merger, and eight clipped but valid boundary fires.
 
 \begin{center}\begin{tabular}{p{0.22\textwidth}p{0.22\textwidth}p{0.12\textwidth}p{0.34\textwidth}}\toprule
 Parameter & Configured value & Units & Role \\
 \midrule Domain/grid & 2000 m square; 5 & m/cell & Resolves source placement and merging \\
 Fuel/moisture & FM10; 3/5/6 & --- / percent & Homogeneous surface response \\
 Time control & step 1, maximum 5; stop 14400 & s & Exact timestep multiple for scheduled sources \\
-Variants & dual calm, dual wind, staggered, boundary & --- & Exercises symmetry, weather, timing, and clipping \\
+Simulation conditions & dual calm, dual wind, staggered, boundary & --- & Exercises symmetry, weather, timing, and clipping \\
 Output cadence & 1200 & s & Timing-error acceptance scale \\
 \bottomrule\end{tabular}\end{center}
 
-Figure~\ref{fig:input-configuration} is generated mechanically from the prepared case-local GeoTIFF inputs. It identifies the selected source artifact and representative variant; the left panel shows a fuel, terrain, moisture, wind, canopy, or other controlling field selected for this experiment, and the right panel shows the cells selected by the non-positive initial level-set field. No values in this figure are redrawn or inferred from the expected response.
+Figure~\ref{fig:input-configuration} shows the prescribed spatial condition used in this experiment. The displayed field represents the initial level-set geometry or a controlling fuel, terrain, moisture, wind, or canopy quantity, as identified by the figure labels. The plotted values come from the prepared simulation inputs, not from the expected response.
 
 \begin{figure}[H]
   \centering
   \IfFileExists{../figures/input_configuration.pdf}{%
     \includegraphics[width=0.98\textwidth,height=0.46\textheight,keepaspectratio]{input_configuration.pdf}%
-  }{\fbox{\parbox{0.88\textwidth}{The prepared-input figure has not been generated. Run the case-local preprocessing and spatial-evidence step.}}}
-  \caption{Prepared input conditions from case-local generated rasters. Coordinates are in metres; the colorbar identifies the displayed field and its physical units or category. The ignition panel is derived directly from \(\phi\leq0\).}
+  }{\fbox{\parbox{0.88\textwidth}{Prepared-input evidence is unavailable. The prescribed configuration is described in the text; this absence does not establish that it was simulated.}}}
+  \caption{Prescribed initial level-set geometry for two simultaneous ignitions without wind. Coordinates are grid-cell indices on the 5 m grid; the field is dimensionless.}
   \label{fig:input-configuration}
 \end{figure}
 
 \section{Actual simulation results}
 
-The generated result is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} required metrics pass across \VariantCount{} variants. Missing ELMFIRE output yields NOT EVALUABLE rather than a pass.
+The generated result is \textbf{\VerificationStatus}; \PassingMetricCount{} of \MetricCount{} required metrics pass across \VariantCount{} simulation conditions. Missing ELMFIRE output yields NOT EVALUABLE rather than a pass.
 
 \begin{figure}[H]\centering
-\IfFileExists{../figures/verification_summary.pdf}{\includegraphics[width=\textwidth]{verification_summary.pdf}}{\fbox{No case-local result figure is available.}}
-\caption{Case-local time-of-arrival fields for the four ignition-topology variants.}
+\IfFileExists{../figures/verification_summary.pdf}{\includegraphics[width=\textwidth]{verification_summary.pdf}}{\fbox{No case-specific result figure is available.}}
+\caption{Case-specific time-of-arrival fields for the four ignition-topology simulation conditions.}
 \end{figure}
 
 \section{Calculated metrics and verification decision}
@@ -78,7 +79,7 @@ The generated result is \textbf{\VerificationStatus}; \PassingMetricCount{} of \
 Metric & Expected & Calculated & Status \\\midrule
 \MetricRows
 \bottomrule\end{tabular}\end{center}
-The authoritative decision is \textbf{\VerificationStatus} from \texttt{outputs/metrics.json}.
+The authoritative decision is \textbf{\VerificationStatus} from calculated verification and validation metrics.
 
 \section{Technical interpretation}
 
@@ -86,4 +87,4 @@ A symmetry failure points to directional indexing or level-set transport. No win
 
 \section{Scope and limitations}
 
-This is deterministic implementation verification, not fire-behavior validation. It does not expose the internal Fortran ignition routines directly; it checks their observable behavior through an unmodified ELMFIRE executable.
+This is deterministic implementation verification, not fire-behavior validation. It does not expose the internal Fortran ignition calculations directly; it checks their observable behavior through an unmodified ELMFIRE executable.

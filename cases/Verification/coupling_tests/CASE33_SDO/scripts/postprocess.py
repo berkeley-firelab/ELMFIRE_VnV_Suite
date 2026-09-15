@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Measure isotropy of the control and directional elongation on slope."""
 from __future__ import annotations
+
+from report_language import polish_figure
 import json
 from pathlib import Path
 import matplotlib
@@ -107,6 +109,7 @@ def main():
         ax.set_title(title)
         fig.colorbar(im, ax=ax, shrink=0.75)
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG / "verification_summary.pdf", bbox_inches="tight")
     plt.close(fig)
     with rasterio.open(CASE_DIR / "variants/slope_30/inputs/slp.tif") as src:
@@ -115,6 +118,7 @@ def main():
     ax.imshow(a, origin="upper")
     ax.set_title("Uniform 30 degree slope input")
     fig.tight_layout()
+    polish_figure(fig)
     fig.savefig(FIG / "input_configuration.pdf", bbox_inches="tight")
     plt.close(fig)
     p = {

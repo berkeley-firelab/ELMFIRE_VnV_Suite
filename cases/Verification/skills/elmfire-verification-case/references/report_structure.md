@@ -4,13 +4,16 @@ Write the report as a self-contained scientific verification argument for a read
 
 Use numbered `\\section{...}` commands with these exact names and in this order. Do not merge or reorder them around the chronology of file generation.
 
+Apply [report_language.md](report_language.md) to all reader-facing text and figures.
+Operational filenames below describe construction only, not report wording.
+
 ## 1. Verification purpose
 
 State:
 
 - the physical, mathematical, numerical, or algorithmic behavior being verified;
 - why that behavior matters to ELMFIRE;
-- the exact implementation path exercised, including relevant modules, routines, selectors, or state updates;
+- the physical and numerical ELMFIRE processes exercised, including relevant model choices and state updates;
 - the defects the case is capable of exposing;
 - what is controlled, varied, enabled, and disabled; and
 - why this is implementation verification rather than physical validation.
@@ -51,7 +54,7 @@ For every metric document:
 - the expected property it measures;
 - why it is sensitive to the defect or implementation error of interest;
 - why it is preferable to plausible alternatives and robust to irrelevant variation;
-- the source output field and exact file-selection rule;
+- the physical output quantity and exact semantic selection rule (member, time, uniqueness, and completeness);
 - spatial region, masks, nodata handling, and buffer exclusion;
 - temporal selection or ensemble statistic;
 - normalization and aggregation;
@@ -67,11 +70,11 @@ State the complete Boolean rule for the overall decision. A metric must not be c
 
 Document enough information to reproduce the experiment: domain and coordinate system, physical and buffer cells, grid resolution, timestep, initialization or ignition, fuels, terrain, moisture, weather, relevant model selectors, coupled or disabled processes, variants, duration, and output cadence. When terminal evidence is required, state how `SIMULATION_DT`, `SIMULATION_DTMAX`, and `SIMULATION_TSTOP` were aligned and identify any justified exception.
 
-Use a table with columns for parameter, configured value, units, and role in isolating the behavior. Every spatial case must include at least one whole-domain prepared-input figure before any actual-result figure, even when the inputs are uniform. Generate it mechanically from the current case-local preprocessing artifacts and show the initial PHI or ignition geometry together with a scientifically controlling fuel, terrain, moisture, weather, canopy, structure, or other field. For sweeps, identify the representative generated variant or visualize the varying input. Put coordinates, physical units or categories, variant identity, and source artifact in the figure or caption. A schematic, hand-redrawn field, reference image, or expected solution cannot substitute for this input evidence. Before showing actual output, state the predicted qualitative appearance and quantitative values of every result that will be used in the decision.
+Use a table with columns for parameter, configured value, units, and role in isolating the behavior. Every spatial case must include at least one whole-domain prepared-input figure before any actual-result figure, even when the inputs are uniform. Generate it mechanically from the current case-local preprocessing artifacts and show the initial PHI or ignition geometry together with a scientifically controlling fuel, terrain, moisture, weather, canopy, structure, or other field. For sweeps, identify the representative generated variant or visualize the varying input. Put coordinates, physical units or categories, the prescribed simulation condition, and the scientific input construction in the figure or caption. Do not display filenames or routine names. A schematic, hand-redrawn field, reference image, or expected solution cannot substitute for this input evidence. Before showing actual output, state the predicted qualitative appearance and quantitative values of every result that will be used in the decision.
 
 ## 6. Actual simulation results
 
-Present only results read from actual case-local artifacts. Record the executable or source revision when available, selected output files, completed and required variants, and incomplete or failed runs. If a stalled-final compatibility path selected terminal evidence, report the meteorology-interval reconstruction test, reconstructed pre-jump time, whether the stall was near-stop or independently expected no-propagation, and the uniquely selected artifacts; do not present the overrun timestamp as the nominal stop time.
+Present only results read from actual case-local artifacts. Record the ELMFIRE release or source revision when available, the physical output quantities and their time/member selection, completed and required simulation conditions, and incomplete or failed simulations. If a stalled-final compatibility path selected terminal evidence, report the meteorology-interval reconstruction test, reconstructed pre-jump time, whether the stall was near-stop or independently expected no-propagation, and the physical quantities uniquely selected at that time; do not present the overrun timestamp as the nominal stop time.
 
 For a completed spatial case, include at least one representative whole-domain result before or beside derived profiles, convergence curves, tables, or scalar summaries. Every figure must identify the data source, reference where applicable, physical units, variant, output time or ensemble statistic, and acceptance limits. Do not manufacture results, substitute a synthetic curve for missing output, or show only a cropped region when domain behavior matters.
 
@@ -130,7 +133,7 @@ Use the current suite style for every standalone verification and validation cas
 
 Case titles contain only the report title: omit subtitle, author/organization subtitle blocks, and title dates. Retain scientifically relevant dates and provenance in the body. The aggregate guide's separately maintained cover layout is independent of the case title rule.
 
-Keep figure labels readable at their final printed size. Wrap table cells, split tables, or use multipage tables rather than shrinking tables below 10 pt with `resizebox` or `scalebox`. Mathematical notation may use mathematical fonts and code identifiers may use monospace styling.
+Keep figure labels readable at their final printed size. Wrap table cells, split tables, or use multipage tables rather than shrinking tables below 10 pt with `resizebox` or `scalebox`. Mathematical notation may use mathematical fonts. Operational identifiers must not appear in reader-facing prose or figures.
 
 The canonical style is `main_report/report_style.tex`. When formatting changes are approved, update that style and synchronize exact local copies into every current case's `report/report_style.tex` and the case template. Load the local file last in the case wrapper's preamble. Cases must never load the canonical file by an external relative path at runtime: independent compilation must remain possible without the suite. Future cases inherit the template copy.
 
@@ -139,3 +142,16 @@ Compile using `latexmk -lualatex`. Genuine Times New Roman regular, bold, italic
 For a formatting-only request, edit report sources/styles, report build commands, and these instructions only. Do not run preprocessing, simulation, or numerical postprocessing; do not alter namelists, input data, model parameters, evaluation criteria, or result artifacts. Compile directly from existing report inputs, then refresh the guides from the standalone PDFs. Inspect actual PDF font embedding, title weight and size, page layout, captions, and tables. Resolve line overflow through report layout changes while preserving the approved style and scientific content. Distinguish pre-existing missing evidence from formatting failures.
 
 Use `\documentclass[12pt]{article}` in both individual and aggregate report wrappers. Keep `\normalsize` at 12 pt with 14 pt leading, and use the local style's `\ReportBodyText` to restore normal body text after compact material. This rule includes introductions, summary narratives, lists, interpretation, and conclusions. Compact table sizes are exceptions for table content only: enclose their size commands in a local group and restore 12 pt prose afterward. Summary generators must emit these groups and resets so regeneration cannot introduce smaller narrative text. Verify 12 pt body text in the compiled individual PDFs and on aggregate summary pages, including prose after tables; source declarations alone are insufficient.
+
+## Consistent case presentation
+
+Do not add separate terminology or notation sections. Explain terms at first
+use in the scientific narrative or beside their first equation. Do not repeat
+the case ID in the opening purpose/objective section; keep identity in the
+report title, metadata, and guide links. Verification reports retain the nine
+section headings above; validation reports retain their ten section headings.
+Use US Letter pages with 0.85-inch margins for standalone cases. Use the local
+canonical style for 15-pt first-line paragraph indentation and 0-pt paragraph
+spacing (with 1-pt stretch); do not override these in individual wrappers.
+Keep scientific subsections and equations where needed rather than forcing
+different experiments into identical paragraph lengths or table dimensions.

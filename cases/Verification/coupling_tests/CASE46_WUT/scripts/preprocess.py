@@ -6,6 +6,8 @@ reviewed, version-pinned design fact carried as a machine-readable artifact.
 """
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import json
 import math
 import shutil
@@ -454,6 +456,7 @@ def make_figure(specs: list[dict[str, object]]) -> None:
     fig.suptitle("Prepared fuels and ignition\nGreen: wildland; red: urban; gray: nonburnable")
     out = CASE_DIR / "figures/input_configuration.pdf"
     out.parent.mkdir(parents=True, exist_ok=True)
+    polish_figure(fig)
     fig.savefig(out, metadata={"CreationDate": None, "ModDate": None})
     plt.close(fig)
 

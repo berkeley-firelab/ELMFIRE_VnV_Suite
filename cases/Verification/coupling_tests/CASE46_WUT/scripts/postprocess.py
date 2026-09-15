@@ -2,6 +2,8 @@
 """Fail-closed CASE46 evaluation of current, content-bound black-box outputs."""
 from __future__ import annotations
 
+from report_language import polish_figure
+
 import csv
 import datetime as dt
 import hashlib
@@ -658,6 +660,7 @@ def save_figure(rows: list[dict[str, object]], selector_passed: bool) -> None:
     axes[0].axvline(1000, color="black", ls="--", label="Optional shortcut threshold")
     axes[0].legend(loc="lower right")
     axes[1].axvline(0, color="black", lw=1)
+    polish_figure(fig)
     fig.savefig(CASE_DIR / "figures/transition_observations.pdf")
     plt.close(fig)
 

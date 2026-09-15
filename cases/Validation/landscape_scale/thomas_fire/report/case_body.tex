@@ -2,10 +2,11 @@
 
 This case asks whether ELMFIRE can reconstruct the landscape-scale spatial
 growth of the \CaseTitle{} through \SimulationDuration{} when driven by the
-case-local archived landscape, weather, moisture, ignition, spotting, and WUI
-inputs.  The comparison evidence is a time-filtered set of \ObservationSource{}.
+supplied landscape, weather, moisture, ignition, spotting, and wildland--urban
+interface (WUI) inputs.  The comparison evidence is a time-filtered set of active-fire detections from the
+Visible Infrared Imaging Radiometer Suite (VIIRS).
 The case exercises the coupled surface- and crown-fire, level-set, firebrand,
-ember-ignition, Monte Carlo, and building-spread pathways.  It does not isolate
+ember-ignition, Monte Carlo, and building-spread processes.  It does not isolate
 or verify any single algorithm, and it does not establish predictive skill for
 events outside the three received reconstructions.
 
@@ -18,45 +19,46 @@ independent, predeclared acceptance thresholds, so completed runs are
 
 \section{Reference event, experiment, and observations}
 
-The configured event start is \EventStart{}, and the comparison instant is
-\ComparisonTime{}.  The observation directory contains
-\InputMetric{observation_total_detection_count} point records in an
-EPSG:4326 shapefile; \InputMetric{observation_retained_detection_count} occur
-on or before the comparison cutoff.  The local fields identify the instrument
-as VIIRS and follow the NASA FIRMS active-fire schema.  NASA describes VIIRS
+The configured event start, expressed in Pacific standard time (PST), is
+\EventStart{}. The comparison instant is \ComparisonTime{}, with UTC
+indicating Coordinated Universal Time.  The supplied observation dataset contains
+\InputMetric{observation_total_detection_count} point records in the
+geographic coordinate system defined by EPSG:4326; \InputMetric{observation_retained_detection_count} occur
+on or before the comparison cutoff.  The observation attributes identify the instrument
+as VIIRS and are consistent
+with the National Aeronautics and Space Administration (NASA) Fire Information
+for Resource Management System (FIRMS) active-fire product.  NASA describes VIIRS
 active-fire data as nominal 375-m thermal detections, not mapped fire
 perimeters.  General product information is available from
-\url{https://firms.modaps.eosdis.nasa.gov/active_fire/} and
-\url{https://www.earthdata.nasa.gov/data/catalog/lancemodis-vnp14img-nrt-2}.
+\href{https://firms.modaps.eosdis.nasa.gov/active_fire/}{NASA FIRMS active-fire product documentation} and
+\href{https://www.earthdata.nasa.gov/data/catalog/lancemodis-vnp14img-nrt-2}{NASA Earthdata VIIRS near-real-time product documentation}.
 
 The exact FIRMS collection, granules, download URL, acquisition date, filtering
 history, and license are not recorded in the case material.  Consequently the
-NASA attribution is inferred from the field schema rather than established by
-a complete chain of custody.  The local observation component checksums are
-recorded in \texttt{data/source\_manifest.json}; no observation file is modified
-by preprocessing.
+NASA attribution is inferred from the observation attributes rather than
+established by complete provenance. Integrity checks identify the supplied
+observations, which remain unchanged during preprocessing.
 
 For raster comparison, detections through the cutoff are projected to the
-simulation CRS and enclosed by a concave hull with ratio 0.2 and no holes.  If
+simulation coordinate reference system (CRS) and enclosed by a concave hull with ratio 0.2 and no holes.  If
 the installed geometry library lacks that operation, the postprocessor reports
 and uses a convex-hull fallback.  This converts intermittent points into a
-comparison support; it is a declared workflow assumption, not an observed final
+comparison support; it is a declared comparison assumption, not an observed final
 perimeter.  Cloud, smoke, overpass timing, geolocation error, false detections,
 and the hull choice remain observation uncertainties.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.76\textwidth,height=0.52\textheight,keepaspectratio]{observation_summary.pdf}
-  \caption{Case-local VIIRS detections retained through the comparison cutoff,
+  \caption{Supplied VIIRS detections retained through the comparison cutoff,
   colored by elapsed time from the configured event start.}
 \end{figure}
 
 \section{Input data provenance and characterization}
 
-The received source is \texttt{\ArchiveName{}} (SHA-256
-\texttt{\ArchiveSha}).  Its extracted payload is preserved under
-\texttt{data/archive\_payload/}; every payload file is checked against
-\texttt{data/archive\_manifest.json}.  The collection's only supplied
+The supplied historical-fire reconstruction is identified by the SHA-256
+checksum \texttt{\ArchiveSha}. The extracted source data are retained unchanged,
+and their identities are checked before analysis.  The collection's only supplied
 provenance note is ``From Dwi.''  Upstream product names, providers, vintages,
 acquisition dates, processing history, and licenses for fuels, terrain,
 meteorology, moisture, WUI, and ignition data are unknown.  The report therefore
@@ -89,8 +91,7 @@ Aspect and wind direction are circular quantities.  Their arithmetic means are
 not used as directional summaries; the circular means are
 \InputMetric{asp_circular_mean_degrees}$^\circ$ and
 \InputMetric{wd_circular_mean_degrees}$^\circ$, respectively.  Exact means and
-standard deviations use every valid selected value.  Reported quantiles in
-\texttt{outputs/input\_statistics.json} use a deterministic nearest-neighbor
+standard deviations use every valid selected value.  Reported quantiles use a deterministic nearest-neighbor
 sample of at most $512\times512$ cells per band, and are labeled accordingly.
 
 \begin{figure}[H]
@@ -117,7 +118,7 @@ sample of at most $512\times512$ cells per band, and are labeled accordingly.
 
 The active domain is \GridDescription{}.  Weather is \WeatherDescription{}, and
 the ignition treatment is \IgnitionDescription{}.  The simulation uses
-\EnsembleSize{} members, a target CFL of 0.45, crown-fire model 2, and PER-MW
+\EnsembleSize{} members, a target Courant--Friedrichs--Lewy (CFL) number of 0.45, crown-fire model 2, and fire-power-proportional
 firebrand generation with empirical transport distance, Eulerian accumulation,
 and physical ignition.  These physical values, seeds, uncertainty ranges,
 ignition choices, and WUI settings are retained from the received archive.  In
@@ -125,13 +126,12 @@ the available material they are \emph{documented by configuration} but their
 scientific selection rationale is unsupported; they must not be described as
 independently derived or literature-justified.
 
-The archived namelist was migrated only where required by the inspected local
-ELMFIRE interface at base commit
-\texttt{efa0b8fa3935ea4cd30a2bd054c7e9b83db81163}, whose working tree already
-contained modifications.  \CompatibilityNote{}  The complete mapping and audit
-limitations are recorded in the suite-level \texttt{SOURCE\_AUDIT.md}.  The
-active assignments pass the repository namelist schema and the test-critical
-values are locked in \texttt{case.yaml}.
+The original settings were adapted only where required for compatibility
+with the inspected ELMFIRE formulation at source revision
+\texttt{efa0b8fa3935ea4cd30a2bd054c7e9b83db81163}, which already
+contained additional modifications when inspected. \CompatibilityNote{}
+The required physical values are retained in the case specification; this
+compatibility review does not establish their scientific justification.
 
 \begin{table}[H]
 \centering
@@ -140,10 +140,10 @@ values are locked in \texttt{case.yaml}.
 Choice & Evidence class & Basis and limitation \\
 \midrule
 Landscape, weather, ignition, Monte Carlo, spotting, and WUI values & documented & Retained from the received archive; upstream derivation and event-specific tuning history are unknown. \\
-Namelist interface mappings & derived & Required by identifiers and enumerations in the inspected current source; no physical values were tuned. \\
-Comparison time & documented & Locked in the case contract and consistent with the reconstructed archive workflow; original scientific rationale is absent. \\
-$p\geq\ProbabilityThreshold$ footprint & workflow-selected & Majority-ensemble interpretation used for reproducibility; it is not an acceptance threshold and sensitivity should be reported for scientific use. \\
-VIIRS hull ratio 0.2 & workflow-selected & Compact cumulative support for point detections; not calibrated to an uncertainty-bounded perimeter. \\
+Model-setting compatibility & derived & Required by the choices supported by the inspected model formulation; no physical values were tuned. \\
+Comparison time & documented & Fixed in the case specification and consistent with the supplied reconstruction procedure; original scientific rationale is absent. \\
+$p\geq\ProbabilityThreshold$ footprint & selected for this comparison & Majority-ensemble interpretation used for reproducibility; it is not an acceptance threshold and sensitivity should be reported for scientific use. \\
+VIIRS hull ratio 0.2 & selected for this comparison & Compact cumulative support for point detections; not calibrated to an uncertainty-bounded perimeter. \\
 \bottomrule
 \end{tabular}
 \caption{Provenance of consequential configuration and comparison choices.}
@@ -151,24 +151,20 @@ VIIRS hull ratio 0.2 & workflow-selected & Compact cumulative support for point 
 
 \section{Preprocessing and reproducibility}
 
-The case-local \texttt{scripts/preprocess.py} verifies the source archive,
-every materialized payload file, and every observation component by size and
-SHA-256.  It checks that required landscape rasters share a grid, confirms that
+Preprocessing verifies the supplied reconstruction and observations by size
+and SHA-256 checksum.  It checks that required landscape rasters share a grid, confirms that
 the namelist-selected weather rasters contain at least 25 bands, computes input
-and observation statistics, and regenerates the four input figures.  It writes
-only \texttt{outputs/input\_statistics.json} and \texttt{figures/*.pdf}; it does
-not rewrite raw evidence.
+and observation statistics, and regenerates the four input figures.  The resulting statistics and figures characterize the source data without
+modifying the original evidence.
 
-\texttt{run\_case.sh} then launches ELMFIRE, runs the case-local postprocessor,
-and compiles this report.  The executable, Python interpreter, and MPI rank
-count can be selected through \texttt{ELMFIRE\_BIN}, \texttt{PYTHON\_BIN}, and
-\texttt{ELMFIRE\_MPI\_RANKS}.  The default 50 ranks assign one rank to each
-ensemble member and avoid an unnecessary virtual rank.  Outputs and logs are
-retained rather than deleted or renamed.  Reproducible input identity does not by itself guarantee result
+Simulation is followed by analysis of the complete ensemble. The declared
+default allocation is 50 Message Passing Interface (MPI) processes, one per
+ensemble member, without an additional coordinating process. The original
+simulation results remain available for examination.  Reproducible input identity does not by itself guarantee result
 reproducibility: each run must also record the actual ELMFIRE revision,
 compiler, dependencies, and platform.
 
-\section{Validation metrics and comparison framework}
+\section{Validation metrics and comparison method}
 
 For member $i$, let $\tau_i(\mathbf{x})$ be the time-of-arrival raster and $t_c$
 the declared comparison time.  The ensemble burn probability and thresholded
@@ -179,7 +175,7 @@ footprint are
  P=\{\mathbf{x}:p(\mathbf{x})\ge\ProbabilityThreshold\}.
 \end{equation}
 For the rasterized observation support $O$, intersection $I=|P\cap O|$, and
-valid-cell count $M$, the workflow reports
+valid-cell count $M$, the analysis reports
 \begin{align}
  J&=\frac{|P\cap O|}{|P\cup O|}, &
  \mathrm{precision}&=\frac{I}{|P|}, &
@@ -199,7 +195,7 @@ the observational baseline; no previous simulation result is used as truth.
 
 Metrics are calculated only when exactly \EnsembleSize{} uniquely identified
 members reach the comparison time and share one grid and CRS.  This completeness
-gate prevents partial runs from being reported as scientific results.
+requirement prevents partial runs from being reported as scientific results.
 The static aspect raster defines the analysis-domain mask.  Member-specific
 NoData cells in time-of-arrival outputs represent cells not burned by that
 member; they are therefore retained as zero burn outcomes rather than treated
@@ -207,9 +203,9 @@ as a grid-mask mismatch.
 
 \section{Simulation results and field-level comparison}
 
-The current workflow status is \textbf{\Metric{status}}.  \Metric{reason}
-Metrics and figures are generated only from the complete, current case-local
-ensemble.  If that ensemble is unavailable, the workflow reports the result as
+The current scientific status is \textbf{\Metric{status}}.  \Metric{reason}
+Metrics and figures are generated only from the complete, current
+ensemble.  If that ensemble is unavailable, the analysis reports the result as
 not evaluable rather than substituting legacy outputs or zero-valued metrics.
 
 \IfFileExists{../figures/validation_comparison.pdf}{%
@@ -237,7 +233,7 @@ not evaluable rather than substituting legacy outputs or zero-valued metrics.
   available; it does not imply a zero field.}
 \end{figure}}{}
 
-The active deck requests flame length and ember flux in addition to arrival
+The simulation requests flame length and ember flux in addition to arrival
 time.  It does not request a structure-damage count or damage-time output, so a
 damaged-structures time series is not reported and must not be inferred from WUI
 input rasters alone.
@@ -262,7 +258,7 @@ Ensemble members found & \Metric{ensemble_members_found} \\
 \bottomrule
 \end{tabular}
 \caption{Calculated statistics.  \textbf{MISSING} is intentionally conspicuous
-when the completeness gate prevents evaluation.}
+when the completeness requirement prevents evaluation.}
 \end{table}
 
 \IfFileExists{../figures/burned_area_growth.pdf}{%
@@ -296,10 +292,10 @@ themselves quantify all epistemic uncertainty.
 
 \section{Conclusions and limitations}
 
-The case is a self-contained, auditable validation workflow: raw archive
-and observation identities are checked, inputs are statistically characterized,
-output completeness is enforced, applicable raster and integrated results are
-visualized, and metric definitions and limitations are explicit.  Its current
+This case characterizes the agreement between a complete simulated ensemble
+and a spatial support derived from active-fire detections. Input statistics
+describe the forcing, spatial comparisons distinguish omission and commission,
+and integrated quantities provide context for the overlap metrics.  Its current
 scientific result is \textbf{\Metric{status}}; the accompanying reason states
 whether the complete current ensemble supported quantitative characterization.
 

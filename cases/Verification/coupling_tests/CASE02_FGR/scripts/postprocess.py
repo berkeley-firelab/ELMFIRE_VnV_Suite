@@ -2,6 +2,8 @@
 """Evaluate timestep-independent firebrand generation over a finite duration."""
 from __future__ import annotations
 
+from report_language import polish_figure, report_text
+
 import json
 import math
 import re
@@ -124,6 +126,7 @@ def write_pdf(results: list[dict]) -> None:
     axes[-1].set_xticks(np.arange(0.0, xmax + 1.0, 50.0))
     axes[-1].set_xlabel("Downwind distance [m]")
     figure.supylabel("Accumulated firebrand count [pcs/cell]")
+    polish_figure(figure)
     figure.savefig(FIGURE_DIR / "generation_residence_time.pdf", format="pdf")
     plt.close(figure)
 
@@ -262,7 +265,7 @@ def main() -> None:
     lines = [
         f"\\expandafter\\def\\csname metric@{re.sub(r'[^A-Za-z0-9]+', '', key)}\\endcsname{{{latex_escape(val)}}}" for key,
         val in macros.items()]
-    (REPORT_DIR / "metrics_macros.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (REPORT_DIR / "metrics_macros.tex").write_text(report_text("\n".join(lines) + "\n"), encoding="utf-8")
     print(f"[OK] evaluated {len(computed)}/{len(serializable)} variants: {status}")
 
 
