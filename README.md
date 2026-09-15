@@ -285,18 +285,27 @@ do not adopt its legacy locations or superseded instructions.
 
 ### Select a skill and describe the task
 
-Open this repository as the working folder in Codex. Include the relative path
-to the desired `SKILL.md` in your request and ask Codex to read it completely,
-together with its required references, before working. The examples below use
-this explicit file-reference approach; they are **chat prompts, not shell
-commands**. Replace all angle-bracket placeholders with your actual information.
+These skills are Markdown instructions that can be supplied to an AI assistant
+or coding agent; using them does not require a platform-specific skill command.
+Provide the instructions and supporting materials in a way the assistant can
+access:
 
-Do not assume the nested skill folders are automatically available in the skill
-selector. Codex's documented repository discovery location is `.agents/skills`.
-If a skill is already available in Codex CLI or the IDE extension, you can also
-select it with `/skills` or mention it as `$elmfire-verification-case`,
-`$elmfire-validation-case`, or `$elmfire-namelist-versioning`. See the
-[official skill usage and discovery instructions](https://learn.chatgpt.com/docs/build-skills).
+- **With repository access:** open this repository as the working folder,
+  include the relative path to the desired `SKILL.md` in your request, and ask
+  the assistant to read it completely together with its required references.
+- **Without repository access:** attach or paste the skill and its required
+  reference documents, along with the relevant case materials and ELMFIRE
+  source excerpts. A local path alone does not give the assistant access to
+  those files. Ask it to identify missing materials before proposing changes.
+
+If your platform supports skill registration or selection, you may use that
+facility, but do not assume it automatically discovers these nested folders.
+The examples below use explicit file references; they are **chat prompts, not
+shell commands**. Replace all angle-bracket placeholders with your actual
+information, or identify the corresponding attachments when files are uploaded.
+An assistant without file-editing or execution tools can propose changes and
+commands for you to apply locally; it must distinguish proposed checks from
+checks actually performed.
 
 For new case design or namelist compatibility work, provide an **explicit
 ELMFIRE source-root path and target revision**. An executable path alone does
@@ -328,7 +337,7 @@ verification case registry for the next unused CASE number; preserve existing
 case identities. Do not create files or run simulations until I approve.
 ```
 
-After approving the design, ask Codex to implement that design with the same
+After approving the design, ask the assistant to implement it with the same
 skill. It should produce a case with its own preprocessing, postprocessing,
 namelist, simple execution script, metadata, and report, without depending on
 another case's files or shared execution helpers.
