@@ -266,6 +266,134 @@ artifacts.
 
 ---
 
+## Using the repository skills
+
+The skills provide instructions for AI-assisted case design, review, and
+maintenance. They are not executable programs and do not replace the suite's
+run and report-building commands.
+
+| Skill | When to use it |
+| --- | --- |
+| [elmfire-verification-case](cases/Verification/skills/elmfire-verification-case/SKILL.md) | Create, extend, or review a self-contained verification case against an analytical solution, independent reference calculation, or known numerical response. Covers unit and coupling tests. |
+| [elmfire-validation-case](cases/Validation/skills/elmfire-validation-case/SKILL.md) | Create, complete, or review a validation case against observations or experiments. Covers data provenance, configuration rationale, input statistics, comparisons, metrics, figures, and reports. |
+| [elmfire-namelist-versioning](skills/elmfire-namelist-versioning/SKILL.md) | Check or adapt an existing case's namelist for another ELMFIRE revision while preserving the experiment and its evaluation criteria. |
+
+The archived [spotting-suite skill](cases/Verification/coupling_tests/__legacy__/spotting_model/SKILL.md)
+is a domain-specific historical reference. For current spotting-case work, use
+`elmfire-verification-case` and consult the archived material only where relevant;
+do not adopt its legacy locations or superseded instructions.
+
+### Select a skill and describe the task
+
+Open this repository as the working folder in Codex. Include the relative path
+to the desired `SKILL.md` in your request and ask Codex to read it completely,
+together with its required references, before working. The examples below use
+this explicit file-reference approach; they are **chat prompts, not shell
+commands**. Replace all angle-bracket placeholders with your actual information.
+
+Do not assume the nested skill folders are automatically available in the skill
+selector. Codex's documented repository discovery location is `.agents/skills`.
+If a skill is already available in Codex CLI or the IDE extension, you can also
+select it with `/skills` or mention it as `$elmfire-verification-case`,
+`$elmfire-validation-case`, or `$elmfire-namelist-versioning`. See the
+[official skill usage and discovery instructions](https://learn.chatgpt.com/docs/build-skills).
+
+For new case design or namelist compatibility work, provide an **explicit
+ELMFIRE source-root path and target revision**. An executable path alone does
+not establish which equations, namelist entries, or defaults apply. Also supply:
+
+- The scientific objective and the existing case or proposed case scope.
+- Relevant papers, reference calculations, source datasets, and observations.
+- Known domain, grid, time, ignition, fuel, weather, and model settings; identify
+  quantities to vary and quantities to hold fixed.
+- Proposed metrics and acceptance criteria, or the references from which they
+  should be justified. Missing scientific choices should be raised for review,
+  not invented.
+- Whether the request is a proposal, implementation, scientific review, or
+  report-only edit, and whether simulations or postprocessing may be run.
+
+### Example: propose a verification case
+
+```text
+Read and follow cases/Verification/skills/elmfire-verification-case/SKILL.md
+and its required references.
+ELMFIRE source root: <absolute path to the source checkout>
+Target revision: <release tag or commit>
+Verification objective: <physical or numerical response to verify>
+Reference material: <paper, analytical solution, or benchmark>
+Prescribed and varied conditions: <settings and sweep values>
+Propose the category, simulation design, expected response, metrics, and
+acceptance criteria. Identify unsupported choices for my review. Consult the
+verification case registry for the next unused CASE number; preserve existing
+case identities. Do not create files or run simulations until I approve.
+```
+
+After approving the design, ask Codex to implement that design with the same
+skill. It should produce a case with its own preprocessing, postprocessing,
+namelist, simple execution script, metadata, and report, without depending on
+another case's files or shared execution helpers.
+
+### Example: complete a validation case
+
+```text
+Read and follow cases/Validation/skills/elmfire-validation-case/SKILL.md
+and its required references.
+Case: <existing case path or proposed event>
+ELMFIRE source root: <absolute path to the source checkout>
+Target revision: <release tag or commit>
+Input and observation locations: <paths or dataset references>
+Scientific references: <papers, thesis, or experimental documentation>
+First review the available evidence and propose the remaining work. Explain
+data provenance, ignition and model-setting choices, input statistics,
+observation comparisons, metrics, and acceptance criteria. Ask me about
+unsupported choices, including spotting or WUI parameters. Distinguish
+calibration data from independent validation data. After approval, complete
+the self-contained case scripts and report. Do not run ELMFIRE yet.
+```
+
+### Example: review compatibility with another ELMFIRE revision
+
+```text
+Read and follow skills/elmfire-namelist-versioning/SKILL.md and its required
+references for <case path>.
+Target ELMFIRE source root and revision: <absolute path> at <tag or commit>
+Previous source root and revision, if available: <absolute path> at <revision>
+Inspect the source-defined namelist entries and their scientific meaning.
+Validate the existing case and propose only source-supported equivalent
+changes. Write any migration candidate outside the canonical case for review;
+do not overwrite its namelist or run simulations. Preserve the critical
+conditions in case.yaml, all metrics, and all acceptance criteria. Report
+changes that cannot preserve the experiment instead of applying them.
+```
+
+The supporting commands and review procedure are described in
+[Namelist versioning](docs/namelist-versioning.md).
+
+### Report-only work and review of the result
+
+For language or formatting edits, use the corresponding verification or
+validation skill and explicitly limit the request, for example:
+
+```text
+Use the verification-case skill at
+cases/Verification/skills/elmfire-verification-case/SKILL.md to revise the
+report for <case path>. This is a report-only edit: preserve scientific
+meaning, equations, settings, numerical results, citations, and status
+decisions. Define terms at first use and follow the common report format.
+Do not run preprocessing, simulations, or numerical postprocessing. Compile
+the existing report sources with LuaLaTeX and inspect the resulting PDF.
+```
+
+For all three skills, keep scientific intent and reasoning in the report and
+only test-critical invariants in `case.yaml`; do not introduce a separate
+`scientific_intent.yaml` unless the specification genuinely needs it. Review
+the changed files, unresolved assumptions, and reported checks before running
+or accepting a case. Successful execution or report compilation is not a
+scientific pass: missing evidence remains `NOT EVALUABLE`, and validation
+without justified acceptance thresholds may remain `CHARACTERIZED`.
+
+---
+
 ## Creating a new verification case
 
 1. **Bootstrap from the template** using the helper script or Makefile target:
