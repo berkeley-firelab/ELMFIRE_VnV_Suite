@@ -1,0 +1,15 @@
+{
+  "inputs": "../../../../../ELMFIRE_GOFER_validation/Kincade_2019/inputs",
+  "observation": "../../../../../toa/Kincade_2019_toa.tif",
+  "simulations": [
+    {
+      "run_id": "reference_spotting",
+      "label": "Reference-case spotting configuration",
+      "configuration": "reference_spotting",
+      "results_dir": "../../../../../../../GOFER_val_exploratory/Kincade_2019/outputs",
+      "notes": [
+        "The configuration file was not retained with this result; the configuration is documented from the case owner's preparation record."
+      ]
+    }
+  ]
+}

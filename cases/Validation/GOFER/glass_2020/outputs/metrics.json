@@ -1,0 +1,100 @@
+{
+  "method_version": "gofer_validation_v1",
+  "status": "CHARACTERIZED",
+  "reason": "Metrics are descriptive because no independent predeclared acceptance thresholds are available. Only results from earlier simulation configurations are available; the current case configuration has not been simulated.",
+  "simulations_found": 1,
+  "current_configuration_simulated": false,
+  "summary_figures": [
+    "burned_area_growth.pdf"
+  ],
+  "runs": [
+    {
+      "run_id": "baseline",
+      "label": "Single-ignition baseline without spotting",
+      "configuration": "baseline",
+      "notes": [
+        "The configuration file used was retained with this result."
+      ],
+      "status": "CHARACTERIZED",
+      "output_time_s": 680400,
+      "comparison_region": "valid landscape cells",
+      "observation_alignment": "nearest-neighbour transfer of GOFER arrival time to the 30 m model grid",
+      "final_comparison_h": 189.0,
+      "simulation_end_h": 189.0,
+      "stopped_early": false,
+      "domain_edge_contact_h": null,
+      "fire_size_stats": {
+        "stop_h": 189.0,
+        "total_area_ac": 64854.7,
+        "crown_area_ac": 13319.9,
+        "wall_clock_s": 1010.904
+      },
+      "overlap": [
+        {
+          "t_h": 24,
+          "true_positive_cells": 5997,
+          "false_positive_cells": 0,
+          "false_negative_cells": 209328,
+          "jaccard": 0.027850923023336815,
+          "precision": 1.0,
+          "recall": 0.027850923023336815,
+          "f1": 0.054192533955051914,
+          "simulated_area_km2": 5.3972999999999995,
+          "observed_area_km2": 193.7925,
+          "area_ratio": 0.027850923023336815
+        },
+        {
+          "t_h": 48,
+          "true_positive_cells": 19607,
+          "false_positive_cells": 0,
+          "false_negative_cells": 306007,
+          "jaccard": 0.06021546985080494,
+          "precision": 1.0,
+          "recall": 0.06021546985080494,
+          "f1": 0.11359100402350959,
+          "simulated_area_km2": 17.6463,
+          "observed_area_km2": 293.0526,
+          "area_ratio": 0.06021546985080494
+        },
+        {
+          "t_h": 72,
+          "true_positive_cells": 37180,
+          "false_positive_cells": 153,
+          "false_negative_cells": 296637,
+          "jaccard": 0.11132736473335929,
+          "precision": 0.99590174912276,
+          "recall": 0.11137838995617359,
+          "f1": 0.20035026269702277,
+          "simulated_area_km2": 33.5997,
+          "observed_area_km2": 300.4353,
+          "area_ratio": 0.11183672491215246
+        },
+        {
+          "t_h": 189.0,
+          "true_positive_cells": 138800,
+          "false_positive_cells": 152820,
+          "false_negative_cells": 252771,
+          "jaccard": 0.25496380358969933,
+          "precision": 0.4759618681846238,
+          "recall": 0.3544695597988615,
+          "f1": 0.40632853770029176,
+          "simulated_area_km2": 262.45799999999997,
+          "observed_area_km2": 352.4139,
+          "area_ratio": 0.7447436097157348
+        }
+      ],
+      "arrival_time_error": {
+        "co_burned_cells": 138800,
+        "bias_h": 41.665790597356086,
+        "mae_h": 46.48761677454943,
+        "rmse_h": 55.40432140057655,
+        "median_error_h": 37.07080729166667
+      },
+      "figures": [
+        "comparison_baseline.pdf",
+        "arrival_baseline.pdf",
+        "fields_baseline.pdf"
+      ]
+    }
+  ]
+}
