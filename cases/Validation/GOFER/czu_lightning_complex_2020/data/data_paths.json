@@ -1,6 +1,6 @@
 {
   "inputs": "../../../../../ELMFIRE_GOFER_validation/CZU_Lightning_Complex_2020/inputs",
-  "observation": "../../../../../toa/CZU_Lightning_Complex_2020_toa.tif",
+  "observation": "../../../../../ELMFIRE_GOFER_validation/CZU_Lightning_Complex_2020/observations/CZU_Lightning_Complex_2020_toa.tif",
   "simulations": [
     {
       "run_id": "baseline",

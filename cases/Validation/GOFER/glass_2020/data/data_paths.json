@@ -1,6 +1,6 @@
 {
   "inputs": "../../../../../ELMFIRE_GOFER_validation/Glass_2020/inputs",
-  "observation": "../../../../../toa/Glass_2020_toa.tif",
+  "observation": "../../../../../ELMFIRE_GOFER_validation/Glass_2020/observations/Glass_2020_toa.tif",
   "simulations": [
     {
       "run_id": "baseline",
