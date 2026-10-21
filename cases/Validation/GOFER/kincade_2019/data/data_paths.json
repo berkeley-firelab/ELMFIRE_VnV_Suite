@@ -1,6 +1,6 @@
 {
   "inputs": "../../../../../ELMFIRE_GOFER_validation/Kincade_2019/inputs",
-  "observation": "../../../../../toa/Kincade_2019_toa.tif",
+  "observation": "../../../../../ELMFIRE_GOFER_validation/Kincade_2019/observations/Kincade_2019_toa.tif",
   "simulations": [
     {
       "run_id": "reference_spotting",

@@ -26,7 +26,6 @@ GOFER_DIR = Path(__file__).resolve().parents[1]          # cases/Validation/GOFE
 SUITE_DIR = GOFER_DIR.parents[2]                          # ELMFIRE_VnV_Suite
 DATA_ROOT = SUITE_DIR.parent                              # fire_data/GOFER
 VALIDATION_DIR = DATA_ROOT / "ELMFIRE_GOFER_validation"
-TOA_DIR = DATA_ROOT / "toa"
 GOFER_SUMMARY = DATA_ROOT / "GOFER_Combined" / "GOFERC_summary.csv"
 FIRE_DATA = DATA_ROOT / "fireData.csv"
 EXPLORATORY = Path.home() / "Desktop" / "GOFER_val_exploratory"
@@ -222,7 +221,7 @@ def build_case(row: dict, log: dict, summary: list[dict], official: dict) -> Pat
     write(case / "data" / "source_manifest.json", json.dumps(source, indent=2) + "\n")
     paths = {
         "inputs": rel(inputs, case),
-        "observation": rel(TOA_DIR / f"{fire_id}_toa.tif", case),
+        "observation": rel(VALIDATION_DIR / fire_id / "observations" / f"{fire_id}_toa.tif", case),
         "simulations": [{"run_id": r, "label": lab, "configuration": c,
                          "results_dir": rel(d, case), "notes": notes}
                         for r, lab, c, d, notes in sims],

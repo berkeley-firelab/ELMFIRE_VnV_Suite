@@ -34,7 +34,7 @@ case directory), which currently point to:
 | Data | Default location | Override |
 |---|---|---|
 | Model inputs (landscape, weather, ignitions, …) | `fire_data/GOFER/ELMFIRE_GOFER_validation/<Fire_id>/inputs` | `GOFER_INPUTS_DIR` |
-| GOFER arrival-time raster | `fire_data/GOFER/toa/<Fire_id>_toa.tif` | `GOFER_OBSERVATION_TOA` |
+| GOFER arrival-time raster | `fire_data/GOFER/ELMFIRE_GOFER_validation/<Fire_id>/observations/<Fire_id>_toa.tif` | `GOFER_OBSERVATION_TOA` |
 | Earlier simulation results | `~/Desktop/GOFER_val_exploratory/<Fire_id>/outputs*` | `GOFER_SIMULATIONS_DIR/<run_id>` |
 | Current-configuration result | `<case>/simulation/` (written by `run_case.sh`) | — |
 

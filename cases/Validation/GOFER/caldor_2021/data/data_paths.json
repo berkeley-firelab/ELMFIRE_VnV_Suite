@@ -1,6 +1,6 @@
 {
   "inputs": "../../../../../ELMFIRE_GOFER_validation/Caldor_2021/inputs",
-  "observation": "../../../../../toa/Caldor_2021_toa.tif",
+  "observation": "../../../../../ELMFIRE_GOFER_validation/Caldor_2021/observations/Caldor_2021_toa.tif",
   "simulations": [
     {
       "run_id": "baseline",

@@ -18,14 +18,14 @@ Configuration & Recorded value \\
 \endhead
 \bottomrule
 \endlastfoot
-Recorded at (Coordinated Universal Time) & 2026-09-15T18:02:20+00:00 \\
+Recorded at (Coordinated Universal Time) & 2026-10-21T20:25:11+00:00 \\
 Declared ELMFIRE release & not declared \\
-Operating system & macOS-15.7.7-arm64-arm-64bit \\
+Operating system & macOS-27.0.1-arm64-arm-64bit-Mach-O \\
 Processor architecture & arm64 \\
-Message Passing Interface (MPI) implementation & not available \\
-Available Fortran compiler & GNU Fortran (Homebrew GCC 14.2.0\_1) 14.2.0 \\
-Python version & CPython 3.12.9 \\
-Scientific analysis libraries & NumPy 1.26.4; \allowbreak{}Matplotlib 3.9.2; \allowbreak{}PyYAML 6.0.1; \allowbreak{}Rasterio 1.5.0; \allowbreak{}GDAL not installed; \allowbreak{}Pandas 2.2.2; \allowbreak{}GeoPandas not installed; \allowbreak{}Shapely not installed \\
+Message Passing Interface (MPI) implementation & mpirun (Open MPI) 5.0.9 \\
+Available Fortran compiler & GNU Fortran (Homebrew GCC 15.2.0\_1) 15.2.0 \\
+Python version & CPython 3.14.6 \\
+Scientific analysis libraries & NumPy 2.5.4; \allowbreak{}Matplotlib 3.11.2; \allowbreak{}PyYAML 6.0.3; \allowbreak{}Rasterio not installed; \allowbreak{}GDAL not installed; \allowbreak{}Pandas not installed; \allowbreak{}GeoPandas not installed; \allowbreak{}Shapely not installed \\
 \end{longtable}
 \endgroup\ReportBodyText
 
@@ -47,7 +47,11 @@ Case & Comparison type & MPI processes \\
 \endfoot
 \bottomrule
 \endlastfoot
+\hyperref[case-detail:caldor-2021]{caldor\_2021} & Scientific comparison & 1 \\
 \hyperref[case-detail:camp-fire]{camp\_fire} & Landscape-scale validation & 50 \\
+\hyperref[case-detail:czu-lightning-complex-2020]{czu\_lightning\_complex\_2020} & Scientific comparison & 1 \\
+\hyperref[case-detail:glass-2020]{glass\_2020} & Scientific comparison & 1 \\
+\hyperref[case-detail:kincade-2019]{kincade\_2019} & Scientific comparison & 1 \\
 \hyperref[case-detail:thomas-fire]{thomas\_fire} & Landscape-scale validation & 50 \\
 \hyperref[case-detail:tubbs-fire]{tubbs\_fire} & Landscape-scale validation & 50 \\
 \end{longtable}
@@ -56,10 +60,10 @@ Case & Comparison type & MPI processes \\
 \subsection{Scientific decision summary}
 The decisions below follow the established calculated metrics and case-specific acceptance criteria. Completing a simulation or preparing a report does not establish PASS. Missing or insufficient scientific evidence is reported as NOT EVALUABLE.
 
-\textbf{Total cases:} 3\quad
+\textbf{Total cases:} 7\quad
 \textbf{PASS:} 0\quad
 \textbf{FAIL:} 0\quad
-\textbf{CHARACTERIZED:} 3\quad
+\textbf{CHARACTERIZED:} 7\quad
 \textbf{NOT EVALUABLE:} 0
 
 \begingroup\small
@@ -79,7 +83,11 @@ Case & Category & Title & Decision \\
 \endfoot
 \bottomrule
 \endlastfoot
+\hyperref[case-detail:caldor-2021]{caldor\_2021} & Scientific comparison & \hyperref[case-detail:caldor-2021]{2021 Caldor Fire reconstruction against GOFER hourly perimeters} & \mbox{\textcolor{blue!70!black}{\textbf{CHARACTERIZED}}} \\
 \hyperref[case-detail:camp-fire]{camp\_fire} & Landscape-scale validation & \hyperref[case-detail:camp-fire]{2018 Camp Fire landscape reconstruction} & \mbox{\textcolor{blue!70!black}{\textbf{CHARACTERIZED}}} \\
+\hyperref[case-detail:czu-lightning-complex-2020]{czu\_lightning\_complex\_2020} & Scientific comparison & \hyperref[case-detail:czu-lightning-complex-2020]{2020 CZU Lightning Complex reconstruction against GOFER hourly perimeters} & \mbox{\textcolor{blue!70!black}{\textbf{CHARACTERIZED}}} \\
+\hyperref[case-detail:glass-2020]{glass\_2020} & Scientific comparison & \hyperref[case-detail:glass-2020]{2020 Glass Fire reconstruction against GOFER hourly perimeters} & \mbox{\textcolor{blue!70!black}{\textbf{CHARACTERIZED}}} \\
+\hyperref[case-detail:kincade-2019]{kincade\_2019} & Scientific comparison & \hyperref[case-detail:kincade-2019]{2019 Kincade Fire reconstruction against GOFER hourly perimeters} & \mbox{\textcolor{blue!70!black}{\textbf{CHARACTERIZED}}} \\
 \hyperref[case-detail:thomas-fire]{thomas\_fire} & Landscape-scale validation & \hyperref[case-detail:thomas-fire]{2017 Thomas Fire landscape reconstruction} & \mbox{\textcolor{blue!70!black}{\textbf{CHARACTERIZED}}} \\
 \hyperref[case-detail:tubbs-fire]{tubbs\_fire} & Landscape-scale validation & \hyperref[case-detail:tubbs-fire]{2017 Tubbs Fire landscape reconstruction} & \mbox{\textcolor{blue!70!black}{\textbf{CHARACTERIZED}}} \\
 \end{longtable}
