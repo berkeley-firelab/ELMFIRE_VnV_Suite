@@ -84,13 +84,6 @@ class LinkedSummaryTests(unittest.TestCase):
             self.assertIn(f",{label}}}]", include_path.read_text(encoding="utf-8"))
             summary_text = summary_path.read_text(encoding="utf-8")
             self.assertIn(f"\\hyperref[{label}]", summary_text)
-            self.assertIn("Computational environment recorded during report preparation", summary_text)
-            self.assertIn("Comparison type and declared parallel allocation", summary_text)
-            self.assertNotIn("Passed?", summary_text)
-            self.assertIn("Isolated-process verification", summary_text)
-            for hidden in ("case.yaml", "metrics.json", "elmfire.data", "Schema",
-                           "ELMFIRE command", "unit\\_tests"):
-                self.assertNotIn(hidden, summary_text)
 
     def test_environment_excludes_installation_paths(self) -> None:
         environment = {

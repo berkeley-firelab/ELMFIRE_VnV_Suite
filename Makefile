@@ -1,8 +1,9 @@
 .PHONY: new run run-all run-verification run-validation build-all \
 	report-inputs verification-report validation-report reports main clean \
-	prepare-run configure
+	prepare-run configure test test-reports test-all
 
 SUITE ?= all
+PYTHON_BIN ?= python3
 ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 # Find all ELMFIRE config files
@@ -75,3 +76,13 @@ configure:
 	@echo "[INFO] Restoring user-executable permission on suite shell scripts..."
 	@find "$(ROOT_DIR)" -path "$(ROOT_DIR)/.git" -prune -o \
 		-type f -name "*.sh" -exec chmod u+x {} +
+
+# Developer checks do not execute ELMFIRE or modify case evidence.
+test:
+	@PYTHONDONTWRITEBYTECODE=1 "$(PYTHON_BIN)" -m unittest discover -s tools/tests -p 'test_*.py' -v
+
+# Optional report typography, structure, and house-style wording checks.
+test-reports:
+	@PYTHONDONTWRITEBYTECODE=1 "$(PYTHON_BIN)" -m unittest discover -s tools/tests -p '*_checks.py' -v
+
+test-all: test test-reports
