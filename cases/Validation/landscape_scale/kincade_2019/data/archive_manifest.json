@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "archive": {
+    "filename": "ELMFIRE_GOFER_validation.tar.gz",
+    "size": 7038832441,
+    "sha256": "714b9f2b3c3417336ea200bfc6f2bba2955376bf3088d675a811a11d28b0fffe",
+    "files": 583,
+    "skipped_macos_metadata": 682,
+    "received_date_utc": "2026-10-21",
+    "provider": "User-supplied archive",
+    "license": "Not documented in the supplied archive; upstream access and redistribution terms still apply."
+  },
+  "case_id": "kincade_2019",
+  "fire_id": "Kincade_2019",
+  "files": [
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/01-run.sh",
+      "size": 1883,
+      "sha256": "c59719749a5eecfe20cae7333414c29bb2fa61f0b23ddce80489d951e45823a7",
+      "path": "data/archive_payload/01-run.sh",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/adj.tif",
+      "size": 63736,
+      "sha256": "0da3881ce8af4ab34e1e5c7911fef89e24cc71639e5504850a539f31261b65a9",
+      "path": "data/archive_payload/inputs/adj.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/elmfire.data",
+      "size": 1230,
+      "sha256": "a7d881dd7f935995ac2593b668c790dfdaa1cd347d9f4c0a9709e19f77b8d54c",
+      "path": "data/archive_payload/inputs/elmfire.data",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/fuel_models.csv",
+      "size": 3948,
+      "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
+      "path": "data/archive_payload/inputs/fuel_models.csv",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/ignition_mask.tif",
+      "size": 57803,
+      "sha256": "031630246b535c856498fbe2785422ebd6d77e90d5311fd2e3d10960bf8842b3",
+      "path": "data/archive_payload/inputs/ignition_mask.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/ignition_mask.tif.aux.xml",
+      "size": 412,
+      "sha256": "2107ad4f1f6911fe8ed0c5b7be9d9869b7063211679defd64a6c6b6dc197d5a0",
+      "path": "data/archive_payload/inputs/ignition_mask.tif.aux.xml",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/ignitions.csv",
+      "size": 171,
+      "sha256": "4d7e85c308a154028af6e33af327553536654dc8537912ffb90dd2375ac84092",
+      "path": "data/archive_payload/inputs/ignitions.csv",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/landscape.tif",
+      "size": 11232241,
+      "sha256": "7932f3ffb6c89df316e8a6018bc413d8f1353137b584e055f318f9e63415ce58",
+      "path": "data/archive_payload/inputs/landscape.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/landscape.tif.aux.xml",
+      "size": 8468,
+      "sha256": "ea076d11bac20ea683b07884e5676157ab258475b8f6b7f003807c4688ce2343",
+      "path": "data/archive_payload/inputs/landscape.tif.aux.xml",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/lh.tif",
+      "size": 2208404,
+      "sha256": "efda3cabd4fcb03ddce0bbe9748b317e62a89989eb3ad794be81779f49eb00fa",
+      "path": "data/archive_payload/inputs/lh.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/lw.tif",
+      "size": 2146989,
+      "sha256": "5b1b2eb83531961e0c12996a28475723e0bdb53875ab6c0be5c30f5ee6d7e185",
+      "path": "data/archive_payload/inputs/lw.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/m1.tif",
+      "size": 4277471,
+      "sha256": "d41bcf1f3e5b4b6f3639e17adff74fc93c3df167df288b0b8b3a7df4bd4cb14c",
+      "path": "data/archive_payload/inputs/m1.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/m10.tif",
+      "size": 4252892,
+      "sha256": "410b261ec589378e7a73d10b11432cf4c3e65f938ebfaf601887be5ca653cc2e",
+      "path": "data/archive_payload/inputs/m10.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/m100.tif",
+      "size": 4304091,
+      "sha256": "864133b52d944ae480f121a75ba7692f95d64075c647396c96971f16d20bd830",
+      "path": "data/archive_payload/inputs/m100.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/metadata.in",
+      "size": 561,
+      "sha256": "2d9f59b403e5ef3c17fbb0a735c13f0b595548749957a9e5452dcedf13d9a52f",
+      "path": "data/archive_payload/inputs/metadata.in",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/metadata.out",
+      "size": 292,
+      "sha256": "dec13bd1e6679a9d71d0d5f0a8f8b3f46640ef9746b8fa37d3f231729074525f",
+      "path": "data/archive_payload/inputs/metadata.out",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/phi.tif",
+      "size": 63736,
+      "sha256": "0da3881ce8af4ab34e1e5c7911fef89e24cc71639e5504850a539f31261b65a9",
+      "path": "data/archive_payload/inputs/phi.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/wd.tif",
+      "size": 602537,
+      "sha256": "23cbd0dbc6d77ea96f1f53e74770f1258c2bb20de75e6db403a458a2f4a05bb2",
+      "path": "data/archive_payload/inputs/wd.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/wd.tif.aux.xml",
+      "size": 59104,
+      "sha256": "e61c56b086641e7c6f4a7e72f2e651e6555ebb5eaa03ec3fcdfde189fb73a40b",
+      "path": "data/archive_payload/inputs/wd.tif.aux.xml",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/ws.tif",
+      "size": 4331072,
+      "sha256": "2a60702e5835f8600f31b470e0e78a26f3ce52abd106aea8a36f6aedd34914c9",
+      "path": "data/archive_payload/inputs/ws.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/ws.tif.aux.xml",
+      "size": 57683,
+      "sha256": "7ff2039fe5ab8c56fc84eedfa322677a08247cfdd79f907fd8ade2daad4a49ca",
+      "path": "data/archive_payload/inputs/ws.tif.aux.xml",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/observations/Kincade_2019_toa.png",
+      "size": 150919,
+      "sha256": "d1d7559f01333502247557b54c7c395758c1ad1f9c92b8eb8b6a6705e9aac469",
+      "path": "data/archive_payload/observations/Kincade_2019_toa.png",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/observations/Kincade_2019_toa.tif",
+      "size": 20184,
+      "sha256": "eb018cf60095a5c61d3475ce2c4f9b3a1202b14f0ed1fee431c7fa5b82498197",
+      "path": "data/archive_payload/observations/Kincade_2019_toa.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/coeffs.csv",
+      "size": 134,
+      "sha256": "9a18e0fed64736298ac6b2ca9842c996193be18742602dd49815db161ab35120",
+      "path": "data/archive_payload/outputs/coeffs.csv",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/dump_times_0000001.csv",
+      "size": 69,
+      "sha256": "1eeb1645fb10d63c8b91bf6211b27d832a0adb8d7fbfa216fb7d2d45244c98da",
+      "path": "data/archive_payload/outputs/dump_times_0000001.csv",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/fire_size_stats.csv",
+      "size": 495,
+      "sha256": "234dc2d5368d83205e1b37eebaf9c7abfbe9b7b9dc62e663e32c3bc59ad19789",
+      "path": "data/archive_payload/outputs/fire_size_stats.csv",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/flin_0000001_0482400.tif",
+      "size": 7266250,
+      "sha256": "55a13467ad296e2d4521e5bf957ec80b167648c39019e96fbde08982e67954fa",
+      "path": "data/archive_payload/outputs/flin_0000001_0482400.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/hourly_isochrones.dbf",
+      "size": 529869,
+      "sha256": "8c3d616fbe7171e6e3c7fce5fd49b4fefe55772d9efe030a5d16469805f7ce68",
+      "path": "data/archive_payload/outputs/hourly_isochrones.dbf",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/hourly_isochrones.prj",
+      "size": 403,
+      "sha256": "ab78490474b2fb27a27ad2566802a7f49338602419540dd07cbcf22af5e50b6f",
+      "path": "data/archive_payload/outputs/hourly_isochrones.prj",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/hourly_isochrones.shp",
+      "size": 15775452,
+      "sha256": "800faa4c76b4f49ceb96be3b03241742eed76c91a2efeff70b3611f0c27ccb88",
+      "path": "data/archive_payload/outputs/hourly_isochrones.shp",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/hourly_isochrones.shx",
+      "size": 471036,
+      "sha256": "31a7516d585fc61485cc2f2b6aa72e18a2782c954e42e0e54a5425265178f5bc",
+      "path": "data/archive_payload/outputs/hourly_isochrones.shx",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/segments_0000001_0482400.tif",
+      "size": 172246,
+      "sha256": "3fdeb8aa1f0e0e52278115bed5495594460d7a323cc11c82c3503ff15efa7a44",
+      "path": "data/archive_payload/outputs/segments_0000001_0482400.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/sts_0000001_0482400.tif",
+      "size": 247564,
+      "sha256": "1a645eea6711a16bc741e24a03c64cfcbbb5fd64a45f3aefcbbddee048e148c2",
+      "path": "data/archive_payload/outputs/sts_0000001_0482400.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/time_of_arrival_0000001_0482400.tif",
+      "size": 6179850,
+      "sha256": "1b209a6e4b03fb4861e91beb36b30dc42ac5e2277e169345752ddd5c635a8262",
+      "path": "data/archive_payload/outputs/time_of_arrival_0000001_0482400.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/outputs/vs_0000001_0482400.tif",
+      "size": 7176628,
+      "sha256": "f0f2b150d204e5fcff09ab71369719665d7ced4cc57b677d74b8f6327aa7ebe5",
+      "path": "data/archive_payload/outputs/vs_0000001_0482400.tif",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/fires.csv",
+      "size": 7506,
+      "sha256": "ec179d623054018bfe3cd1f4566944feb737c29c2165df01527bf9cc11f248c3",
+      "path": "data/provenance/archive/fires.csv",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/inputs_log.csv",
+      "size": 4993,
+      "sha256": "4416ec2d34bd144fb76dd3696fd6e7a38bf32aba907c58e8458ea680bccc7364",
+      "path": "data/provenance/archive/inputs_log.csv",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/make_fires.py",
+      "size": 3167,
+      "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94",
+      "path": "data/provenance/archive/make_fires.py",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/prepare_inputs.py",
+      "size": 16402,
+      "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c",
+      "path": "data/provenance/archive/prepare_inputs.py",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/run_all.sh",
+      "size": 728,
+      "sha256": "7ac9cb0b80c992278de3fc27db8351b85509f9ccd40024b0210f5610fc93185f",
+      "path": "data/provenance/archive/run_all.sh",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/score_runs.py",
+      "size": 5456,
+      "sha256": "2c63477ed4f5db55e3ece74c641570815e6aa65a82979a57bb56c68418a558a0",
+      "path": "data/provenance/archive/score_runs.py",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
+      "size": 2379,
+      "sha256": "1fd3fbd75411b6145b2eb7edcdfb6f0d1abb349611077184fef89b30957168f8",
+      "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
+      "size": 4459,
+      "sha256": "29318a6cd45fe91df6a1fe41827bcf1cdbb0b55fcf036397d6a8d74a991e9fd8",
+      "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign.py",
+      "size": 15656,
+      "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f",
+      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign.py",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.py",
+      "size": 2623,
+      "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6",
+      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.py",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+      "size": 3441,
+      "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac",
+      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+      "size": 3384,
+      "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee",
+      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+      "processing": "extracted unchanged from the user-supplied archive"
+    },
+    {
+      "archive_member": "ELMFIRE_GOFER_validation/tools/fuel_models.csv",
+      "size": 3948,
+      "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
+      "path": "data/provenance/archive/tools/fuel_models.csv",
+      "processing": "extracted unchanged from the user-supplied archive"
+    }
+  ]
+}

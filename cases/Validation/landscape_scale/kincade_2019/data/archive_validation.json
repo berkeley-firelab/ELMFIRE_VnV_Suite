@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "case_id": "kincade_2019",
+  "archive_sha256": "714b9f2b3c3417336ea200bfc6f2bba2955376bf3088d675a811a11d28b0fffe",
+  "verified_source_files": 48,
+  "input_check_errors": [],
+  "historical_run_checks": [
+    {
+      "run_id": "reference_spotting",
+      "status": "CHARACTERIZED",
+      "differences": {
+        "grid_alignment": {
+          "saved": null,
+          "archive_calculation": "matching cells with identical coordinates or verified ELMFIRE REAL/F12.2 header rounding; no landscape resampling"
+        },
+        "arrival_time_error": {
+          "saved": {
+            "co_burned_cells": 332015,
+            "bias_h": -12.139367618826409,
+            "mae_h": 20.928861086607206,
+            "rmse_h": 27.851327862836985,
+            "median_error_h": -10.710399305555555
+          },
+          "archive_calculation": {
+            "co_burned_cells": 332015,
+            "bias_h": -12.13936761882641,
+            "mae_h": 20.928861086607206,
+            "rmse_h": 27.851327862836992,
+            "median_error_h": -10.710399305555555
+          }
+        }
+      },
+      "saved_result_matches_exactly": false,
+      "saved_result_matches_within_roundoff": true,
+      "maximum_absolute_numeric_difference": 7.105427357601002e-15,
+      "roundoff_comparison_absolute_tolerance": 1e-12,
+      "roundoff_note": "Numerical reproducibility check only, not a scientific acceptance threshold; saved metrics are unchanged."
+    }
+  ],
+  "rasters": {
+    "data/archive_payload/inputs/adj.tif": {
+      "crs": "EPSG:32610",
+      "width": 1400,
+      "height": 1667,
+      "bands": 1,
+      "transform": [
+        30.0,
+        0.0,
+        498709.598755626,
+        0.0,
+        -30.0,
+        4305580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/inputs/ignition_mask.tif": {
+      "crs": "EPSG:32610",
+      "width": 1400,
+      "height": 1667,
+      "bands": 1,
+      "transform": [
+        30.0,
+        0.0,
+        498709.598755626,
+        0.0,
+        -30.0,
+        4305580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/inputs/landscape.tif": {
+      "crs": "EPSG:32610",
+      "width": 1400,
+      "height": 1667,
+      "bands": 8,
+      "transform": [
+        30.0,
+        0.0,
+        498709.598755626,
+        0.0,
+        -30.0,
+        4305580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "int16"
+      ]
+    },
+    "data/archive_payload/inputs/lh.tif": {
+      "crs": "EPSG:32610",
+      "width": 90,
+      "height": 103,
+      "bands": 135,
+      "transform": [
+        600.0,
+        0.0,
+        492709.598755626,
+        0.0,
+        -600.0,
+        4311580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/inputs/lw.tif": {
+      "crs": "EPSG:32610",
+      "width": 90,
+      "height": 103,
+      "bands": 135,
+      "transform": [
+        600.0,
+        0.0,
+        492709.598755626,
+        0.0,
+        -600.0,
+        4311580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/inputs/m1.tif": {
+      "crs": "EPSG:32610",
+      "width": 90,
+      "height": 103,
+      "bands": 135,
+      "transform": [
+        600.0,
+        0.0,
+        492709.598755626,
+        0.0,
+        -600.0,
+        4311580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/inputs/m10.tif": {
+      "crs": "EPSG:32610",
+      "width": 90,
+      "height": 103,
+      "bands": 135,
+      "transform": [
+        600.0,
+        0.0,
+        492709.598755626,
+        0.0,
+        -600.0,
+        4311580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/inputs/m100.tif": {
+      "crs": "EPSG:32610",
+      "width": 90,
+      "height": 103,
+      "bands": 135,
+      "transform": [
+        600.0,
+        0.0,
+        492709.598755626,
+        0.0,
+        -600.0,
+        4311580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/inputs/phi.tif": {
+      "crs": "EPSG:32610",
+      "width": 1400,
+      "height": 1667,
+      "bands": 1,
+      "transform": [
+        30.0,
+        0.0,
+        498709.598755626,
+        0.0,
+        -30.0,
+        4305580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/inputs/wd.tif": {
+      "crs": "EPSG:32610",
+      "width": 90,
+      "height": 103,
+      "bands": 135,
+      "transform": [
+        600.0,
+        0.0,
+        492709.598755626,
+        0.0,
+        -600.0,
+        4311580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/inputs/ws.tif": {
+      "crs": "EPSG:32610",
+      "width": 90,
+      "height": 103,
+      "bands": 135,
+      "transform": [
+        600.0,
+        0.0,
+        492709.598755626,
+        0.0,
+        -600.0,
+        4311580.90800621,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/observations/Kincade_2019_toa.tif": {
+      "crs": "EPSG:32610",
+      "width": 470,
+      "height": 655,
+      "bands": 1,
+      "transform": [
+        50.0,
+        0.0,
+        507958.7258302559,
+        0.0,
+        -50.0,
+        4296937.003819842,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "nan",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/outputs/flin_0000001_0482400.tif": {
+      "crs": "EPSG:32610",
+      "width": 1400,
+      "height": 1667,
+      "bands": 1,
+      "transform": [
+        30.0,
+        0.0,
+        498709.59,
+        0.0,
+        -30.0,
+        4305581.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/outputs/segments_0000001_0482400.tif": {
+      "crs": "EPSG:32610",
+      "width": 1400,
+      "height": 1667,
+      "bands": 1,
+      "transform": [
+        30.0,
+        0.0,
+        498709.59,
+        0.0,
+        -30.0,
+        4305581.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "int16"
+      ]
+    },
+    "data/archive_payload/outputs/sts_0000001_0482400.tif": {
+      "crs": "EPSG:32610",
+      "width": 1400,
+      "height": 1667,
+      "bands": 1,
+      "transform": [
+        30.0,
+        0.0,
+        498709.59,
+        0.0,
+        -30.0,
+        4305581.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/outputs/time_of_arrival_0000001_0482400.tif": {
+      "crs": "EPSG:32610",
+      "width": 1400,
+      "height": 1667,
+      "bands": 1,
+      "transform": [
+        30.0,
+        0.0,
+        498709.59,
+        0.0,
+        -30.0,
+        4305581.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    },
+    "data/archive_payload/outputs/vs_0000001_0482400.tif": {
+      "crs": "EPSG:32610",
+      "width": 1400,
+      "height": 1667,
+      "bands": 1,
+      "transform": [
+        30.0,
+        0.0,
+        498709.59,
+        0.0,
+        -30.0,
+        4305581.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "nodata": "-9999.0",
+      "dtypes": [
+        "float32"
+      ]
+    }
+  },
+  "note": "Read-only comparison against retained metrics; no simulation, figure regeneration, or saved metric replacement.",
+  "grid_serialization_evidence": {
+    "source_revision": "8981f14e0170ced6cc28c4d308d4545ba925f5ef",
+    "rules": [
+      "DUMP_RASTERS computes pixel-center coordinates in Fortran REAL (single precision).",
+      "WRITE_BIL_RASTER serializes ULXMAP and ULYMAP using F12.2.",
+      "Only identical or exactly reproduced serialized affine transforms are accepted; no landscape resampling."
+    ],
+    "files": {
+      "build/source/elmfire_io.f90": "e5a54c76c7e71b18ce2751eb839724843fee0e1f90823c8544a9ce9fc10550a6",
+      "build/source/elmfire_vars.f90": "5b7a9e00798216d6516922e2a27bde8907a4e518dbfb68b8f4be42dd1841f215"
+    }
+  }
+}

@@ -118,3 +118,14 @@ cases/Verification/coupling_tests/CASE33_SDO/data/
 !cases/Verification/coupling_tests/CASE4[3-9]_*/data/
 !cases/Verification/coupling_tests/CASE4[3-9]_*/data/misc/
 !cases/Verification/coupling_tests/CASE4[3-9]_*/data/misc/*.csv
+
+# User-supplied GOFER archive payloads; pinned manifests and local staging scripts are tracked.
+/cases/Validation/GOFER/data/archive_payload/
+/cases/Validation/landscape_scale/caldor_2021/data/archive_payload/
+/cases/Validation/landscape_scale/caldor_2021/data/provenance/archive/
+/cases/Validation/landscape_scale/czu_lightning_complex_2020/data/archive_payload/
+/cases/Validation/landscape_scale/czu_lightning_complex_2020/data/provenance/archive/
+/cases/Validation/landscape_scale/glass_2020/data/archive_payload/
+/cases/Validation/landscape_scale/glass_2020/data/provenance/archive/
+/cases/Validation/landscape_scale/kincade_2019/data/archive_payload/
+/cases/Validation/landscape_scale/kincade_2019/data/provenance/archive/
