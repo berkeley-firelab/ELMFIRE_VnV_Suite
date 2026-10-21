@@ -1,0 +1,173 @@
+% Generated from outputs/*.json and data/source_manifest.json; do not edit by hand.
+\makeatletter
+\newcommand{\DefineMetric}[2]{\expandafter\def\csname metric@#1\endcsname{#2}}
+\newcommand{\Metric}[1]{\ifcsname metric@#1\endcsname\csname metric@#1\endcsname\else\textbf{MISSING}\fi}
+\newcommand{\DefineInputMetric}[2]{\expandafter\def\csname inputmetric@#1\endcsname{#2}}
+\newcommand{\InputMetric}[1]{\ifcsname inputmetric@#1\endcsname\csname inputmetric@#1\endcsname\else\textbf{MISSING}\fi}
+\makeatother
+
+\DefineMetric{status}{CHARACTERIZED}
+\DefineMetric{reason}{Metrics are descriptive because no independent predeclared acceptance thresholds are available. Only results from earlier simulation configurations are available; the current case configuration has not been simulated.}
+\DefineMetric{simulations_found}{1}
+\DefineInputMetric{dem_minimum}{302}
+\DefineInputMetric{dem_mean}{1{,}700}
+\DefineInputMetric{dem_median}{1{,}722}
+\DefineInputMetric{dem_maximum}{3{,}312}
+\DefineInputMetric{dem_p05}{653}
+\DefineInputMetric{dem_p95}{2{,}642}
+\DefineInputMetric{slp_minimum}{0}
+\DefineInputMetric{slp_mean}{14.7}
+\DefineInputMetric{slp_median}{13}
+\DefineInputMetric{slp_maximum}{74}
+\DefineInputMetric{slp_p05}{2}
+\DefineInputMetric{slp_p95}{32}
+\DefineInputMetric{cc_minimum}{0}
+\DefineInputMetric{cc_mean}{34.6}
+\DefineInputMetric{cc_median}{45}
+\DefineInputMetric{cc_maximum}{85}
+\DefineInputMetric{cc_p05}{0}
+\DefineInputMetric{cc_p95}{65}
+\DefineInputMetric{ch_minimum}{0}
+\DefineInputMetric{ch_mean}{17.4}
+\DefineInputMetric{ch_median}{19}
+\DefineInputMetric{ch_maximum}{39}
+\DefineInputMetric{ch_p05}{0}
+\DefineInputMetric{ch_p95}{39}
+\DefineInputMetric{cbh_minimum}{0}
+\DefineInputMetric{cbh_mean}{1.18}
+\DefineInputMetric{cbh_median}{0.9}
+\DefineInputMetric{cbh_maximum}{10}
+\DefineInputMetric{cbh_p05}{0}
+\DefineInputMetric{cbh_p95}{4.2}
+\DefineInputMetric{cbd_minimum}{0}
+\DefineInputMetric{cbd_mean}{0.0671}
+\DefineInputMetric{cbd_median}{0.08}
+\DefineInputMetric{cbd_maximum}{0.34}
+\DefineInputMetric{cbd_p05}{0}
+\DefineInputMetric{cbd_p95}{0.16}
+\DefineInputMetric{asp_circular_mean}{247}
+\DefineInputMetric{fuel_non_burnable}{11.4}
+\DefineInputMetric{fuel_grass}{3.22}
+\DefineInputMetric{fuel_grass_shrub}{12.6}
+\DefineInputMetric{fuel_shrub}{9.19}
+\DefineInputMetric{fuel_timber_understory}{49.2}
+\DefineInputMetric{fuel_timber_litter}{14.4}
+\DefineInputMetric{fuel_slash_blowdown}{0.0394}
+\DefineInputMetric{grid_width}{2{,}800}
+\DefineInputMetric{grid_height}{1{,}933}
+\DefineInputMetric{grid_cell_size_m}{30}
+\DefineInputMetric{grid_area_km2}{4{,}871}
+\DefineInputMetric{ws_minimum}{0}
+\DefineInputMetric{ws_mean}{4.6}
+\DefineInputMetric{ws_median}{3.89}
+\DefineInputMetric{ws_maximum}{29.2}
+\DefineInputMetric{ws_p05}{0.565}
+\DefineInputMetric{ws_p95}{11.4}
+\DefineInputMetric{m1_minimum}{1.18}
+\DefineInputMetric{m1_mean}{6.15}
+\DefineInputMetric{m1_median}{5.74}
+\DefineInputMetric{m1_maximum}{45.2}
+\DefineInputMetric{m1_p05}{3.2}
+\DefineInputMetric{m1_p95}{10.3}
+\DefineInputMetric{m10_minimum}{2.05}
+\DefineInputMetric{m10_mean}{6.17}
+\DefineInputMetric{m10_median}{5.76}
+\DefineInputMetric{m10_maximum}{17.1}
+\DefineInputMetric{m10_p05}{3.88}
+\DefineInputMetric{m10_p95}{9.36}
+\DefineInputMetric{m100_minimum}{3.24}
+\DefineInputMetric{m100_mean}{6.37}
+\DefineInputMetric{m100_median}{6.25}
+\DefineInputMetric{m100_maximum}{12.4}
+\DefineInputMetric{m100_p05}{4.63}
+\DefineInputMetric{m100_p95}{8.34}
+\DefineInputMetric{lh_minimum}{30}
+\DefineInputMetric{lh_mean}{44}
+\DefineInputMetric{lh_median}{30}
+\DefineInputMetric{lh_maximum}{178}
+\DefineInputMetric{lh_p05}{30}
+\DefineInputMetric{lh_p95}{105}
+\DefineInputMetric{lw_minimum}{60}
+\DefineInputMetric{lw_mean}{68.9}
+\DefineInputMetric{lw_median}{60}
+\DefineInputMetric{lw_maximum}{154}
+\DefineInputMetric{lw_p05}{60}
+\DefineInputMetric{lw_p95}{108}
+\DefineInputMetric{wd_circular_mean}{206}
+\DefineInputMetric{wd_resultant}{0.193}
+\DefineInputMetric{weather_bands}{621}
+\DefineInputMetric{obs_burned_area_km2}{995}
+\DefineInputMetric{obs_first_arrival_h}{7}
+\DefineInputMetric{obs_last_arrival_h}{626}
+\DefineInputMetric{obs_cell_size_m}{51.3}
+\DefineInputMetric{obs_gofer_final_area_km2}{994}
+\DefineInputMetric{obs_hourly_perimeters}{620}
+\DefineInputMetric{ignition_count}{1}
+\DefineInputMetric{ignitions_moved}{0}
+\DefineInputMetric{max_ignition_move_m}{0}
+
+\newcommand{\SimulationFields}{%
+\subsection*{Single-ignition baseline without spotting}
+
+This result used a single point ignition at the first GOFER ignition point, firebrand spotting disabled and the ELMFIRE default crown-fire treatment, with the same inputs, stop time and numerical controls as the current configuration.
+The configuration file used was retained with this result.
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{comparison_baseline.pdf}
+\caption{Single-ignition baseline without spotting: simulated and GOFER-derived footprints at the fixed comparison times (hours since the GOES ignition hour) on the 30-m model grid: cells burned in both (green), only in the simulation (red), and only in the GOFER observation (blue). Stars mark the configured ignition points.}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{arrival_baseline.pdf}
+\caption{Single-ignition baseline without spotting: simulated arrival time, GOFER-derived arrival time and their difference where both burned through the final comparison time, all in hours since the GOES ignition hour. The difference color scale is symmetric and clipped at the 95th percentile of its magnitude.}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{fields_baseline.pdf}
+\caption{Single-ignition baseline without spotting: simulated spread rate and fireline intensity recorded when each cell burned, for the single simulation member at its final output time; color scales are clipped at the 99th percentile.}
+\end{figure}
+
+}
+
+\newcommand{\SimulationMetrics}{%
+\subsection*{Single-ignition baseline without spotting}
+
+\begin{table}[H]\centering{\small
+\begin{tabular}{@{}rrrrrrrr@{}}\toprule
+Time (h) & GOFER (km$^2$) & Simulated (km$^2$) & Area ratio & Jaccard & Precision & Recall & $F_1$ \\ \midrule
+24 & 12.1 & 11.1 & 0.918 & 0.63 & 0.81 & 0.74 & 0.77 \\
+48 & 29.2 & 37.5 & 1.29 & 0.57 & 0.64 & 0.83 & 0.73 \\
+72 & 216 & 68.7 & 0.318 & 0.2 & 0.68 & 0.22 & 0.33 \\
+626 & 995 & 569 & 0.572 & 0.34 & 0.69 & 0.4 & 0.51 \\
+\bottomrule\end{tabular}}
+\caption{Footprint metrics of the single-ignition baseline without spotting against the GOFER-derived footprint at fixed times since the GOES ignition hour, evaluated on the 30-m model grid over valid landscape cells. Time is the comparison instant; areas are burned areas through that instant.}
+\end{table}\ReportBodyText
+
+\begin{table}[H]\centering{\small
+\begin{tabular}{@{}lr@{}}\toprule
+Quantity & Value \\ \midrule
+Cells burned in both by 626~h & 438{,}997 \\
+Mean arrival-time difference, simulated minus GOFER (h) & 150 \\
+Median arrival-time difference (h) & 116 \\
+Mean absolute arrival-time difference (h) & 172 \\
+Root-mean-square arrival-time difference (h) & 227 \\
+Simulated end since GOES ignition (h) & 626 \\
+Propagation stalled before the planned end & no \\
+First contact with domain boundary (h) & none \\
+Final simulated area (ac) & 140{,}605 \\
+Final crown-fire area (ac) & 69{,}820 \\
+\bottomrule\end{tabular}}
+\caption{Arrival-time and integrated statistics of the single-ignition baseline without spotting. Arrival-time differences use cells burned in both the simulation and the GOFER observation by the final comparison time.}
+\end{table}\ReportBodyText
+
+Precision exceeds recall at the final comparison time, so the simulated footprint lies largely inside the observation but misses much of it: the simulation undergrows or follows a displaced trajectory. The simulated burned area is 0.57 times the observed area at 626~h. Where both burned, the simulated fire arrives on average 149.5~h later than the observed fire (mean absolute difference 172.3~h).
+
+}
+
+\newcommand{\IntegratedResults}{%
+\begin{figure}[H]\centering
+\includegraphics[width=0.98\textwidth,height=0.42\textheight,keepaspectratio]{burned_area_growth.pdf}
+\caption{Observed (GOFER) and simulated burned-area growth, and the Jaccard overlap of each simulation with the GOFER footprint, evaluated hourly since the GOES ignition hour. Dotted lines mark the time each simulated fire first reaches the model-domain boundary.}
+\end{figure}
+}
+

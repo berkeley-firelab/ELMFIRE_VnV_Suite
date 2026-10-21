@@ -1,0 +1,100 @@
+{
+  "method_version": "gofer_validation_v1",
+  "status": "CHARACTERIZED",
+  "reason": "Metrics are descriptive because no independent predeclared acceptance thresholds are available. Only results from earlier simulation configurations are available; the current case configuration has not been simulated.",
+  "simulations_found": 1,
+  "current_configuration_simulated": false,
+  "summary_figures": [
+    "burned_area_growth.pdf"
+  ],
+  "runs": [
+    {
+      "run_id": "reference_spotting",
+      "label": "Reference-case spotting configuration",
+      "configuration": "reference_spotting",
+      "notes": [
+        "The configuration file was not retained with this result; the configuration is documented from the case owner's preparation record."
+      ],
+      "status": "CHARACTERIZED",
+      "output_time_s": 482400,
+      "comparison_region": "valid landscape cells",
+      "observation_alignment": "nearest-neighbour transfer of GOFER arrival time to the 30 m model grid",
+      "final_comparison_h": 134.0,
+      "simulation_end_h": 134.0,
+      "stopped_early": false,
+      "domain_edge_contact_h": 40.08634982638889,
+      "fire_size_stats": {
+        "stop_h": 134.0,
+        "total_area_ac": 416395.4,
+        "crown_area_ac": 104649.7,
+        "wall_clock_s": 14588.959
+      },
+      "overlap": [
+        {
+          "t_h": 24,
+          "true_positive_cells": 69932,
+          "false_positive_cells": 84817,
+          "false_negative_cells": 59331,
+          "jaccard": 0.3266629297458894,
+          "precision": 0.4519059896994488,
+          "recall": 0.5410055468308796,
+          "f1": 0.4924580651521766,
+          "simulated_area_km2": 139.2741,
+          "observed_area_km2": 116.3367,
+          "area_ratio": 1.1971639216171681
+        },
+        {
+          "t_h": 48,
+          "true_positive_cells": 131842,
+          "false_positive_cells": 300362,
+          "false_negative_cells": 18819,
+          "jaccard": 0.29231768668116703,
+          "precision": 0.3050457654255861,
+          "recall": 0.8750904348172387,
+          "f1": 0.4523929211738567,
+          "simulated_area_km2": 388.98359999999997,
+          "observed_area_km2": 135.5949,
+          "area_ratio": 2.868718513749411
+        },
+        {
+          "t_h": 72,
+          "true_positive_cells": 138219,
+          "false_positive_cells": 666747,
+          "false_negative_cells": 18827,
+          "jaccard": 0.16778365438890594,
+          "precision": 0.17170787337601837,
+          "recall": 0.8801179272315118,
+          "f1": 0.28735400390015925,
+          "simulated_area_km2": 724.4694,
+          "observed_area_km2": 141.3414,
+          "area_ratio": 5.125670185805433
+        },
+        {
+          "t_h": 134.0,
+          "true_positive_cells": 332015,
+          "false_positive_cells": 1557504,
+          "false_negative_cells": 53254,
+          "jaccard": 0.17089747489799376,
+          "precision": 0.17571403092533072,
+          "recall": 0.8617745004139965,
+          "f1": 0.29190852070610535,
+          "simulated_area_km2": 1700.5671,
+          "observed_area_km2": 346.7421,
+          "area_ratio": 4.904414837425279
+        }
+      ],
+      "arrival_time_error": {
+        "co_burned_cells": 332015,
+        "bias_h": -12.139367618826409,
+        "mae_h": 20.928861086607206,
+        "rmse_h": 27.851327862836985,
+        "median_error_h": -10.710399305555555
+      },
+      "figures": [
+        "comparison_reference_spotting.pdf",
+        "arrival_reference_spotting.pdf",
+        "fields_reference_spotting.pdf"
+      ]
+    }
+  ]
+}
