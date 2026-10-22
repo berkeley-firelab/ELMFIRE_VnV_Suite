@@ -6,12 +6,8 @@ ELMFIRE_BIN=${ELMFIRE_BIN:-elmfire}
 PYTHON_BIN=${PYTHON_BIN:-python3}
 export PYTHONNOUSERSITE=1
 
-mkdir -p "$CASE_DIR/outputs" "$CASE_DIR/figures" "$CASE_DIR/logs/scratch" "$CASE_DIR/simulation"
+mkdir -p "$CASE_DIR/outputs" "$CASE_DIR/figures" "$CASE_DIR/logs/scratch"
 "$PYTHON_BIN" "$CASE_DIR/scripts/preprocess.py"
-
-# The configuration reads ./inputs; point it at the provided input directory.
-INPUTS=${GOFER_INPUTS_DIR:-$("$PYTHON_BIN" -c 'import json,os,sys; d=sys.argv[1]; print(os.path.normpath(os.path.join(d, json.load(open(os.path.join(d,"data","data_paths.json")))["inputs"])))' "$CASE_DIR")}
-ln -sfn "$INPUTS" "$CASE_DIR/inputs"
 
 echo "[INFO] Running Glass Fire (2020) with one ELMFIRE process."
 (cd "$CASE_DIR" && GFORTRAN_UNBUFFERED_PRECONNECTED=y "$ELMFIRE_BIN" elmfire.data.in) \

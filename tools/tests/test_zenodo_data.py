@@ -23,16 +23,16 @@ def fixture(root):
     case = root / 'example_fire'
     records = []
     for relative, content in (
-        ('data/archive_payload/inputs/landscape.tif', b'canonical input'),
-        ('data/archive_payload/observations/toa.tif', b'observation'),
+        ('data/fuels_and_topography/landscape.tif', b'canonical input'),
+        ('data/observation/toa.tif', b'observation'),
         ('data/archive_payload/outputs/result.bil', b'historical output'),
-        ('data/provenance/archive/original.py', b'original preparation record'),
+        ('scripts/generate_data/generate.py', b'original preparation record'),
     ):
         write(case / relative, content)
         records.append(packaging.file_record(case, relative))
     packaging.write_json(case / 'data/archive_manifest.json', {'files': records})
     packaging.write_json(case / 'data/source_manifest.json', {'observation': {}})
-    write(case / 'data/weather/old.tif', b'distinct old input')
+    write(case / 'data/legacy_inputs/old.tif', b'distinct old input')
     write(case / 'data/archive_payload/.DS_Store', b'junk')
     write(case / 'case.yaml', b'case_id: example_fire\n')
     write(case / 'elmfire.data.in', b'&INPUTS /\n')
@@ -66,7 +66,7 @@ class ZenodoDataTests(unittest.TestCase):
                 fetch.assert_called_once_with(container['url'], timeout=120)
             target = root / 'restored'
             staging.restore(target, cache, bundles)
-            self.assertEqual((target / 'data/archive_payload/inputs/landscape.tif').read_bytes(),
+            self.assertEqual((target / 'data/fuels_and_topography/landscape.tif').read_bytes(),
                              b'canonical input')
             self.assertFalse((target / 'data/archive_payload/outputs/result.bil').exists())
             # Cached corruption must fail rather than silently downloading or overwriting it.
@@ -81,9 +81,9 @@ class ZenodoDataTests(unittest.TestCase):
         case = root / 'zenodo/datasets' / fire.lower()
         records = []
         for role, relative, content in (
-            ('inputs', 'data/archive_payload/inputs/grid.tif', (fire + '/grid').encode()),
-            ('observations', 'data/archive_payload/observations/toa.tif', (fire + '/toa').encode()),
-            ('provenance', 'data/provenance/archive/fires.csv', b'original fire table'),
+            ('inputs', 'data/fuels_and_topography/grid.tif', (fire + '/grid').encode()),
+            ('observations', 'data/observation/toa.tif', (fire + '/toa').encode()),
+            ('generation', 'scripts/generate_data/fires.csv', b'original fire table'),
         ):
             write(case / relative, content)
             record = packaging.file_record(case, relative)
@@ -105,13 +105,16 @@ class ZenodoDataTests(unittest.TestCase):
                 first = manifests[0]
                 self.assertEqual(first['case_id'], 'first_2020')
                 self.assertEqual([b['filename'] for b in first['bundles']],
-                                 ['inputs.tar.gz', 'observations.tar.gz', 'provenance.tar.gz'])
+                                 ['inputs.tar.gz', 'observations.tar.gz', 'generation.tar.gz'])
                 target = root / 'future validation case'
                 staging.restore(target, root / 'out/first_2020', staging.selected_bundles(first))
-                self.assertEqual((target / 'data/archive_payload/inputs/grid.tif').read_bytes(), b'First_2020/grid')
-                self.assertTrue((target / 'data/provenance/archive/fires.csv').is_file())
+                self.assertEqual((target / 'data/fuels_and_topography/grid.tif').read_bytes(), b'First_2020/grid')
+                self.assertTrue((target / 'scripts/generate_data/fires.csv').is_file())
                 self.assertFalse((target / 'data/archive_payload/Second_2021').exists())
                 # The restored definition can build a new upload version using only local paths.
+                # A data-only archive uses the case definition maintained in Git.
+                for name in ('archive_manifest.json', 'source_manifest.json'):
+                    write(target / 'data' / name, (cases[0] / 'data' / name).read_bytes())
                 rebuilt = packaging.build_case(target, root / 'rebuilt', '1.0.1', 'new revision')
                 self.assertEqual([b['sha256'] for b in rebuilt['bundles']],
                                  [b['sha256'] for b in first['bundles']])
@@ -130,7 +133,7 @@ class ZenodoDataTests(unittest.TestCase):
                 packaging.write_json(case / 'data/dataset_manifest.json', manifest)
                 directory = root / 'out/first_2020'
                 packaging.verify_upload_set(case, directory, check_sources=True)
-                source = case / 'data/archive_payload/inputs/grid.tif'
+                source = case / 'data/fuels_and_topography/grid.tif'
                 source.unlink()
                 packaging.verify_upload_set(case, directory)
                 with self.assertRaisesRegex(ValueError, 'Missing file'):
@@ -155,13 +158,16 @@ class ZenodoDataTests(unittest.TestCase):
             bundles = staging.selected_bundles(first)
             staging.restore(target, root / 'first/example_fire', bundles)
             staging.restore(target, root / 'first/example_fire', bundles)
-            self.assertEqual((target / 'data/archive_payload/inputs/landscape.tif').read_bytes(), b'canonical input')
+            self.assertEqual((target / 'data/fuels_and_topography/landscape.tif').read_bytes(), b'canonical input')
             self.assertFalse((target / 'data/archive_payload/outputs/result.bil').exists())
-            self.assertFalse((target / 'data/weather/old.tif').exists())
+            self.assertFalse((target / 'data/legacy_inputs/old.tif').exists())
             self.assertFalse((target / 'data/archive_payload/.DS_Store').exists())
             staging.restore(target, root / 'first/example_fire', staging.selected_bundles(first, True))
-            self.assertTrue((target / 'data/weather/old.tif').is_file())
-            self.assertTrue((target / 'data/archive_payload/outputs/result.bil').is_file())
+            self.assertFalse((target / 'data/legacy_inputs/old.tif').exists())
+            self.assertFalse((target / 'data/archive_payload/outputs/result.bil').exists())
+            self.assertFalse((target / 'elmfire.data.in').exists())
+            self.assertFalse((target / 'case.yaml').exists())
+            self.assertTrue((target / 'scripts/generate_data/generate.py').is_file())
             with self.assertRaises(ValueError):
                 packaging.build_case(case, root / 'first', '1.0.0', 'revision')
 
@@ -169,13 +175,13 @@ class ZenodoDataTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             case = fixture(root)
-            path = case / 'data/archive_payload/inputs/landscape.tif'
+            path = case / 'data/fuels_and_topography/landscape.tif'
             original = path.read_bytes()
             path.write_bytes(b'changed')
             with self.assertRaises(ValueError):
                 packaging.build_case(case, root / 'out', '1.0.0', 'revision')
             path.write_bytes(original)
-            write(case / 'data/archive_payload/inputs/untracked.tif', b'forgotten data')
+            write(case / 'data/weather/untracked.tif', b'forgotten data')
             with self.assertRaises(ValueError):
                 packaging.inventory(case)
 
@@ -186,12 +192,12 @@ class ZenodoDataTests(unittest.TestCase):
             manifest = packaging.build_case(case, root / 'out', '1.0.0', 'revision')
             bundles = staging.selected_bundles(manifest)
             target = root / 'restored'
-            path = target / 'data/archive_payload/inputs/landscape.tif'
+            path = target / 'data/fuels_and_topography/landscape.tif'
             write(path, b'local edit')
             with self.assertRaises(ValueError):
                 staging.restore(target, root / 'out/example_fire', bundles)
             self.assertEqual(path.read_bytes(), b'local edit')
-            self.assertFalse((target / 'data/archive_payload/observations/toa.tif').exists())
+            self.assertFalse((target / 'data/observation/toa.tif').exists())
             archive = root / 'out/example_fire' / bundles[0]['filename']
             archive.write_bytes(b'corrupt')
             with self.assertRaises(ValueError):

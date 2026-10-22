@@ -33,6 +33,7 @@ namelist_contract:
   files:
     - path: "elmfire.data.in"
       invariants:
+        OUTPUTS.OUTPUTS_DIRECTORY: "./outputs"
         TIME_CONTROL.SIMULATION_TSTOP: 2232000.0
         TIME_CONTROL.TARGET_CFL: 0.2
         MONTE_CARLO.NUM_METEOROLOGY_TIMES: 621

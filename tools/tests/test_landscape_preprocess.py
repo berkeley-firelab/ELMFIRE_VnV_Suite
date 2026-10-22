@@ -43,17 +43,18 @@ class InputValidationPassed(Exception):
 
 def fixture(case):
     for folder, names, bands in (
-        ('fuels', ('dem', 'slp', 'asp', 'fbfm40b', 'ignition_mask'), 1),
+        ('fuels_and_topography', ('dem', 'slp', 'asp', 'fbfm40b', 'ignition_mask'), 1),
         ('weather', ('ws', 'wd', 'm1', 'm10', 'm100'), 2),
     ):
-        directory = case / 'data/archive_payload' / folder
+        directory = case / 'data' / folder
         directory.mkdir(parents=True)
         for name in names:
             with rasterio.open(directory / (name + '.tif'), 'w', driver='GTiff',
                                height=2, width=2, count=bands, dtype='float32',
                                crs='EPSG:32610', transform=from_origin(500000, 4200000, 30, 30)) as dst:
                 dst.write(np.ones((bands, 2, 2), dtype='float32'))
-    table = case / 'data/archive_payload/building_fuel_models.csv'
+    table = case / 'data/misc/building_fuel_models.csv'
+    table.parent.mkdir(parents=True)
     table.write_bytes(b'building table\n')
     observation = case / 'data/observation.csv'
     observation.write_bytes(b'observed data\n')
@@ -63,10 +64,10 @@ def fixture(case):
                 'size': path.stat().st_size,
                 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
 
-    archive = {'fuel_directory': 'data/archive_payload/fuels',
-               'weather_directory': 'data/archive_payload/weather',
+    archive = {'fuel_directory': 'data/fuels_and_topography',
+               'weather_directory': 'data/weather',
                'required_fuel_rasters': ['dem', 'slp', 'asp', 'fbfm40b', 'ignition_mask'],
-               'payload_files': [record(p) for p in sorted((case / 'data/archive_payload').rglob('*')) if p.is_file()]}
+               'payload_files': [record(p) for p in sorted((case / 'data').rglob('*')) if p.is_file()]}
     (case / 'data/archive_manifest.json').write_text(json.dumps(archive))
     (case / 'data/source_manifest.json').write_text(json.dumps({
         'analysis': {'weather_bands_used': 2}, 'observation': {'files': [record(observation)]}}))
@@ -113,7 +114,7 @@ class LandscapePreprocessTests(unittest.TestCase):
                 with self.subTest(case=name, condition=condition), tempfile.TemporaryDirectory() as tmp:
                     case = Path(tmp)
                     fixture(case)
-                    path = case / 'data/archive_payload/building_fuel_models.csv'
+                    path = case / 'data/misc/building_fuel_models.csv'
                     if condition == 'missing':
                         path.unlink()
                     else:

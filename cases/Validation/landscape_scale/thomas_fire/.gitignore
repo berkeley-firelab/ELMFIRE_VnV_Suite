@@ -1,5 +1,4 @@
-# Redundant copies removed after SHA-256 verification against data/archive_payload/.
-# Keep these paths ignored if old data folders are copied back into this case.
+# Source tables are restored from the checksummed dataset archives.
 /data/fuels_and_topography/adj.tif
 /data/fuels_and_topography/asp.tif
 /data/fuels_and_topography/cbd.tif

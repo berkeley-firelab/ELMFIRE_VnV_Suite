@@ -1,26 +1,10 @@
 {
-  "inputs": "data/archive_payload/inputs",
-  "observation": "data/archive_payload/observations/CZU_Lightning_Complex_2020_toa.tif",
-  "simulations": [
-    {
-      "run_id": "baseline",
-      "label": "Single-ignition baseline without spotting",
-      "configuration": "baseline",
-      "results_dir": "data/historical_outputs/baseline",
-      "notes": [
-        "The configuration file was not retained with this result; the configuration is documented from the case owner's preparation record.",
-        "This result was produced before offshore cells outside LANDFIRE coverage were filled with open-water values; those cells then held a fill value read as data. They lie offshore beyond a band of open water that the simulated fire did not reach, but the result is not from the corrected inputs."
-      ]
-    },
-    {
-      "run_id": "reference_spotting",
-      "label": "Reference-case spotting configuration",
-      "configuration": "reference_spotting",
-      "results_dir": "data/historical_outputs/reference_spotting",
-      "notes": [
-        "The configuration file used was retained with this result.",
-        "This result was produced before offshore cells outside LANDFIRE coverage were filled with open-water values; those cells then held a fill value read as data. They lie offshore beyond a band of open water that the simulated fire did not reach, but the result is not from the corrected inputs."
-      ]
-    }
-  ]
+  "observation": "data/observation/CZU_Lightning_Complex_2020_toa.tif",
+  "simulations": [],
+  "fuels_and_topography": "data/fuels_and_topography",
+  "weather": "data/weather",
+  "misc": "data/misc",
+  "gofer_preview": "data/observation/CZU_Lightning_Complex_2020_toa.png",
+  "final_perimeter": "data/observation/CZU_Lightning_Complex_2020_final_perimeter.gpkg",
+  "final_perimeter_mask": "data/observation/CZU_Lightning_Complex_2020_final_perimeter_30m.tif"
 }

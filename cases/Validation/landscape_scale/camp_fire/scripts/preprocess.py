@@ -167,7 +167,7 @@ def read_observations() -> list[dict[str, object]]:
         ogr2ogr = str(candidate) if candidate.is_file() else None
     if not ogr2ogr:
         raise RuntimeError("ogr2ogr is required to characterize the VIIRS shapefile")
-    shapefile = next((CASE_DIR / "data" / "viirs_observation").glob("*.shp"))
+    shapefile = next((CASE_DIR / "data" / "observation").glob("*.shp"))
     result = subprocess.run(
         [ogr2ogr, "-f", "GeoJSON", "/vsistdout/", str(shapefile)],
         check=True,

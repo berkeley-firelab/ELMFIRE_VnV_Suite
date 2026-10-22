@@ -10,6 +10,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 import rasterio
@@ -59,6 +60,24 @@ class GoferEvidenceTests(unittest.TestCase):
 
     def tearDown(self):
         self.directory.cleanup()
+
+    def test_current_run_is_discovered_in_outputs_only(self):
+        outputs = self.root / 'outputs'
+        outputs.mkdir()
+        (outputs / 'metrics.json').write_text('{}')
+        old = self.root / 'simulation'
+        old.mkdir()
+        (old / 'time_of_arrival_0000001_0000200.tif').touch()
+        for name, module in MODULES.items():
+            with self.subTest(case=name), patch.object(module, 'CURRENT_RESULTS', outputs):
+                self.assertEqual(module.provided_runs({'simulations': []}), [])
+        (outputs / 'time_of_arrival_0000001_0000200.tif').touch()
+        for name, module in MODULES.items():
+            with self.subTest(case=name), patch.object(module, 'CURRENT_RESULTS', outputs):
+                runs = module.provided_runs({'simulations': []})
+                self.assertEqual(len(runs), 1)
+                self.assertEqual(runs[0]['run_id'], 'current')
+                self.assertEqual(runs[0]['directory'], outputs)
 
     def test_latest_unique_member_one(self):
         older = self.root / 'time_of_arrival_0000001_0000100.tif'

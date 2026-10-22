@@ -144,3 +144,12 @@ cases/Verification/coupling_tests/CASE11_WSC/data/misc/fuel_models.csv
 /cases/Validation/landscape_scale/*/data/fuels_and_topography/
 /cases/Validation/landscape_scale/*/data/weather/
 /cases/Validation/landscape_scale/*/data/misc/
+
+# Canonical input folders restored from per-fire datasets.
+/zenodo/datasets/*/data/weather/
+/zenodo/datasets/*/data/fuels_and_topography/
+/zenodo/datasets/*/data/misc/
+
+# Comparison observations restored from the checksummed per-fire archives.
+/cases/Validation/landscape_scale/*/data/observation/
+/zenodo/datasets/*/data/observation/

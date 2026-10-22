@@ -11,10 +11,22 @@
   },
   "namelist": {
     "path": "elmfire.data.in",
-    "sha256": "93611e9dd7f912bc24016c5c440d8113fc938f4335cf5baa3ae93a26e3a67739"
+    "sha256": "0cc5dd0829e2f7b4082a23022712d89fd7966b5cf33f0f2c810f193f7a2c7c3d",
+    "previous_layout_sha256": "93611e9dd7f912bc24016c5c440d8113fc938f4335cf5baa3ae93a26e3a67739",
+    "previous_outputs_directory_sha256": "14d8f17982381a31b564c6bdcea205a40c8b07c99be26ff1131b18f2511fe79c"
   },
-  "historical_results_revision": "5ea7460d514b24bf9a1cdda571c16f4f03de603f",
   "status": "PASS",
-  "checked_invariants": 7,
-  "errors": []
+  "checked_invariants": 8,
+  "errors": [],
+  "layout_change": "Input and output directory strings updated only; scientific values unchanged.",
+  "output_layout_check": {
+    "checked_at_utc": "2026-10-22T22:54:27.690204+00:00",
+    "schema": "schemas/elmfire/efa0b8fa-working-tree.json",
+    "schema_sha256": "cd4c61d5efbe7bdaeb380f4c2434d59b6c29291fce3535d913fa7baa501efe15",
+    "results_directory": "outputs",
+    "log_directory": "logs",
+    "scratch_directory": "logs/scratch",
+    "status": "PASS",
+    "errors": []
+  }
 }

@@ -1,15 +1,10 @@
 {
-  "inputs": "data/archive_payload/inputs",
-  "observation": "data/archive_payload/observations/Caldor_2021_toa.tif",
-  "simulations": [
-    {
-      "run_id": "baseline",
-      "label": "Single-ignition baseline without spotting",
-      "configuration": "baseline",
-      "results_dir": "data/archive_payload/outputs",
-      "notes": [
-        "The configuration file used was retained with this result."
-      ]
-    }
-  ]
+  "observation": "data/observation/Caldor_2021_toa.tif",
+  "simulations": [],
+  "fuels_and_topography": "data/fuels_and_topography",
+  "weather": "data/weather",
+  "misc": "data/misc",
+  "gofer_preview": "data/observation/Caldor_2021_toa.png",
+  "final_perimeter": "data/observation/Caldor_2021_final_perimeter.gpkg",
+  "final_perimeter_mask": "data/observation/Caldor_2021_final_perimeter_30m.tif"
 }

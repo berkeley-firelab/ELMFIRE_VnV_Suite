@@ -1,9 +1,105 @@
 {
   "schema_version": 1,
   "case_id": "north_complex_2020",
-  "dataset_version": "1.0.0",
-  "source_revision": "51453eb80806cf7e1389d1d1af1dacaacd294267",
+  "dataset_version": "2.1.0",
+  "source_revision": "9b2f5614fac60e1877221399db05a9bd73a86c52",
   "source_state": "working tree snapshot; file hashes are authoritative",
+  "archive_scope": "input data, observations and data-generation source only",
+  "source_metadata": {
+    "schema_version": 1,
+    "case_id": "north_complex_2020",
+    "fire_id": "North_Complex_2020",
+    "case_status": "data prepared for a future validation case",
+    "model_inputs": {
+      "source": {
+        "kind": "user-supplied directory",
+        "name": "ELMFIRE_GOFER_validation",
+        "received_date": "2026-10-22",
+        "provider": "User-supplied updated directory",
+        "license": "Not documented in the supplied directory; upstream access and redistribution terms still apply."
+      },
+      "processing": "unchanged file contents; case-relative paths normalized",
+      "updated_source": {
+        "kind": "user-supplied directory",
+        "name": "ELMFIRE_GOFER_validation",
+        "received_date": "2026-10-22"
+      },
+      "previous_source_archive": {
+        "filename": "ELMFIRE_GOFER_validation.tar.gz",
+        "size": 7038832441,
+        "sha256": "714b9f2b3c3417336ea200bfc6f2bba2955376bf3088d675a811a11d28b0fffe",
+        "files": 583,
+        "skipped_macos_metadata": 682,
+        "received_date_utc": "2026-10-21",
+        "provider": "User-supplied archive",
+        "license": "Not documented in the supplied archive; upstream access and redistribution terms still apply."
+      }
+    },
+    "observation": {
+      "product": "GOFER arrival-time rasters and previews, plus CAL FIRE final-perimeter GeoPackages and aligned raster masks",
+      "source_dataset": "https://doi.org/10.5281/zenodo.8327264",
+      "reference": "https://doi.org/10.5194/essd-16-1395-2024",
+      "files": [
+        {
+          "path": "data/observation/North_Complex_2020_final_perimeter.gpkg",
+          "size": 823296,
+          "sha256": "89d6699aab5fbb35a8b05ac155fb58bfa3d614b5d115e671661943277a942835",
+          "source_relative_path": "North_Complex_2020/observations/North_Complex_2020_final_perimeter.gpkg",
+          "processing": "copied unchanged from the user-supplied updated directory"
+        },
+        {
+          "path": "data/observation/North_Complex_2020_final_perimeter_30m.tif",
+          "size": 24986,
+          "sha256": "5ae6730ee0bf50b4e09a2f5dc7dafc390c12850f5ffb288a1e469d723e6e48c9",
+          "source_relative_path": "North_Complex_2020/observations/North_Complex_2020_final_perimeter_30m.tif",
+          "processing": "copied unchanged from the user-supplied updated directory"
+        },
+        {
+          "path": "data/observation/North_Complex_2020_toa.png",
+          "size": 178914,
+          "sha256": "06d6b5c14ba417a4d0734464d42529fc658c47184b39a5a586b8dd8561c732fe",
+          "source_relative_path": "North_Complex_2020/observations/North_Complex_2020_toa.png",
+          "processing": "copied unchanged from the user-supplied updated directory"
+        },
+        {
+          "path": "data/observation/North_Complex_2020_toa.tif",
+          "size": 108265,
+          "sha256": "389cdc2349231ddd48064a53aa7328e5208946a4e13358d557d312afc3e438a7",
+          "source_relative_path": "North_Complex_2020/observations/North_Complex_2020_toa.tif",
+          "processing": "copied unchanged from the user-supplied updated directory"
+        }
+      ],
+      "products": {
+        "gofer_arrival": "data/observation/North_Complex_2020_toa.tif",
+        "gofer_preview": "data/observation/North_Complex_2020_toa.png",
+        "final_perimeter": "data/observation/North_Complex_2020_final_perimeter.gpkg",
+        "final_perimeter_mask": "data/observation/North_Complex_2020_final_perimeter_30m.tif"
+      },
+      "final_perimeter_source": {
+        "provider": "CAL FIRE FRAP",
+        "source_identification": "California Historic Fire Perimeters (2026-05-26), as identified by the supplied exploratory.py",
+        "generator": "scripts/generate_data/source/exploratory.py",
+        "layers": [
+          "calfire_final",
+          "calfire_records",
+          "gofer_final"
+        ],
+        "matching": "year, name/complex name, and more than 20 percent of each CAL FIRE record overlapping the final GOFER perimeter",
+        "mask": "cell-centre rasterization on the input landscape grid; burned=1, unburned=0, nodata=255",
+        "license_evidence": "not supplied in the referenced directory"
+      }
+    },
+    "known_provenance_gaps": [
+      "Upstream access and redistribution terms remain undocumented.",
+      "A runnable case, scientific configuration and acceptance basis have not yet been authored."
+    ],
+    "generation": {
+      "input_scripts": "scripts/generate_data/prepare_inputs.py",
+      "observation_scripts": "scripts/generate_data/generate_observations.py",
+      "supplied_sources": "scripts/generate_data/source",
+      "limitations": "CAL FIRE final-perimeter generation is supplied in exploratory.py; GOFER arrival-time TIFF/PNG generation code is absent. Upstream CAL FIRE/GOFER files and CloudFire service access are external requirements."
+    }
+  },
   "zenodo": {
     "record_id": null,
     "version_doi": null,
@@ -14,137 +110,74 @@
       "role": "inputs",
       "filename": "inputs.tar.gz",
       "required": true,
-      "size": 385174907,
-      "sha256": "f36c376a22751917b13bfbf363505f337969b383bf16335e5c8edf93a45c3af8",
+      "size": 385173005,
+      "sha256": "d5d9a2c95aeeddcb1c68bc4d0c958ec915d93cf76324d892541f49394c632ca2",
       "url": null,
       "files": [
         {
-          "path": "data/archive_payload/inputs/adj.tif",
-          "role": "inputs",
-          "size": 107708,
-          "sha256": "4757bed755f49e9a7635912bd08e1e27960c5c3846e626ed0b0d3f7d4f50c1fc",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/adj.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/adj.tif"
-        },
-        {
-          "path": "data/archive_payload/inputs/elmfire.data",
-          "role": "inputs",
-          "size": 1562,
-          "sha256": "828c29e411a81c41a39959befd101b75a5768f7269097b2d9ab686a2784c460e",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/elmfire.data",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/elmfire.data"
-        },
-        {
-          "path": "data/archive_payload/inputs/fuel_models.csv",
-          "role": "inputs",
-          "size": 3948,
-          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/fuel_models.csv",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/fuel_models.csv"
-        },
-        {
-          "path": "data/archive_payload/inputs/ignition_mask.tif",
-          "role": "inputs",
-          "size": 96899,
-          "sha256": "2a2ee2c116b5a1b2f372fb821fcde5f80e984de275cd5c87b74dcac62470aeb5",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/ignition_mask.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/ignition_mask.tif"
-        },
-        {
-          "path": "data/archive_payload/inputs/ignitions.csv",
-          "role": "inputs",
-          "size": 789,
-          "sha256": "f136a033d469cd4d2863abc20a5eb8479a736d7efa99ea7fcc2382d09fdb8430",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/ignitions.csv",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/ignitions.csv"
-        },
-        {
-          "path": "data/archive_payload/inputs/landscape.tif",
-          "role": "inputs",
-          "size": 35387465,
-          "sha256": "99112859079a19a4cb69831f87ba6e382b6c1ca0ca50fc7aa9e2db41f70df9e1",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/landscape.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/landscape.tif"
-        },
-        {
-          "path": "data/archive_payload/inputs/lh.tif",
-          "role": "inputs",
+          "path": "data/weather/lh.tif",
           "size": 17734000,
-          "sha256": "a350c382bfe6fa3f3b889e6e93ec3367b6cfe8655337b301178eb933d850180d",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/lh.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/lh.tif"
+          "sha256": "a350c382bfe6fa3f3b889e6e93ec3367b6cfe8655337b301178eb933d850180d"
         },
         {
-          "path": "data/archive_payload/inputs/lw.tif",
-          "role": "inputs",
+          "path": "data/weather/lw.tif",
           "size": 17078655,
-          "sha256": "f9b849a1e80f64389e9a8853018d8ef90943d8ec72eb793bd229e81816cfc438",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/lw.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/lw.tif"
+          "sha256": "f9b849a1e80f64389e9a8853018d8ef90943d8ec72eb793bd229e81816cfc438"
         },
         {
-          "path": "data/archive_payload/inputs/m1.tif",
-          "role": "inputs",
+          "path": "data/weather/m1.tif",
           "size": 80854443,
-          "sha256": "65799a41cb32b3888e49dba93b4ca60a195e777c10443c7e2f12657e09f4789d",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/m1.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/m1.tif"
+          "sha256": "65799a41cb32b3888e49dba93b4ca60a195e777c10443c7e2f12657e09f4789d"
         },
         {
-          "path": "data/archive_payload/inputs/m10.tif",
-          "role": "inputs",
+          "path": "data/weather/m10.tif",
           "size": 80719253,
-          "sha256": "788da019a35f97f12619867c0a03d8238d7ad0bf83827cc58d576524ff4bb56f",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/m10.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/m10.tif"
+          "sha256": "788da019a35f97f12619867c0a03d8238d7ad0bf83827cc58d576524ff4bb56f"
         },
         {
-          "path": "data/archive_payload/inputs/m100.tif",
-          "role": "inputs",
+          "path": "data/weather/m100.tif",
           "size": 81067464,
-          "sha256": "e409df462a316916745820e51d4cc2991e971e26e54dfdb309d30b71b72a3ffa",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/m100.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/m100.tif"
+          "sha256": "e409df462a316916745820e51d4cc2991e971e26e54dfdb309d30b71b72a3ffa"
         },
         {
-          "path": "data/archive_payload/inputs/metadata.in",
-          "role": "inputs",
-          "size": 561,
-          "sha256": "d43704dcc6e4df59cb5d63373205c100b5d68147fcd680cca0f8dfdb3c5ca2e8",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/metadata.in",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/metadata.in"
-        },
-        {
-          "path": "data/archive_payload/inputs/metadata.out",
-          "role": "inputs",
-          "size": 292,
-          "sha256": "b42bdf79d455246eda5579638cb860b7db31d64f3f7f457a63b08136038c5d66",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/metadata.out",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/metadata.out"
-        },
-        {
-          "path": "data/archive_payload/inputs/phi.tif",
-          "role": "inputs",
-          "size": 107708,
-          "sha256": "4757bed755f49e9a7635912bd08e1e27960c5c3846e626ed0b0d3f7d4f50c1fc",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/phi.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/phi.tif"
-        },
-        {
-          "path": "data/archive_payload/inputs/wd.tif",
-          "role": "inputs",
+          "path": "data/weather/wd.tif",
           "size": 12390462,
-          "sha256": "f0ce8d20ed4da8bef09313eafe13c1b952f3d1312deb04dd4ffff809f23c0923",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/wd.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/wd.tif"
+          "sha256": "f0ce8d20ed4da8bef09313eafe13c1b952f3d1312deb04dd4ffff809f23c0923"
         },
         {
-          "path": "data/archive_payload/inputs/ws.tif",
-          "role": "inputs",
+          "path": "data/weather/ws.tif",
           "size": 83224324,
-          "sha256": "8e1364e5d613640b834531b093ac469f3c85117c58ee8b022ccfa76cb739c6d5",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/inputs/ws.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/inputs/ws.tif"
+          "sha256": "8e1364e5d613640b834531b093ac469f3c85117c58ee8b022ccfa76cb739c6d5"
+        },
+        {
+          "path": "data/fuels_and_topography/adj.tif",
+          "size": 107708,
+          "sha256": "4757bed755f49e9a7635912bd08e1e27960c5c3846e626ed0b0d3f7d4f50c1fc"
+        },
+        {
+          "path": "data/fuels_and_topography/ignition_mask.tif",
+          "size": 96899,
+          "sha256": "2a2ee2c116b5a1b2f372fb821fcde5f80e984de275cd5c87b74dcac62470aeb5"
+        },
+        {
+          "path": "data/fuels_and_topography/landscape.tif",
+          "size": 35387465,
+          "sha256": "99112859079a19a4cb69831f87ba6e382b6c1ca0ca50fc7aa9e2db41f70df9e1"
+        },
+        {
+          "path": "data/fuels_and_topography/phi.tif",
+          "size": 107708,
+          "sha256": "4757bed755f49e9a7635912bd08e1e27960c5c3846e626ed0b0d3f7d4f50c1fc"
+        },
+        {
+          "path": "data/misc/fuel_models.csv",
+          "size": 3948,
+          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b"
+        },
+        {
+          "path": "data/misc/ignitions.csv",
+          "size": 789,
+          "sha256": "f136a033d469cd4d2863abc20a5eb8479a736d7efa99ea7fcc2382d09fdb8430"
         }
       ]
     },
@@ -152,164 +185,99 @@
       "role": "observations",
       "filename": "observations.tar.gz",
       "required": true,
-      "size": 256420,
-      "sha256": "dde8c607ed6c3b68d3d10d1b2420b1a840cf7773f6bf22906159c4c8fa9b53b6",
+      "size": 788056,
+      "sha256": "cc3c46091a2a3672262f092a422e31492f6600faf78e50691ad6da40be9f8612",
       "url": null,
       "files": [
         {
-          "path": "data/archive_payload/observations/North_Complex_2020_toa.png",
-          "role": "observations",
-          "size": 178914,
-          "sha256": "06d6b5c14ba417a4d0734464d42529fc658c47184b39a5a586b8dd8561c732fe",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/observations/North_Complex_2020_toa.png",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/observations/North_Complex_2020_toa.png"
+          "path": "data/observation/North_Complex_2020_final_perimeter.gpkg",
+          "size": 823296,
+          "sha256": "89d6699aab5fbb35a8b05ac155fb58bfa3d614b5d115e671661943277a942835"
         },
         {
-          "path": "data/archive_payload/observations/North_Complex_2020_toa.tif",
-          "role": "observations",
+          "path": "data/observation/North_Complex_2020_final_perimeter_30m.tif",
+          "size": 24986,
+          "sha256": "5ae6730ee0bf50b4e09a2f5dc7dafc390c12850f5ffb288a1e469d723e6e48c9"
+        },
+        {
+          "path": "data/observation/North_Complex_2020_toa.png",
+          "size": 178914,
+          "sha256": "06d6b5c14ba417a4d0734464d42529fc658c47184b39a5a586b8dd8561c732fe"
+        },
+        {
+          "path": "data/observation/North_Complex_2020_toa.tif",
           "size": 108265,
-          "sha256": "389cdc2349231ddd48064a53aa7328e5208946a4e13358d557d312afc3e438a7",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/observations/North_Complex_2020_toa.tif",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/observations/North_Complex_2020_toa.tif"
+          "sha256": "389cdc2349231ddd48064a53aa7328e5208946a4e13358d557d312afc3e438a7"
         }
       ]
     },
     {
-      "role": "provenance",
-      "filename": "provenance.tar.gz",
+      "role": "generation",
+      "filename": "generation.tar.gz",
       "required": true,
-      "size": 59804,
-      "sha256": "1960473248745785737374cf84c7d6df5f592f273d43157c1b317de4f72a08a0",
+      "size": 25993,
+      "sha256": "a571eb9822fb6d4d11bc78cc6208a280e7d9d4f533e942985f44e1ad69bc4927",
       "url": null,
       "files": [
         {
-          "path": "data/archive_manifest.json",
-          "size": 13673,
-          "sha256": "4aac4a7388d0a9082541cf549f855c62157721a768122735633f1113b860ca3f"
+          "path": "scripts/generate_data/README.txt",
+          "size": 1791,
+          "sha256": "2ee931f0f245b8c86efb7dbefe19079782db3ffe3a0ce71154e5b2f6182a99c7"
         },
         {
-          "path": "data/provenance/archive/North_Complex_2020/01-run.sh",
-          "role": "provenance",
-          "size": 1889,
-          "sha256": "c9d41cf411d874f195be76eab2f935fa2059e97017120a30c93c8998b256b549",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/North_Complex_2020/01-run.sh",
-          "archive_member": "ELMFIRE_GOFER_validation/North_Complex_2020/01-run.sh"
+          "path": "scripts/generate_data/fires.csv",
+          "size": 495,
+          "sha256": "318cd855ecb497966721fff49fbecb39eb7c9fa1dccc87e73f4426c99271aaaa"
         },
         {
-          "path": "data/provenance/archive/archive_inventory.json",
-          "role": "provenance",
-          "size": 182529,
-          "sha256": "bf4f8f8ca202fded62c71bee5f227580790d2c04fb1d541336d3befaa2f71dec",
-          "repository_source": "cases/Validation/GOFER/data/archive_inventory.json"
+          "path": "scripts/generate_data/generate_observations.py",
+          "size": 3360,
+          "sha256": "504622c5a2c99679a5fab3b49b9c77bb5e6531ac48313bd381d5e9c957810ad1"
         },
         {
-          "path": "data/provenance/archive/fires.csv",
-          "role": "provenance",
-          "size": 7506,
-          "sha256": "ec179d623054018bfe3cd1f4566944feb737c29c2165df01527bf9cc11f248c3",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/fires.csv",
-          "archive_member": "ELMFIRE_GOFER_validation/fires.csv"
+          "path": "scripts/generate_data/make_fires.py",
+          "size": 3674,
+          "sha256": "db102eaee83a12ee43cc5430db56f9ac2f98e215a97b1eda473a5f22d640350b"
         },
         {
-          "path": "data/provenance/archive/inputs_log.csv",
-          "role": "provenance",
-          "size": 4993,
-          "sha256": "4416ec2d34bd144fb76dd3696fd6e7a38bf32aba907c58e8458ea680bccc7364",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/inputs_log.csv",
-          "archive_member": "ELMFIRE_GOFER_validation/inputs_log.csv"
+          "path": "scripts/generate_data/prepare_inputs.py",
+          "size": 11078,
+          "sha256": "820365bdda8beebf082b3ef304d85a31f13317237d2faad07ceee113adde7757"
         },
         {
-          "path": "data/provenance/archive/make_fires.py",
-          "role": "provenance",
+          "path": "scripts/generate_data/source/exploratory.py",
+          "size": 21531,
+          "sha256": "3ce3f69eb0bab864adbaab85d1032934c9bcdcc89c8e41cf6ef6f354b7ab851e"
+        },
+        {
+          "path": "scripts/generate_data/source/make_fires.py",
           "size": 3167,
-          "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/make_fires.py",
-          "archive_member": "ELMFIRE_GOFER_validation/make_fires.py"
+          "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94"
         },
         {
-          "path": "data/provenance/archive/prepare_inputs.py",
-          "role": "provenance",
+          "path": "scripts/generate_data/source/prepare_inputs.py",
           "size": 16402,
-          "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/prepare_inputs.py",
-          "archive_member": "ELMFIRE_GOFER_validation/prepare_inputs.py"
+          "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c"
         },
         {
-          "path": "data/provenance/archive/run_all.sh",
-          "role": "provenance",
-          "size": 728,
-          "sha256": "7ac9cb0b80c992278de3fc27db8351b85509f9ccd40024b0210f5610fc93185f",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/run_all.sh",
-          "archive_member": "ELMFIRE_GOFER_validation/run_all.sh"
-        },
-        {
-          "path": "data/provenance/archive/score_runs.py",
-          "role": "provenance",
-          "size": 5456,
-          "sha256": "2c63477ed4f5db55e3ece74c641570815e6aa65a82979a57bb56c68418a558a0",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/score_runs.py",
-          "archive_member": "ELMFIRE_GOFER_validation/score_runs.py"
-        },
-        {
-          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
-          "role": "provenance",
-          "size": 2379,
-          "sha256": "1fd3fbd75411b6145b2eb7edcdfb6f0d1abb349611077184fef89b30957168f8",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
-          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc"
-        },
-        {
-          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
-          "role": "provenance",
-          "size": 4459,
-          "sha256": "29318a6cd45fe91df6a1fe41827bcf1cdbb0b55fcf036397d6a8d74a991e9fd8",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
-          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc"
-        },
-        {
-          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign.py",
-          "role": "provenance",
+          "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign.py",
           "size": 15656,
-          "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign.py",
-          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign.py"
+          "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f"
         },
         {
-          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.py",
-          "role": "provenance",
+          "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign_pb2.py",
           "size": 2623,
-          "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2.py",
-          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.py"
+          "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6"
         },
         {
-          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.pyi",
-          "role": "provenance",
+          "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign_pb2.pyi",
           "size": 3441,
-          "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2.pyi",
-          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.pyi"
+          "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac"
         },
         {
-          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
-          "role": "provenance",
+          "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
           "size": 3384,
-          "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
-          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2_grpc.py"
-        },
-        {
-          "path": "data/provenance/archive/tools/fuel_models.csv",
-          "role": "provenance",
-          "size": 3948,
-          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
-          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/fuel_models.csv",
-          "archive_member": "ELMFIRE_GOFER_validation/tools/fuel_models.csv"
-        },
-        {
-          "path": "data/source_manifest.json",
-          "size": 1120,
-          "sha256": "0f4c1c5be6530eb4e728ff69388df30308d393b140cfb2c1ffcc53c4264df628"
+          "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee"
         }
       ]
     }

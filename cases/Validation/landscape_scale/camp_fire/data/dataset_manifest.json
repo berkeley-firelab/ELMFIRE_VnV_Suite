@@ -1,9 +1,88 @@
 {
   "schema_version": 1,
   "case_id": "camp_fire",
-  "dataset_version": "1.0.0",
-  "source_revision": "51453eb80806cf7e1389d1d1af1dacaacd294267",
+  "dataset_version": "2.1.0",
+  "source_revision": "9b2f5614fac60e1877221399db05a9bd73a86c52",
   "source_state": "working tree snapshot; file hashes are authoritative",
+  "archive_scope": "input data, observations and data-generation source only",
+  "source_metadata": {
+    "schema_version": 1,
+    "case_id": "camp_fire",
+    "event_start_utc": "2018-11-08T22:00:00Z",
+    "comparison_time_s": 129600,
+    "comparison_time_utc": "2018-11-10T10:00:00Z",
+    "model_inputs": {
+      "source": "Camp_VAL.rar, received in the 3_FIRES collection identified only as 'From Dwi'",
+      "archive_namelist_sha256": "6e0a9dac2c4be01794b61d30aac531858657157d6515d0692600910fc567e9b6",
+      "upstream_products": "unknown",
+      "provider": "unknown",
+      "acquisition_dates": "unknown",
+      "license": "unknown"
+    },
+    "analysis": {
+      "weather_bands_used": 25,
+      "weather_interval_s": 3600,
+      "wind_speed_units": "mph at 20 ft (inferred from current ELMFIRE source and archived flags)",
+      "wind_direction_units": "degrees",
+      "dead_fuel_moisture_units": "percent",
+      "topography_units": {
+        "dem": "m (archive convention; upstream metadata absent)",
+        "slp": "degrees",
+        "asp": "degrees"
+      }
+    },
+    "observation": {
+      "description": "VIIRS 375 m active-fire point detections with NASA FIRMS-compatible fields",
+      "source_attribution": "NASA FIRMS / VIIRS active-fire product inferred from field schema; exact collection, granules, download URL, acquisition date, and chain of custody are not recorded locally",
+      "source_url": "https://firms.modaps.eosdis.nasa.gov/active_fire/",
+      "product_reference_url": "https://www.earthdata.nasa.gov/data/catalog/lancemodis-vnp14img-nrt-2",
+      "crs": "EPSG:4326",
+      "geometry": "Point",
+      "comparison_cutoff_utc": "2018-11-10T10:00:00Z",
+      "files": [
+        {
+          "relative_path": "data/observation/viirs_camp.cpg",
+          "size": 5,
+          "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824"
+        },
+        {
+          "relative_path": "data/observation/viirs_camp.dbf",
+          "size": 581334,
+          "sha256": "c8717446b0d91bcd7930c63fab2f9a254563800129b5baf904c6e2e46087a0d9"
+        },
+        {
+          "relative_path": "data/observation/viirs_camp.prj",
+          "size": 145,
+          "sha256": "a02a27b1d1982c8516d83398e85a3c8b1aef1713c13ef4d84d7bde17430c07c4"
+        },
+        {
+          "relative_path": "data/observation/viirs_camp.qmd",
+          "size": 1623,
+          "sha256": "e8dd30fbe4e3dfb933702ce596796ec442c09a05fdb587fd38460872910a312c"
+        },
+        {
+          "relative_path": "data/observation/viirs_camp.shp",
+          "size": 63380,
+          "sha256": "3cee20171a2dfe2859ae2cb82a3c1be5900133bdd4385db67ffbb49807c24fb6"
+        },
+        {
+          "relative_path": "data/observation/viirs_camp.shx",
+          "size": 18180,
+          "sha256": "3f0e0962e2b3ab644a4e81b5223013538c26bce1f819ec3558b4ce2094768566"
+        }
+      ]
+    },
+    "known_provenance_gaps": [
+      "Upstream fuel, terrain, weather, moisture, WUI, and ignition products are not identified in the received archive.",
+      "The local VIIRS files do not record the exact FIRMS collection/granules, download URL, acquisition date, filtering history, or license.",
+      "The archive does not state whether model parameters were calibrated against this event."
+    ],
+    "generation": {
+      "input_scripts": null,
+      "observation_scripts": null,
+      "limitations": "No original script was supplied for generating the observation data. Input generation, where supplied, requires external source data and service access; frozen-file equivalence is unverified."
+    }
+  },
   "zenodo": {
     "record_id": null,
     "version_doi": null,
@@ -14,162 +93,122 @@
       "role": "inputs",
       "filename": "inputs.tar.gz",
       "required": true,
-      "size": 15307767,
-      "sha256": "2e094310ffccdca427222a3a1ced26c3c5b78cf407217b655e183bd4b3bea0e9",
+      "size": 10729002,
+      "sha256": "1bad1370b5276c1c9406ae5b0172160169d29fae35e21f138236f14c019f14fa",
       "url": null,
       "files": [
         {
-          "path": "data/archive_payload/fuels_weather/adj.tif",
-          "size": 75878,
-          "sha256": "0124a1c29f0b5948497930e95df01ea7e47a24cdfccd2c986d299dd035c32f70"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/asp.tif",
-          "size": 2135148,
-          "sha256": "4d463e0e9938ff043e6a7dbff7d632bbdf67db5492ee340f508445b30f0a3c5a"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/baa_m.tif",
-          "size": 8611360,
-          "sha256": "86a82d3e709024884fe175b0f9ce3e503768683d802e887de5466c2113ab058a"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/baa_m2.tif",
-          "size": 8611360,
-          "sha256": "65f7edf418b7c7c7613a7884baa72ac4140e867c89279171e027bde1343c9173"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/bfm13.tif",
-          "size": 4305868,
-          "sha256": "7520c02155c7574a0da7c720a22a06310c61f469aeb9420f435602ffc6bca4c4"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/bha.tif",
-          "size": 8611360,
-          "sha256": "7185d39f929d7971544a93d11cfb0d53b21df74c88f2fbbd7a63c78ba0e6121e"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/cbd.tif",
-          "size": 656076,
-          "sha256": "ff61560b936fc69aa9a4feffbdb1d1d9ddb8f78ad002d8bdac1481c8f6a74303"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/cbh.tif",
-          "size": 871462,
-          "sha256": "2347176c63702a6852bee38a1b0701ce4dc05a6f457638c4dc4520e8855a5c16"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/cc.tif",
-          "size": 567550,
-          "sha256": "0f54fe91ceb55ab6cb96edd479c1cadadd1012e1852a32b7781a9e41388f5b2d"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/ch.tif",
-          "size": 746030,
-          "sha256": "3bc5c0b74222f452f84ebc44683967b5fd1fd07614b08e8331f59580417f0000"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/dem.tif",
-          "size": 2264639,
-          "sha256": "d70b342d5882d867498fda892356edbea9717acd364061193a002eaf9641dbaa"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/fbfm40.tif",
-          "size": 672687,
-          "sha256": "975719c518a7cd893ed2fff9c6b4d26b107967fbf596ba790ed2b473e9735568"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/fbfm40b.tif",
-          "size": 756946,
-          "sha256": "ca38d4d6fb3da03bf3afd8fedd01fa2eb02600092d05f385dc11555745bddb8e"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/fbfm40r3.tif",
-          "size": 1409560,
-          "sha256": "f99258d87ba6604f7586ecfcac8240c0db50839175e27cbe6084a607730739d1"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/fbfm40r4.tif",
-          "size": 1981773,
-          "sha256": "825f242d158044f514e3e19cfd1362b284d91e28d89a6b08617dbe939c12600f"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/ff.tif",
-          "size": 8611360,
-          "sha256": "fb76412273bf820259e4aa2b4f0a3a68aa26950157f3d81acec8b94e5018bc82"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/ignition_mask.tif",
-          "size": 68670,
-          "sha256": "31b580c5e4c7a4bf63a505effce82e92aa6f230bde095e5fea937387aa8d4c90"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/m1.tif",
-          "size": 131952,
-          "sha256": "7e92a5eaf56433f1458cd4b87b802228e390fc18e5672c57f6ac5b7d622dd468"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/m10.tif",
-          "size": 131952,
-          "sha256": "ea97ab08a124d3d0dbad07be078a091afd9c8d3d2e1bb4f950dcca1b965a01b1"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/m100.tif",
-          "size": 131952,
-          "sha256": "1974f95fa5c347d501d0294d2ea92a30d7f664e93fb70cb427367a11d11e88d0"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/m100f.tif",
+          "path": "data/weather/m100f.tif",
           "size": 2489156,
           "sha256": "db8f41a8d10913c74fe32bdf5bd2b80aee7be6f9de0c348daa2815053dcc98c8"
         },
         {
-          "path": "data/archive_payload/fuels_weather/m10f.tif",
+          "path": "data/weather/m10f.tif",
           "size": 2490632,
           "sha256": "459230fa813b36e9d4ef17c8a11cdf1cb3da7279332c9af0cdd0709be73ad531"
         },
         {
-          "path": "data/archive_payload/fuels_weather/m1f.tif",
+          "path": "data/weather/m1f.tif",
           "size": 2490632,
           "sha256": "315628f7f9bc879bfd2ff0a1d7f0ec41769c72f99c40dadb1d85ebb3bb9e568b"
         },
         {
-          "path": "data/archive_payload/fuels_weather/nbf.tif",
-          "size": 8611360,
-          "sha256": "a40a6ebed6b2ef86ac17955f5e5a15c62b1002797ddf4edc8e03d5d154ccd671"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/phi.tif",
-          "size": 75878,
-          "sha256": "0124a1c29f0b5948497930e95df01ea7e47a24cdfccd2c986d299dd035c32f70"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/slp.tif",
-          "size": 1281745,
-          "sha256": "ae0ca79ed240f9a640ddaf13354e02c2585c16f7099b0106f7bf3452de5051d3"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/ssd_min.tif",
-          "size": 8611360,
-          "sha256": "4f8b4d5a773003b96883a4475c6ac83694130d08eb9f17634885a662cd2aa533"
-        },
-        {
-          "path": "data/archive_payload/fuels_weather/wd.tif",
+          "path": "data/weather/wd.tif",
           "size": 4293145,
           "sha256": "c72423cc8b4b5dd3b5a4c33ae07b2e0a5f3ebc18fbf59c41d292a4b09b9c6d08"
         },
         {
-          "path": "data/archive_payload/fuels_weather/ws.tif",
+          "path": "data/weather/ws.tif",
           "size": 5202031,
           "sha256": "69a5b449f16d4f4265e39a7759170ce34d4327b451230f20b521c2c02841f85c"
         },
         {
-          "path": "data/archive_payload/misc/building_fuel_models.csv",
+          "path": "data/fuels_and_topography/adj.tif",
+          "size": 75878,
+          "sha256": "0124a1c29f0b5948497930e95df01ea7e47a24cdfccd2c986d299dd035c32f70"
+        },
+        {
+          "path": "data/fuels_and_topography/asp.tif",
+          "size": 2135148,
+          "sha256": "4d463e0e9938ff043e6a7dbff7d632bbdf67db5492ee340f508445b30f0a3c5a"
+        },
+        {
+          "path": "data/fuels_and_topography/baa_m.tif",
+          "size": 8611360,
+          "sha256": "86a82d3e709024884fe175b0f9ce3e503768683d802e887de5466c2113ab058a"
+        },
+        {
+          "path": "data/fuels_and_topography/bfm13.tif",
+          "size": 4305868,
+          "sha256": "7520c02155c7574a0da7c720a22a06310c61f469aeb9420f435602ffc6bca4c4"
+        },
+        {
+          "path": "data/fuels_and_topography/cbd.tif",
+          "size": 656076,
+          "sha256": "ff61560b936fc69aa9a4feffbdb1d1d9ddb8f78ad002d8bdac1481c8f6a74303"
+        },
+        {
+          "path": "data/fuels_and_topography/cbh.tif",
+          "size": 871462,
+          "sha256": "2347176c63702a6852bee38a1b0701ce4dc05a6f457638c4dc4520e8855a5c16"
+        },
+        {
+          "path": "data/fuels_and_topography/cc.tif",
+          "size": 567550,
+          "sha256": "0f54fe91ceb55ab6cb96edd479c1cadadd1012e1852a32b7781a9e41388f5b2d"
+        },
+        {
+          "path": "data/fuels_and_topography/ch.tif",
+          "size": 746030,
+          "sha256": "3bc5c0b74222f452f84ebc44683967b5fd1fd07614b08e8331f59580417f0000"
+        },
+        {
+          "path": "data/fuels_and_topography/dem.tif",
+          "size": 2264639,
+          "sha256": "d70b342d5882d867498fda892356edbea9717acd364061193a002eaf9641dbaa"
+        },
+        {
+          "path": "data/fuels_and_topography/fbfm40b.tif",
+          "size": 756946,
+          "sha256": "ca38d4d6fb3da03bf3afd8fedd01fa2eb02600092d05f385dc11555745bddb8e"
+        },
+        {
+          "path": "data/fuels_and_topography/ff.tif",
+          "size": 8611360,
+          "sha256": "fb76412273bf820259e4aa2b4f0a3a68aa26950157f3d81acec8b94e5018bc82"
+        },
+        {
+          "path": "data/fuels_and_topography/ignition_mask.tif",
+          "size": 68670,
+          "sha256": "31b580c5e4c7a4bf63a505effce82e92aa6f230bde095e5fea937387aa8d4c90"
+        },
+        {
+          "path": "data/fuels_and_topography/nbf.tif",
+          "size": 8611360,
+          "sha256": "a40a6ebed6b2ef86ac17955f5e5a15c62b1002797ddf4edc8e03d5d154ccd671"
+        },
+        {
+          "path": "data/fuels_and_topography/phi.tif",
+          "size": 75878,
+          "sha256": "0124a1c29f0b5948497930e95df01ea7e47a24cdfccd2c986d299dd035c32f70"
+        },
+        {
+          "path": "data/fuels_and_topography/slp.tif",
+          "size": 1281745,
+          "sha256": "ae0ca79ed240f9a640ddaf13354e02c2585c16f7099b0106f7bf3452de5051d3"
+        },
+        {
+          "path": "data/fuels_and_topography/ssd_min.tif",
+          "size": 8611360,
+          "sha256": "4f8b4d5a773003b96883a4475c6ac83694130d08eb9f17634885a662cd2aa533"
+        },
+        {
+          "path": "data/misc/building_fuel_models.csv",
           "size": 1180,
           "sha256": "ade4d3c620b0261a42ecd907f19aca3e06a816ec3accf208859dec109a50dd66"
         },
         {
-          "path": "data/archive_payload/misc/fuel_models.csv",
+          "path": "data/misc/fuel_models.csv",
           "size": 3886,
           "sha256": "22b50f3b3dc3b95d1372601a02ff998e197745aff8ee4f96f2c513865e724acb"
         }
@@ -179,179 +218,39 @@
       "role": "observations",
       "filename": "observations.tar.gz",
       "required": true,
-      "size": 84368,
-      "sha256": "691e7b9cd4d34047cb136af8e0b6796ab844c2505b411bd586a3685dc017614f",
+      "size": 84364,
+      "sha256": "ca1ffc87836214f10cb4f07c830b4bd4857c67176c00d10ce4cd8bb0c6dc4a48",
       "url": null,
       "files": [
         {
-          "path": "data/viirs_observation/viirs_camp.cpg",
+          "path": "data/observation/viirs_camp.cpg",
           "size": 5,
           "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824"
         },
         {
-          "path": "data/viirs_observation/viirs_camp.dbf",
+          "path": "data/observation/viirs_camp.dbf",
           "size": 581334,
           "sha256": "c8717446b0d91bcd7930c63fab2f9a254563800129b5baf904c6e2e46087a0d9"
         },
         {
-          "path": "data/viirs_observation/viirs_camp.prj",
+          "path": "data/observation/viirs_camp.prj",
           "size": 145,
           "sha256": "a02a27b1d1982c8516d83398e85a3c8b1aef1713c13ef4d84d7bde17430c07c4"
         },
         {
-          "path": "data/viirs_observation/viirs_camp.qmd",
+          "path": "data/observation/viirs_camp.qmd",
           "size": 1623,
           "sha256": "e8dd30fbe4e3dfb933702ce596796ec442c09a05fdb587fd38460872910a312c"
         },
         {
-          "path": "data/viirs_observation/viirs_camp.shp",
+          "path": "data/observation/viirs_camp.shp",
           "size": 63380,
           "sha256": "3cee20171a2dfe2859ae2cb82a3c1be5900133bdd4385db67ffbb49807c24fb6"
         },
         {
-          "path": "data/viirs_observation/viirs_camp.shx",
+          "path": "data/observation/viirs_camp.shx",
           "size": 18180,
           "sha256": "3f0e0962e2b3ab644a4e81b5223013538c26bce1f819ec3558b4ce2094768566"
-        }
-      ]
-    },
-    {
-      "role": "provenance",
-      "filename": "provenance.tar.gz",
-      "required": true,
-      "size": 5594,
-      "sha256": "9ac95bc89a56da809bbc5e0f8001e83e7df34246d4b2553bca6598d3057cc8ac",
-      "url": null,
-      "files": [
-        {
-          "path": "case.yaml",
-          "size": 1461,
-          "sha256": "031f86d1706884efaed9eb60b606c7299bafceb19be2eb20189f0c2e22b0d0f9"
-        },
-        {
-          "path": "data/archive_manifest.json",
-          "size": 6441,
-          "sha256": "1019fc6445919c3aea5b919dd1531eacff8d0596053c3dc18685e295e8e3bfc3"
-        },
-        {
-          "path": "data/source_manifest.json",
-          "size": 2862,
-          "sha256": "e0f617bdad6b4ee83d983bdda9597e6efea8c87ca74ac6b8864837281445ccda"
-        },
-        {
-          "path": "elmfire.data.in",
-          "size": 4802,
-          "sha256": "4b4f760d6e30550b0f8620972a3250c732e4d56c4c0c58e9d10efefaa59301bb"
-        }
-      ]
-    },
-    {
-      "role": "legacy_inputs",
-      "filename": "legacy_inputs.tar.gz",
-      "required": false,
-      "size": 8649153,
-      "sha256": "c4d8f9829fde7bd171ba14137458413de542ca387bebc05f950d4370080a0f0f",
-      "url": null,
-      "files": [
-        {
-          "path": "data/fuels_and_topography/adj.tif",
-          "size": 8962420,
-          "sha256": "037a52714850da1cfb47c8156c4adb39b6a54420bb85dc392501b08471fe0620"
-        },
-        {
-          "path": "data/fuels_and_topography/asp.tif",
-          "size": 4483660,
-          "sha256": "d918a5fa110c6492bd7dfd0298169d16ef3509c94c0826a80a722574e1598013"
-        },
-        {
-          "path": "data/fuels_and_topography/cbd.tif",
-          "size": 4483660,
-          "sha256": "2f1ad977e464cdac6c54d371c840c6cb322a87c8ebcae94ac8d6c82cc66cfab4"
-        },
-        {
-          "path": "data/fuels_and_topography/cbh.tif",
-          "size": 4483660,
-          "sha256": "4e6d66c9e170a1111d2223e8710103b25b34894c16ad0c01f8c3576c10c45a0c"
-        },
-        {
-          "path": "data/fuels_and_topography/cc.tif",
-          "size": 4483660,
-          "sha256": "6cf6be04d7704328583ef3b6dc0abf8b061754d71bf7907eb4a131c9b72093f1"
-        },
-        {
-          "path": "data/fuels_and_topography/ch.tif",
-          "size": 4483660,
-          "sha256": "0d5a2374c53efe844aee36b25b1204f95deabdc04f0a8ff5ce064d4d8ba8a37f"
-        },
-        {
-          "path": "data/fuels_and_topography/dem.tif",
-          "size": 4483660,
-          "sha256": "98387ca9e28e1c7658a08013ce9a810dcb273c9efb261c28edd926d53680f2e0"
-        },
-        {
-          "path": "data/fuels_and_topography/fbfm40.tif",
-          "size": 4483660,
-          "sha256": "dc49584d2cd800c9b5dc06ec6ae742a367b13392a5ceaa32a02dad59610dced6"
-        },
-        {
-          "path": "data/fuels_and_topography/ignition_mask.tif",
-          "size": 8962420,
-          "sha256": "6fabd9dde6926b7718ded9ac81bed2a3c1fa94a48d516ad946a8f7bb1d65fe4e"
-        },
-        {
-          "path": "data/fuels_and_topography/phi.tif",
-          "size": 8962420,
-          "sha256": "037a52714850da1cfb47c8156c4adb39b6a54420bb85dc392501b08471fe0620"
-        },
-        {
-          "path": "data/fuels_and_topography/phi_masked.tif",
-          "size": 8962420,
-          "sha256": "b29ae73a7893bb67935ca89961b1c4ee370179f34f975ae21eba10bfb43c0e97"
-        },
-        {
-          "path": "data/fuels_and_topography/slp.tif",
-          "size": 4483660,
-          "sha256": "3e33758e6c46103a1cba2ce28d72f6991f24587876413240440da6639f36295b"
-        },
-        {
-          "path": "data/misc/building_fuel_models.csv",
-          "size": 290,
-          "sha256": "c94d0702aa3cc6b5b40eab89c5aea4f2c3b8264cc6acb988ec72b44641e8daf5"
-        },
-        {
-          "path": "data/weather/lfm_herb.tif",
-          "size": 19254,
-          "sha256": "5d156aa283e5275fafdc92b9d4bac204fc1ea3f9d6acf52ebfa8a5cb64f00e66"
-        },
-        {
-          "path": "data/weather/lfm_woody.tif",
-          "size": 19254,
-          "sha256": "5d156aa283e5275fafdc92b9d4bac204fc1ea3f9d6acf52ebfa8a5cb64f00e66"
-        },
-        {
-          "path": "data/weather/m1.tif",
-          "size": 19254,
-          "sha256": "5d156aa283e5275fafdc92b9d4bac204fc1ea3f9d6acf52ebfa8a5cb64f00e66"
-        },
-        {
-          "path": "data/weather/m10.tif",
-          "size": 19254,
-          "sha256": "5d156aa283e5275fafdc92b9d4bac204fc1ea3f9d6acf52ebfa8a5cb64f00e66"
-        },
-        {
-          "path": "data/weather/m100.tif",
-          "size": 19254,
-          "sha256": "5d156aa283e5275fafdc92b9d4bac204fc1ea3f9d6acf52ebfa8a5cb64f00e66"
-        },
-        {
-          "path": "data/weather/wd.tif",
-          "size": 19254,
-          "sha256": "094f6c2c7c7d229a761f2beca50c9eec1e761f8c3eb61575a3f5caa51faa91f7"
-        },
-        {
-          "path": "data/weather/ws.tif",
-          "size": 19254,
-          "sha256": "5f4ee4449902bb746d7d533d1d0314333ae5f6733e2a5592156cb091279ad139"
         }
       ]
     }

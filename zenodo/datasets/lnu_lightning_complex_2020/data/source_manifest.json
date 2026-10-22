@@ -5,6 +5,19 @@
   "case_status": "data prepared for a future validation case",
   "model_inputs": {
     "source": {
+      "kind": "user-supplied directory",
+      "name": "ELMFIRE_GOFER_validation",
+      "received_date": "2026-10-22",
+      "provider": "User-supplied updated directory",
+      "license": "Not documented in the supplied directory; upstream access and redistribution terms still apply."
+    },
+    "processing": "unchanged file contents; case-relative paths normalized",
+    "updated_source": {
+      "kind": "user-supplied directory",
+      "name": "ELMFIRE_GOFER_validation",
+      "received_date": "2026-10-22"
+    },
+    "previous_source_archive": {
       "filename": "ELMFIRE_GOFER_validation.tar.gz",
       "size": 7038832441,
       "sha256": "714b9f2b3c3417336ea200bfc6f2bba2955376bf3088d675a811a11d28b0fffe",
@@ -13,16 +26,70 @@
       "received_date_utc": "2026-10-21",
       "provider": "User-supplied archive",
       "license": "Not documented in the supplied archive; upstream access and redistribution terms still apply."
-    },
-    "processing": "unchanged file contents; case-relative paths normalized"
+    }
   },
   "observation": {
-    "product": "Prepared GOFER arrival-time observations as supplied",
+    "product": "GOFER arrival-time rasters and previews, plus CAL FIRE final-perimeter GeoPackages and aligned raster masks",
     "source_dataset": "https://doi.org/10.5281/zenodo.8327264",
-    "reference": "https://doi.org/10.5194/essd-16-1395-2024"
+    "reference": "https://doi.org/10.5194/essd-16-1395-2024",
+    "files": [
+      {
+        "path": "data/observation/LNU_Lightning_Complex_2020_final_perimeter.gpkg",
+        "size": 987136,
+        "sha256": "4dfa11075335364cdf38a87134fa72a863ae89d33c91ca1289ad041a6fd20fa9",
+        "source_relative_path": "LNU_Lightning_Complex_2020/observations/LNU_Lightning_Complex_2020_final_perimeter.gpkg",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      },
+      {
+        "path": "data/observation/LNU_Lightning_Complex_2020_final_perimeter_30m.tif",
+        "size": 50995,
+        "sha256": "a24f03d13a6d49698ac344c41596dda7736e791f624e169906196f7e374f04f4",
+        "source_relative_path": "LNU_Lightning_Complex_2020/observations/LNU_Lightning_Complex_2020_final_perimeter_30m.tif",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      },
+      {
+        "path": "data/observation/LNU_Lightning_Complex_2020_toa.png",
+        "size": 200842,
+        "sha256": "3cde8607c30251cd4731e73f99526a33168cc9a6ea6c64a84b52fd41368e8fb7",
+        "source_relative_path": "LNU_Lightning_Complex_2020/observations/LNU_Lightning_Complex_2020_toa.png",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      },
+      {
+        "path": "data/observation/LNU_Lightning_Complex_2020_toa.tif",
+        "size": 91978,
+        "sha256": "93d30b163318b9cd18154aa22b35cfeec281f2e9756e3cc737e6d43a2065e968",
+        "source_relative_path": "LNU_Lightning_Complex_2020/observations/LNU_Lightning_Complex_2020_toa.tif",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      }
+    ],
+    "products": {
+      "gofer_arrival": "data/observation/LNU_Lightning_Complex_2020_toa.tif",
+      "gofer_preview": "data/observation/LNU_Lightning_Complex_2020_toa.png",
+      "final_perimeter": "data/observation/LNU_Lightning_Complex_2020_final_perimeter.gpkg",
+      "final_perimeter_mask": "data/observation/LNU_Lightning_Complex_2020_final_perimeter_30m.tif"
+    },
+    "final_perimeter_source": {
+      "provider": "CAL FIRE FRAP",
+      "source_identification": "California Historic Fire Perimeters (2026-05-26), as identified by the supplied exploratory.py",
+      "generator": "scripts/generate_data/source/exploratory.py",
+      "layers": [
+        "calfire_final",
+        "calfire_records",
+        "gofer_final"
+      ],
+      "matching": "year, name/complex name, and more than 20 percent of each CAL FIRE record overlapping the final GOFER perimeter",
+      "mask": "cell-centre rasterization on the input landscape grid; burned=1, unburned=0, nodata=255",
+      "license_evidence": "not supplied in the referenced directory"
+    }
   },
   "known_provenance_gaps": [
     "Upstream access and redistribution terms remain undocumented.",
     "A runnable case, scientific configuration and acceptance basis have not yet been authored."
-  ]
+  ],
+  "generation": {
+    "input_scripts": "scripts/generate_data/prepare_inputs.py",
+    "observation_scripts": "scripts/generate_data/generate_observations.py",
+    "supplied_sources": "scripts/generate_data/source",
+    "limitations": "CAL FIRE final-perimeter generation is supplied in exploratory.py; GOFER arrival-time TIFF/PNG generation code is absent. Upstream CAL FIRE/GOFER files and CloudFire service access are external requirements."
+  }
 }

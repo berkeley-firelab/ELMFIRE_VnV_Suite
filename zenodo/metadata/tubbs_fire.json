@@ -3,7 +3,7 @@
   "case_id": "tubbs_fire",
   "resource_type": "Dataset",
   "title": "ELMFIRE validation inputs and observations for tubbs fire",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "creators": [
     {
       "name": "Dwi M. J. Purnomo",
@@ -30,7 +30,7 @@
     "record_scope": "GOFER observations for 28 California wildfires from 2019-2021; this record does not cover Camp (2018), Thomas (2017), or Tubbs (2017).",
     "next_steps": "Ask the supplied creators/archive providers for the original input product names, versions, license URLs, and written permission from the rights holders to redistribute the bundled files. For VIIRS observations, identify the exact NASA FIRMS product and collection and retain its applicable use and attribution terms."
   },
-  "description": "Frozen model inputs, comparison observations and provenance for tubbs_fire. Optional bundles preserve supplied historical simulation results and distinct inactive older inputs. Source-data limitations are documented in the bundled source_manifest.json. This dataset does not establish a scientific PASS.",
+  "description": "Input rasters, necessary fuel-model and ignition tables, comparison observations, and supplied data-generation source for tubbs_fire. Historical model outputs, runners, original model configurations and reports are excluded. Source limitations and attribution are retained in the metadata. No original data-generation scripts were supplied.",
   "keywords": [
     "ELMFIRE",
     "wildfire",

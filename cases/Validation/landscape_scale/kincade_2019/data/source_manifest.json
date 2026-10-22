@@ -26,138 +26,125 @@
         "name": "landscape.tif",
         "role": "terrain, surface-fuel and canopy layers (8 bands, 30 m)",
         "size": 11232241,
-        "path": "data/archive_payload/inputs/landscape.tif",
+        "path": "data/fuels_and_topography/landscape.tif",
         "sha256": "7932f3ffb6c89df316e8a6018bc413d8f1353137b584e055f318f9e63415ce58",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/landscape.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/landscape.tif"
       },
       {
         "name": "adj.tif",
         "role": "spread-rate adjustment factor",
         "size": 63736,
-        "path": "data/archive_payload/inputs/adj.tif",
+        "path": "data/fuels_and_topography/adj.tif",
         "sha256": "0da3881ce8af4ab34e1e5c7911fef89e24cc71639e5504850a539f31261b65a9",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/adj.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/adj.tif"
       },
       {
         "name": "phi.tif",
         "role": "initial level set",
         "size": 63736,
-        "path": "data/archive_payload/inputs/phi.tif",
+        "path": "data/fuels_and_topography/phi.tif",
         "sha256": "0da3881ce8af4ab34e1e5c7911fef89e24cc71639e5504850a539f31261b65a9",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/phi.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/phi.tif"
       },
       {
         "name": "ws.tif",
         "role": "hourly 20-ft wind speed",
         "size": 4331072,
-        "path": "data/archive_payload/inputs/ws.tif",
+        "path": "data/weather/ws.tif",
         "sha256": "2a60702e5835f8600f31b470e0e78a26f3ce52abd106aea8a36f6aedd34914c9",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/ws.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/ws.tif"
       },
       {
         "name": "wd.tif",
         "role": "hourly wind direction",
         "size": 602537,
-        "path": "data/archive_payload/inputs/wd.tif",
+        "path": "data/weather/wd.tif",
         "sha256": "23cbd0dbc6d77ea96f1f53e74770f1258c2bb20de75e6db403a458a2f4a05bb2",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/wd.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/wd.tif"
       },
       {
         "name": "m1.tif",
         "role": "hourly 1-h dead-fuel moisture",
         "size": 4277471,
-        "path": "data/archive_payload/inputs/m1.tif",
+        "path": "data/weather/m1.tif",
         "sha256": "d41bcf1f3e5b4b6f3639e17adff74fc93c3df167df288b0b8b3a7df4bd4cb14c",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/m1.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/m1.tif"
       },
       {
         "name": "m10.tif",
         "role": "hourly 10-h dead-fuel moisture",
         "size": 4252892,
-        "path": "data/archive_payload/inputs/m10.tif",
+        "path": "data/weather/m10.tif",
         "sha256": "410b261ec589378e7a73d10b11432cf4c3e65f938ebfaf601887be5ca653cc2e",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/m10.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/m10.tif"
       },
       {
         "name": "m100.tif",
         "role": "hourly 100-h dead-fuel moisture",
         "size": 4304091,
-        "path": "data/archive_payload/inputs/m100.tif",
+        "path": "data/weather/m100.tif",
         "sha256": "864133b52d944ae480f121a75ba7692f95d64075c647396c96971f16d20bd830",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/m100.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/m100.tif"
       },
       {
         "name": "lh.tif",
         "role": "hourly live herbaceous moisture",
         "size": 2208404,
-        "path": "data/archive_payload/inputs/lh.tif",
+        "path": "data/weather/lh.tif",
         "sha256": "efda3cabd4fcb03ddce0bbe9748b317e62a89989eb3ad794be81779f49eb00fa",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/lh.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/lh.tif"
       },
       {
         "name": "lw.tif",
         "role": "hourly live woody moisture",
         "size": 2146989,
-        "path": "data/archive_payload/inputs/lw.tif",
+        "path": "data/weather/lw.tif",
         "sha256": "5b1b2eb83531961e0c12996a28475723e0bdb53875ab6c0be5c30f5ee6d7e185",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/lw.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/lw.tif"
       },
       {
         "name": "ignition_mask.tif",
         "role": "300-m disk at the first ignition",
         "size": 57803,
-        "path": "data/archive_payload/inputs/ignition_mask.tif",
+        "path": "data/fuels_and_topography/ignition_mask.tif",
         "sha256": "031630246b535c856498fbe2785422ebd6d77e90d5311fd2e3d10960bf8842b3",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/ignition_mask.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/ignition_mask.tif"
       },
       {
         "name": "ignitions.csv",
         "role": "ignition points used",
         "size": 171,
-        "path": "data/archive_payload/inputs/ignitions.csv",
+        "path": "data/misc/ignitions.csv",
         "sha256": "4d7e85c308a154028af6e33af327553536654dc8537912ffb90dd2375ac84092",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/ignitions.csv",
-        "processing": "extracted unchanged from the user-supplied archive"
-      },
-      {
-        "name": "metadata.out",
-        "role": "retrieval domain record",
-        "size": 292,
-        "path": "data/archive_payload/inputs/metadata.out",
-        "sha256": "dec13bd1e6679a9d71d0d5f0a8f8b3f46640ef9746b8fa37d3f231729074525f",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/metadata.out",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/ignitions.csv"
       },
       {
         "name": "fuel_models.csv",
         "role": "fuel-model parameters",
         "size": 3948,
-        "path": "data/archive_payload/inputs/fuel_models.csv",
+        "path": "data/misc/fuel_models.csv",
         "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/fuel_models.csv",
-        "processing": "extracted unchanged from the user-supplied archive"
-      },
-      {
-        "name": "elmfire.data",
-        "role": "current configuration",
-        "size": 1230,
-        "path": "data/archive_payload/inputs/elmfire.data",
-        "sha256": "a7d881dd7f935995ac2593b668c790dfdaa1cd347d9f4c0a9709e19f77b8d54c",
-        "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/inputs/elmfire.data",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Kincade_2019/inputs/fuel_models.csv"
       }
-    ]
+    ],
+    "updated_source": {
+      "kind": "user-supplied directory",
+      "name": "ELMFIRE_GOFER_validation",
+      "received_date": "2026-10-22"
+    }
   },
   "weather": {
     "first_time_utc": "2019-10-24T04:00:00Z",
@@ -166,8 +153,7 @@
     "offset_from_event_start_h": 0.0
   },
   "simulation": {
-    "planned_stop_h": 134.0,
-    "elmfire_revision": "5ea7460d514b24bf9a1cdda571c16f4f03de603f"
+    "planned_stop_h": 134.0
   },
   "ignitions": [
     {
@@ -181,7 +167,7 @@
     }
   ],
   "observation": {
-    "product": "GOFER-Combined hourly perimeters (Liu et al., 2024; doi:10.5281/zenodo.8327264)",
+    "product": "GOFER arrival-time rasters and previews, plus CAL FIRE final-perimeter GeoPackages and aligned raster masks",
     "derivation": "cumulative hourly perimeters rasterized to first arrival hour since the GOES ignition hour",
     "hourly_perimeters": 134,
     "gofer_final_area_km2": 346.757,
@@ -459,38 +445,70 @@
         346.757
       ]
     },
-    "path": "data/archive_payload/observations/Kincade_2019_toa.tif",
+    "path": "data/observation/Kincade_2019_toa.tif",
     "size": 20184,
     "sha256": "eb018cf60095a5c61d3475ce2c4f9b3a1202b14f0ed1fee431c7fa5b82498197",
     "archive_member": "ELMFIRE_GOFER_validation/Kincade_2019/observations/Kincade_2019_toa.tif",
-    "processing": "extracted unchanged from the user-supplied archive"
+    "processing": "extracted unchanged from the user-supplied archive",
+    "files": [
+      {
+        "path": "data/observation/Kincade_2019_final_perimeter.gpkg",
+        "size": 393216,
+        "sha256": "6ae1c01dd00b660583d689da672245dea1073006efd763bb1c84c07a161084ac",
+        "source_relative_path": "Kincade_2019/observations/Kincade_2019_final_perimeter.gpkg",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      },
+      {
+        "path": "data/observation/Kincade_2019_final_perimeter_30m.tif",
+        "size": 11480,
+        "sha256": "ee78640daa6785e221c8e451f09e2290ba29841ef3a0b530199541852f173900",
+        "source_relative_path": "Kincade_2019/observations/Kincade_2019_final_perimeter_30m.tif",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      },
+      {
+        "path": "data/observation/Kincade_2019_toa.png",
+        "size": 150919,
+        "sha256": "d1d7559f01333502247557b54c7c395758c1ad1f9c92b8eb8b6a6705e9aac469",
+        "source_relative_path": "Kincade_2019/observations/Kincade_2019_toa.png",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      },
+      {
+        "path": "data/observation/Kincade_2019_toa.tif",
+        "size": 20184,
+        "sha256": "eb018cf60095a5c61d3475ce2c4f9b3a1202b14f0ed1fee431c7fa5b82498197",
+        "source_relative_path": "Kincade_2019/observations/Kincade_2019_toa.tif",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      }
+    ],
+    "products": {
+      "gofer_arrival": "data/observation/Kincade_2019_toa.tif",
+      "gofer_preview": "data/observation/Kincade_2019_toa.png",
+      "final_perimeter": "data/observation/Kincade_2019_final_perimeter.gpkg",
+      "final_perimeter_mask": "data/observation/Kincade_2019_final_perimeter_30m.tif"
+    },
+    "final_perimeter_source": {
+      "provider": "CAL FIRE FRAP",
+      "source_identification": "California Historic Fire Perimeters (2026-05-26), as identified by the supplied exploratory.py",
+      "generator": "scripts/generate_data/source/exploratory.py",
+      "layers": [
+        "calfire_final",
+        "calfire_records",
+        "gofer_final"
+      ],
+      "matching": "year, name/complex name, and more than 20 percent of each CAL FIRE record overlapping the final GOFER perimeter",
+      "mask": "cell-centre rasterization on the input landscape grid; burned=1, unburned=0, nodata=255",
+      "license_evidence": "not supplied in the referenced directory"
+    }
   },
   "configurations": {
-    "baseline": {
-      "description": "This result used a single point ignition at the first GOFER ignition point, firebrand spotting disabled and the ELMFIRE default crown-fire treatment, with the same inputs, stop time and numerical controls as the current configuration."
-    },
-    "reference_spotting": {
-      "description": "This result used every GOFER ignition point at its observed time, the ELMFIRE default crown-fire treatment, and firebrand spotting with the settings of the landscape-scale reconstructions of the Camp, Thomas and Tubbs fires: firebrands generated in proportion to fire power from both surface and crown fire, an empirical transport-distance model, Eulerian accumulation and a physical ignition model.  Inputs, stop time and numerical controls match the current configuration."
-    },
     "current": {
       "description": "This result used the current case configuration described in the model configuration section."
     }
   },
-  "archive_staging": {
-    "archive": {
-      "filename": "ELMFIRE_GOFER_validation.tar.gz",
-      "size": 7038832441,
-      "sha256": "714b9f2b3c3417336ea200bfc6f2bba2955376bf3088d675a811a11d28b0fffe",
-      "files": 583,
-      "skipped_macos_metadata": 682,
-      "received_date_utc": "2026-10-21",
-      "provider": "User-supplied archive",
-      "license": "Not documented in the supplied archive; upstream access and redistribution terms still apply."
-    },
-    "manifest": "data/archive_manifest.json",
-    "restage_command": "python3 scripts/stage_data.py /path/to/ELMFIRE_GOFER_validation.tar.gz",
-    "missing_historical_runs": [],
-    "historical_configuration_note": "The archive inputs/elmfire.data is the prepared current configuration, not proof of the configuration used by historical outputs. Historical classifications retain the existing case evidence.",
-    "run_association_basis": "For supplied historical outputs, matching run summaries and numerical comparison with retained metrics (maximum absolute roundoff difference <= 1e-12); no archived execution namelist is inferred from prepared inputs."
+  "generation": {
+    "input_scripts": "scripts/generate_data/prepare_inputs.py",
+    "observation_scripts": "scripts/generate_data/generate_observations.py",
+    "supplied_sources": "scripts/generate_data/source",
+    "limitations": "CAL FIRE final-perimeter generation is supplied in exploratory.py; GOFER arrival-time TIFF/PNG generation code is absent. Upstream CAL FIRE/GOFER files and CloudFire service access are external requirements."
   }
 }

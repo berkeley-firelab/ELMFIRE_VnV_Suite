@@ -26,138 +26,125 @@
         "name": "landscape.tif",
         "role": "terrain, surface-fuel and canopy layers (8 bands, 30 m)",
         "size": 10247299,
-        "path": "data/archive_payload/inputs/landscape.tif",
+        "path": "data/fuels_and_topography/landscape.tif",
         "sha256": "5c0c3c617e3095b1458172c3ec1c3817779a582f35c1cc0b380e582106e661ba",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/landscape.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/landscape.tif"
       },
       {
         "name": "adj.tif",
         "role": "spread-rate adjustment factor",
         "size": 61190,
-        "path": "data/archive_payload/inputs/adj.tif",
+        "path": "data/fuels_and_topography/adj.tif",
         "sha256": "c26294383d6426949b9da89359414262d2c6e40f984ae306ea7cb94a1af68bd8",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/adj.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/adj.tif"
       },
       {
         "name": "phi.tif",
         "role": "initial level set",
         "size": 61190,
-        "path": "data/archive_payload/inputs/phi.tif",
+        "path": "data/fuels_and_topography/phi.tif",
         "sha256": "c26294383d6426949b9da89359414262d2c6e40f984ae306ea7cb94a1af68bd8",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/phi.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/phi.tif"
       },
       {
         "name": "ws.tif",
         "role": "hourly 20-ft wind speed",
         "size": 5915945,
-        "path": "data/archive_payload/inputs/ws.tif",
+        "path": "data/weather/ws.tif",
         "sha256": "d14570db1c09c0b8fe51c6609b4946e11f66c042d4a3b91a978617f845ceef36",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/ws.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/ws.tif"
       },
       {
         "name": "wd.tif",
         "role": "hourly wind direction",
         "size": 824293,
-        "path": "data/archive_payload/inputs/wd.tif",
+        "path": "data/weather/wd.tif",
         "sha256": "35fecc7018a261e06e4c733441d47b7c7465649c7b8e25b82731b39089bcb963",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/wd.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/wd.tif"
       },
       {
         "name": "m1.tif",
         "role": "hourly 1-h dead-fuel moisture",
         "size": 5911847,
-        "path": "data/archive_payload/inputs/m1.tif",
+        "path": "data/weather/m1.tif",
         "sha256": "ac20978308749dd27611727f5888664cc244d55cabf7c56d6cff503b1dc768d9",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/m1.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/m1.tif"
       },
       {
         "name": "m10.tif",
         "role": "hourly 10-h dead-fuel moisture",
         "size": 5924791,
-        "path": "data/archive_payload/inputs/m10.tif",
+        "path": "data/weather/m10.tif",
         "sha256": "e556d079cac87cdd4c92a300b5b5501bbf152bac089191da36c4e24b7041494f",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/m10.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/m10.tif"
       },
       {
         "name": "m100.tif",
         "role": "hourly 100-h dead-fuel moisture",
         "size": 5899441,
-        "path": "data/archive_payload/inputs/m100.tif",
+        "path": "data/weather/m100.tif",
         "sha256": "a71151e166f4890792f099b5df78ab9622bc8e6ffda086b911ffab23bcbdeab9",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/m100.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/m100.tif"
       },
       {
         "name": "lh.tif",
         "role": "hourly live herbaceous moisture",
         "size": 1542576,
-        "path": "data/archive_payload/inputs/lh.tif",
+        "path": "data/weather/lh.tif",
         "sha256": "c80f07ef7500f8d09510f1cf6b8c5d474a9bb0c185c7c29a92214a84babe3fbe",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/lh.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/lh.tif"
       },
       {
         "name": "lw.tif",
         "role": "hourly live woody moisture",
         "size": 1486824,
-        "path": "data/archive_payload/inputs/lw.tif",
+        "path": "data/weather/lw.tif",
         "sha256": "ea3365d320dafc8c70f33e54bb143a09682c152db326797d2542c0b88f33ad82",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/lw.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/lw.tif"
       },
       {
         "name": "ignition_mask.tif",
         "role": "300-m disk at the first ignition",
         "size": 55526,
-        "path": "data/archive_payload/inputs/ignition_mask.tif",
+        "path": "data/fuels_and_topography/ignition_mask.tif",
         "sha256": "1259402d097578d73c5ba0b6990944d623799658417f450d066d310f6b60f884",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/ignition_mask.tif",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/ignition_mask.tif"
       },
       {
         "name": "ignitions.csv",
         "role": "ignition points used",
         "size": 171,
-        "path": "data/archive_payload/inputs/ignitions.csv",
+        "path": "data/misc/ignitions.csv",
         "sha256": "84b4893d4c6fa105ba7670b57e3108703b5af931deedce29dfd3c349f8b29e81",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/ignitions.csv",
-        "processing": "extracted unchanged from the user-supplied archive"
-      },
-      {
-        "name": "metadata.out",
-        "role": "retrieval domain record",
-        "size": 292,
-        "path": "data/archive_payload/inputs/metadata.out",
-        "sha256": "1de1a0d9f94406b1cd65de8a3512635fcbb41350bca62bbcfcefe55ad3cb63bd",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/metadata.out",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/ignitions.csv"
       },
       {
         "name": "fuel_models.csv",
         "role": "fuel-model parameters",
         "size": 3948,
-        "path": "data/archive_payload/inputs/fuel_models.csv",
+        "path": "data/misc/fuel_models.csv",
         "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/fuel_models.csv",
-        "processing": "extracted unchanged from the user-supplied archive"
-      },
-      {
-        "name": "elmfire.data",
-        "role": "current configuration",
-        "size": 1230,
-        "path": "data/archive_payload/inputs/elmfire.data",
-        "sha256": "ca78df99161c81e4a6b0213a82f7a180a00c45a34102e5e2c7ac843b1628abef",
-        "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/inputs/elmfire.data",
-        "processing": "extracted unchanged from the user-supplied archive"
+        "processing": "copied unchanged from the user-supplied updated directory",
+        "source_relative_path": "Glass_2020/inputs/fuel_models.csv"
       }
-    ]
+    ],
+    "updated_source": {
+      "kind": "user-supplied directory",
+      "name": "ELMFIRE_GOFER_validation",
+      "received_date": "2026-10-22"
+    }
   },
   "weather": {
     "first_time_utc": "2020-09-27T10:00:00Z",
@@ -166,8 +153,7 @@
     "offset_from_event_start_h": 0.0
   },
   "simulation": {
-    "planned_stop_h": 189.0,
-    "elmfire_revision": "5ea7460d514b24bf9a1cdda571c16f4f03de603f"
+    "planned_stop_h": 189.0
   },
   "ignitions": [
     {
@@ -181,7 +167,7 @@
     }
   ],
   "observation": {
-    "product": "GOFER-Combined hourly perimeters (Liu et al., 2024; doi:10.5281/zenodo.8327264)",
+    "product": "GOFER arrival-time rasters and previews, plus CAL FIRE final-perimeter GeoPackages and aligned raster masks",
     "derivation": "cumulative hourly perimeters rasterized to first arrival hour since the GOES ignition hour",
     "hourly_perimeters": 189,
     "gofer_final_area_km2": 352.521,
@@ -569,38 +555,70 @@
         352.521
       ]
     },
-    "path": "data/archive_payload/observations/Glass_2020_toa.tif",
+    "path": "data/observation/Glass_2020_toa.tif",
     "size": 19018,
     "sha256": "0ff7991d3936b7a774e7918ed672e8956fb72a8cfd503203163bbd458a2e745d",
     "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/observations/Glass_2020_toa.tif",
-    "processing": "extracted unchanged from the user-supplied archive"
+    "processing": "extracted unchanged from the user-supplied archive",
+    "files": [
+      {
+        "path": "data/observation/Glass_2020_final_perimeter.gpkg",
+        "size": 335872,
+        "sha256": "42c2e421b9177de588f44b0d7998f743ec0dacb5daf8e36be90ba4d694337b1b",
+        "source_relative_path": "Glass_2020/observations/Glass_2020_final_perimeter.gpkg",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      },
+      {
+        "path": "data/observation/Glass_2020_final_perimeter_30m.tif",
+        "size": 11712,
+        "sha256": "5afed511becd0ec4ce29aa39062c4aabe97c7b40c443bece200dee2e8329f41c",
+        "source_relative_path": "Glass_2020/observations/Glass_2020_final_perimeter_30m.tif",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      },
+      {
+        "path": "data/observation/Glass_2020_toa.png",
+        "size": 158369,
+        "sha256": "f4d287b81ad3a56ae15fcd7d9d817d710794dc02c222857e784eabe1c401a71b",
+        "source_relative_path": "Glass_2020/observations/Glass_2020_toa.png",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      },
+      {
+        "path": "data/observation/Glass_2020_toa.tif",
+        "size": 19018,
+        "sha256": "0ff7991d3936b7a774e7918ed672e8956fb72a8cfd503203163bbd458a2e745d",
+        "source_relative_path": "Glass_2020/observations/Glass_2020_toa.tif",
+        "processing": "copied unchanged from the user-supplied updated directory"
+      }
+    ],
+    "products": {
+      "gofer_arrival": "data/observation/Glass_2020_toa.tif",
+      "gofer_preview": "data/observation/Glass_2020_toa.png",
+      "final_perimeter": "data/observation/Glass_2020_final_perimeter.gpkg",
+      "final_perimeter_mask": "data/observation/Glass_2020_final_perimeter_30m.tif"
+    },
+    "final_perimeter_source": {
+      "provider": "CAL FIRE FRAP",
+      "source_identification": "California Historic Fire Perimeters (2026-05-26), as identified by the supplied exploratory.py",
+      "generator": "scripts/generate_data/source/exploratory.py",
+      "layers": [
+        "calfire_final",
+        "calfire_records",
+        "gofer_final"
+      ],
+      "matching": "year, name/complex name, and more than 20 percent of each CAL FIRE record overlapping the final GOFER perimeter",
+      "mask": "cell-centre rasterization on the input landscape grid; burned=1, unburned=0, nodata=255",
+      "license_evidence": "not supplied in the referenced directory"
+    }
   },
   "configurations": {
-    "baseline": {
-      "description": "This result used a single point ignition at the first GOFER ignition point, firebrand spotting disabled and the ELMFIRE default crown-fire treatment, with the same inputs, stop time and numerical controls as the current configuration."
-    },
-    "reference_spotting": {
-      "description": "This result used every GOFER ignition point at its observed time, the ELMFIRE default crown-fire treatment, and firebrand spotting with the settings of the landscape-scale reconstructions of the Camp, Thomas and Tubbs fires: firebrands generated in proportion to fire power from both surface and crown fire, an empirical transport-distance model, Eulerian accumulation and a physical ignition model.  Inputs, stop time and numerical controls match the current configuration."
-    },
     "current": {
       "description": "This result used the current case configuration described in the model configuration section."
     }
   },
-  "archive_staging": {
-    "archive": {
-      "filename": "ELMFIRE_GOFER_validation.tar.gz",
-      "size": 7038832441,
-      "sha256": "714b9f2b3c3417336ea200bfc6f2bba2955376bf3088d675a811a11d28b0fffe",
-      "files": 583,
-      "skipped_macos_metadata": 682,
-      "received_date_utc": "2026-10-21",
-      "provider": "User-supplied archive",
-      "license": "Not documented in the supplied archive; upstream access and redistribution terms still apply."
-    },
-    "manifest": "data/archive_manifest.json",
-    "restage_command": "python3 scripts/stage_data.py /path/to/ELMFIRE_GOFER_validation.tar.gz",
-    "missing_historical_runs": [],
-    "historical_configuration_note": "The archive inputs/elmfire.data is the prepared current configuration, not proof of the configuration used by historical outputs. Historical classifications retain the existing case evidence.",
-    "run_association_basis": "For supplied historical outputs, matching run summaries and numerical comparison with retained metrics (maximum absolute roundoff difference <= 1e-12); no archived execution namelist is inferred from prepared inputs."
+  "generation": {
+    "input_scripts": "scripts/generate_data/prepare_inputs.py",
+    "observation_scripts": "scripts/generate_data/generate_observations.py",
+    "supplied_sources": "scripts/generate_data/source",
+    "limitations": "CAL FIRE final-perimeter generation is supplied in exploratory.py; GOFER arrival-time TIFF/PNG generation code is absent. Upstream CAL FIRE/GOFER files and CloudFire service access are external requirements."
   }
 }

@@ -2,7 +2,207 @@
   "schema_version": 1,
   "case_id": "mccash_2021",
   "fire_id": "McCash_2021",
-  "archive": {
+  "source_files": [
+    {
+      "path": "data/fuels_and_topography/adj.tif",
+      "role": "inputs",
+      "size": 65403,
+      "sha256": "30034e9f8a909266d97623f79995f3d6dc991222c88e8b571f7fa971646d40a7",
+      "source_relative_path": "McCash_2021/inputs/adj.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/misc/fuel_models.csv",
+      "role": "inputs",
+      "size": 3948,
+      "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
+      "source_relative_path": "McCash_2021/inputs/fuel_models.csv",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/fuels_and_topography/ignition_mask.tif",
+      "role": "inputs",
+      "size": 57824,
+      "sha256": "1abea35ac578da0c1d0b05e82c7271cd788255f18426055f52da4aff865c6b25",
+      "source_relative_path": "McCash_2021/inputs/ignition_mask.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/misc/ignitions.csv",
+      "role": "inputs",
+      "size": 422,
+      "sha256": "22f69e4e2a54ad85bafc3d6c15d458c82ccaa2e45338480743bcd39c302bbb5f",
+      "source_relative_path": "McCash_2021/inputs/ignitions.csv",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/fuels_and_topography/landscape.tif",
+      "role": "inputs",
+      "size": 15023615,
+      "sha256": "fb684e0740bcf6157af72fcc6ee2ba9b5be8fc2d54b2c1e99518efacec4ff243",
+      "source_relative_path": "McCash_2021/inputs/landscape.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/weather/lh.tif",
+      "role": "inputs",
+      "size": 18656243,
+      "sha256": "b9d2f57d869ba390350dee2eae6ac669fc4c9d667199f8498020d5d951618db3",
+      "source_relative_path": "McCash_2021/inputs/lh.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/weather/lw.tif",
+      "role": "inputs",
+      "size": 18051343,
+      "sha256": "a7e89d547442847f072610b80832d0f9efe18132fcb7d4cc8d6e61ea0031775b",
+      "source_relative_path": "McCash_2021/inputs/lw.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/weather/m1.tif",
+      "role": "inputs",
+      "size": 45569487,
+      "sha256": "d46d02f3ca6476b448a8145cf2751fa89620c6bba005be2225cdc44d79680a80",
+      "source_relative_path": "McCash_2021/inputs/m1.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/weather/m10.tif",
+      "role": "inputs",
+      "size": 45368485,
+      "sha256": "e63d8f13eb89bbb602a52593e3fc40cc8e4b9061791da179aa37c5aed4c6c752",
+      "source_relative_path": "McCash_2021/inputs/m10.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/weather/m100.tif",
+      "role": "inputs",
+      "size": 45360809,
+      "sha256": "fb25efe07f7f73291a2845353378486efc5e7e2b34219288a273c07612260ef7",
+      "source_relative_path": "McCash_2021/inputs/m100.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/fuels_and_topography/phi.tif",
+      "role": "inputs",
+      "size": 65403,
+      "sha256": "30034e9f8a909266d97623f79995f3d6dc991222c88e8b571f7fa971646d40a7",
+      "source_relative_path": "McCash_2021/inputs/phi.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/weather/wd.tif",
+      "role": "inputs",
+      "size": 6713644,
+      "sha256": "4917a5da23cc7803d7a9103c9ce1aead661e81a6923bf9b1f57f8b5b19a7b476",
+      "source_relative_path": "McCash_2021/inputs/wd.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/weather/ws.tif",
+      "role": "inputs",
+      "size": 47211809,
+      "sha256": "74f8ba582a0364ce41fde8a82c604bb02cbadc01f6d5d087324c4c155aaf89cb",
+      "source_relative_path": "McCash_2021/inputs/ws.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/observation/McCash_2021_final_perimeter.gpkg",
+      "role": "observations",
+      "size": 2654208,
+      "sha256": "423bfcfcdbcc70839080239b9bb99dfe3b0c2daf0f0a70a58fab76f756514fa8",
+      "source_relative_path": "McCash_2021/observations/McCash_2021_final_perimeter.gpkg",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/observation/McCash_2021_final_perimeter_30m.tif",
+      "role": "observations",
+      "size": 14489,
+      "sha256": "d1082fb0de0ebc585a9961a2d1b4ce323cedfb3546773f4eb0ccc801376ebc4c",
+      "source_relative_path": "McCash_2021/observations/McCash_2021_final_perimeter_30m.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/observation/McCash_2021_toa.png",
+      "role": "observations",
+      "size": 228396,
+      "sha256": "ba87a18c9f992f8de435a52ca7883eb5f04d99f911a04f0853bc9b753df53c2a",
+      "source_relative_path": "McCash_2021/observations/McCash_2021_toa.png",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/observation/McCash_2021_toa.tif",
+      "role": "observations",
+      "size": 36226,
+      "sha256": "432c2c4f62a24789eb417815aa03f1a401a03e8bcfbc295a072e30b47609f547",
+      "source_relative_path": "McCash_2021/observations/McCash_2021_toa.tif",
+      "processing": "copied unchanged from the user-supplied updated directory"
+    }
+  ],
+  "generation_files": [
+    {
+      "path": "scripts/generate_data/README.txt",
+      "size": 1791,
+      "sha256": "2ee931f0f245b8c86efb7dbefe19079782db3ffe3a0ce71154e5b2f6182a99c7"
+    },
+    {
+      "path": "scripts/generate_data/fires.csv",
+      "size": 479,
+      "sha256": "127f726debd85c3e289830dba02b002555feb2316974d6850e5b0302a372e1a4"
+    },
+    {
+      "path": "scripts/generate_data/generate_observations.py",
+      "size": 3360,
+      "sha256": "504622c5a2c99679a5fab3b49b9c77bb5e6531ac48313bd381d5e9c957810ad1"
+    },
+    {
+      "path": "scripts/generate_data/make_fires.py",
+      "size": 3674,
+      "sha256": "db102eaee83a12ee43cc5430db56f9ac2f98e215a97b1eda473a5f22d640350b"
+    },
+    {
+      "path": "scripts/generate_data/prepare_inputs.py",
+      "size": 11078,
+      "sha256": "820365bdda8beebf082b3ef304d85a31f13317237d2faad07ceee113adde7757"
+    },
+    {
+      "path": "scripts/generate_data/source/exploratory.py",
+      "size": 21531,
+      "sha256": "3ce3f69eb0bab864adbaab85d1032934c9bcdcc89c8e41cf6ef6f354b7ab851e"
+    },
+    {
+      "path": "scripts/generate_data/source/make_fires.py",
+      "size": 3167,
+      "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94"
+    },
+    {
+      "path": "scripts/generate_data/source/prepare_inputs.py",
+      "size": 16402,
+      "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c"
+    },
+    {
+      "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign.py",
+      "size": 15656,
+      "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f"
+    },
+    {
+      "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign_pb2.py",
+      "size": 2623,
+      "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6"
+    },
+    {
+      "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+      "size": 3441,
+      "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac"
+    },
+    {
+      "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+      "size": 3384,
+      "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee"
+    }
+  ],
+  "previous_source_archive": {
     "filename": "ELMFIRE_GOFER_validation.tar.gz",
     "size": 7038832441,
     "sha256": "714b9f2b3c3417336ea200bfc6f2bba2955376bf3088d675a811a11d28b0fffe",
@@ -12,269 +212,26 @@
     "provider": "User-supplied archive",
     "license": "Not documented in the supplied archive; upstream access and redistribution terms still apply."
   },
-  "source_files": [
+  "source_directory": {
+    "name": "ELMFIRE_GOFER_validation",
+    "received_date": "2026-10-22",
+    "selected_files_sha256": "57ae31c8562e8b23815089dd9c0332606fc521193c634ccde7b84ea56e66f7c7"
+  },
+  "generation_sources": [
     {
-      "path": "data/provenance/archive/McCash_2021/01-run.sh",
-      "role": "provenance",
-      "size": 1882,
-      "sha256": "cd1e11c3191c7edc25f5bbed268058da00c1cab989510263163dd42542eb98af",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/01-run.sh",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/01-run.sh"
-    },
-    {
-      "path": "data/archive_payload/inputs/adj.tif",
-      "role": "inputs",
-      "size": 65403,
-      "sha256": "30034e9f8a909266d97623f79995f3d6dc991222c88e8b571f7fa971646d40a7",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/adj.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/adj.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/elmfire.data",
-      "role": "inputs",
-      "size": 1365,
-      "sha256": "b40db5757688fd1e89494d02ac28ba6c6b1f5bd1565f02b82d77f0a7d4ba5395",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/elmfire.data",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/elmfire.data"
-    },
-    {
-      "path": "data/archive_payload/inputs/fuel_models.csv",
-      "role": "inputs",
-      "size": 3948,
-      "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/fuel_models.csv",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/fuel_models.csv"
-    },
-    {
-      "path": "data/archive_payload/inputs/ignition_mask.tif",
-      "role": "inputs",
-      "size": 57824,
-      "sha256": "1abea35ac578da0c1d0b05e82c7271cd788255f18426055f52da4aff865c6b25",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/ignition_mask.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/ignition_mask.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/ignitions.csv",
-      "role": "inputs",
-      "size": 422,
-      "sha256": "22f69e4e2a54ad85bafc3d6c15d458c82ccaa2e45338480743bcd39c302bbb5f",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/ignitions.csv",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/ignitions.csv"
-    },
-    {
-      "path": "data/archive_payload/inputs/landscape.tif",
-      "role": "inputs",
-      "size": 15023615,
-      "sha256": "fb684e0740bcf6157af72fcc6ee2ba9b5be8fc2d54b2c1e99518efacec4ff243",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/landscape.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/landscape.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/lh.tif",
-      "role": "inputs",
-      "size": 18656243,
-      "sha256": "b9d2f57d869ba390350dee2eae6ac669fc4c9d667199f8498020d5d951618db3",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/lh.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/lh.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/lw.tif",
-      "role": "inputs",
-      "size": 18051343,
-      "sha256": "a7e89d547442847f072610b80832d0f9efe18132fcb7d4cc8d6e61ea0031775b",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/lw.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/lw.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/m1.tif",
-      "role": "inputs",
-      "size": 45569487,
-      "sha256": "d46d02f3ca6476b448a8145cf2751fa89620c6bba005be2225cdc44d79680a80",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/m1.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/m1.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/m10.tif",
-      "role": "inputs",
-      "size": 45368485,
-      "sha256": "e63d8f13eb89bbb602a52593e3fc40cc8e4b9061791da179aa37c5aed4c6c752",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/m10.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/m10.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/m100.tif",
-      "role": "inputs",
-      "size": 45360809,
-      "sha256": "fb25efe07f7f73291a2845353378486efc5e7e2b34219288a273c07612260ef7",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/m100.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/m100.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/metadata.in",
-      "role": "inputs",
-      "size": 556,
-      "sha256": "990a57f905087bbb0bcad754cdacaa20a04db85736ec562720065d63d0702974",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/metadata.in",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/metadata.in"
-    },
-    {
-      "path": "data/archive_payload/inputs/metadata.out",
-      "role": "inputs",
-      "size": 292,
-      "sha256": "22f017a8e4dfa798c462712e2e3c5649359faf99cf56c7142aeecea8c959ca3b",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/metadata.out",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/metadata.out"
-    },
-    {
-      "path": "data/archive_payload/inputs/phi.tif",
-      "role": "inputs",
-      "size": 65403,
-      "sha256": "30034e9f8a909266d97623f79995f3d6dc991222c88e8b571f7fa971646d40a7",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/phi.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/phi.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/wd.tif",
-      "role": "inputs",
-      "size": 6713644,
-      "sha256": "4917a5da23cc7803d7a9103c9ce1aead661e81a6923bf9b1f57f8b5b19a7b476",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/wd.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/wd.tif"
-    },
-    {
-      "path": "data/archive_payload/inputs/ws.tif",
-      "role": "inputs",
-      "size": 47211809,
-      "sha256": "74f8ba582a0364ce41fde8a82c604bb02cbadc01f6d5d087324c4c155aaf89cb",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/inputs/ws.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/inputs/ws.tif"
-    },
-    {
-      "path": "data/archive_payload/observations/McCash_2021_toa.png",
-      "role": "observations",
-      "size": 228396,
-      "sha256": "ba87a18c9f992f8de435a52ca7883eb5f04d99f911a04f0853bc9b753df53c2a",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/observations/McCash_2021_toa.png",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/observations/McCash_2021_toa.png"
-    },
-    {
-      "path": "data/archive_payload/observations/McCash_2021_toa.tif",
-      "role": "observations",
-      "size": 36226,
-      "sha256": "432c2c4f62a24789eb417815aa03f1a401a03e8bcfbc295a072e30b47609f547",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/McCash_2021/observations/McCash_2021_toa.tif",
-      "archive_member": "ELMFIRE_GOFER_validation/McCash_2021/observations/McCash_2021_toa.tif"
-    },
-    {
-      "path": "data/provenance/archive/fires.csv",
-      "role": "provenance",
-      "size": 7506,
-      "sha256": "ec179d623054018bfe3cd1f4566944feb737c29c2165df01527bf9cc11f248c3",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/fires.csv",
-      "archive_member": "ELMFIRE_GOFER_validation/fires.csv"
-    },
-    {
-      "path": "data/provenance/archive/inputs_log.csv",
-      "role": "provenance",
-      "size": 4993,
-      "sha256": "4416ec2d34bd144fb76dd3696fd6e7a38bf32aba907c58e8458ea680bccc7364",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/inputs_log.csv",
-      "archive_member": "ELMFIRE_GOFER_validation/inputs_log.csv"
-    },
-    {
-      "path": "data/provenance/archive/make_fires.py",
-      "role": "provenance",
-      "size": 3167,
-      "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/make_fires.py",
-      "archive_member": "ELMFIRE_GOFER_validation/make_fires.py"
-    },
-    {
-      "path": "data/provenance/archive/prepare_inputs.py",
-      "role": "provenance",
-      "size": 16402,
+      "source_relative_path": "prepare_inputs.py",
       "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/prepare_inputs.py",
-      "archive_member": "ELMFIRE_GOFER_validation/prepare_inputs.py"
+      "size": 16402
     },
     {
-      "path": "data/provenance/archive/run_all.sh",
-      "role": "provenance",
-      "size": 728,
-      "sha256": "7ac9cb0b80c992278de3fc27db8351b85509f9ccd40024b0210f5610fc93185f",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/run_all.sh",
-      "archive_member": "ELMFIRE_GOFER_validation/run_all.sh"
+      "source_relative_path": "make_fires.py",
+      "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94",
+      "size": 3167
     },
     {
-      "path": "data/provenance/archive/score_runs.py",
-      "role": "provenance",
-      "size": 5456,
-      "sha256": "2c63477ed4f5db55e3ece74c641570815e6aa65a82979a57bb56c68418a558a0",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/score_runs.py",
-      "archive_member": "ELMFIRE_GOFER_validation/score_runs.py"
-    },
-    {
-      "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
-      "role": "provenance",
-      "size": 2379,
-      "sha256": "1fd3fbd75411b6145b2eb7edcdfb6f0d1abb349611077184fef89b30957168f8",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
-      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc"
-    },
-    {
-      "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
-      "role": "provenance",
-      "size": 4459,
-      "sha256": "29318a6cd45fe91df6a1fe41827bcf1cdbb0b55fcf036397d6a8d74a991e9fd8",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
-      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc"
-    },
-    {
-      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign.py",
-      "role": "provenance",
-      "size": 15656,
-      "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign.py",
-      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign.py"
-    },
-    {
-      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.py",
-      "role": "provenance",
-      "size": 2623,
-      "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2.py",
-      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.py"
-    },
-    {
-      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.pyi",
-      "role": "provenance",
-      "size": 3441,
-      "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2.pyi",
-      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.pyi"
-    },
-    {
-      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
-      "role": "provenance",
-      "size": 3384,
-      "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
-      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2_grpc.py"
-    },
-    {
-      "path": "data/provenance/archive/tools/fuel_models.csv",
-      "role": "provenance",
-      "size": 3948,
-      "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
-      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/fuel_models.csv",
-      "archive_member": "ELMFIRE_GOFER_validation/tools/fuel_models.csv"
-    },
-    {
-      "path": "data/provenance/archive/archive_inventory.json",
-      "role": "provenance",
-      "size": 182529,
-      "sha256": "bf4f8f8ca202fded62c71bee5f227580790d2c04fb1d541336d3befaa2f71dec",
-      "repository_source": "cases/Validation/GOFER/data/archive_inventory.json"
+      "source_relative_path": "exploratory.py",
+      "sha256": "3ce3f69eb0bab864adbaab85d1032934c9bcdcc89c8e41cf6ef6f354b7ab851e",
+      "size": 21531
     }
   ]
 }

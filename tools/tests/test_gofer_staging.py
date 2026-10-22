@@ -23,6 +23,42 @@ MODULES = {name: load_case(name) for name in CASES}
 
 
 class GoferStagingTests(unittest.TestCase):
+    def test_directory_restore_checks_all_sources_before_writing(self):
+        for name, module in MODULES.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                source = root / 'source'
+                (source / 'Fire/observations').mkdir(parents=True)
+                records = []
+                for filename in ('perimeter.gpkg', 'mask.tif'):
+                    content = filename.encode()
+                    relative = 'Fire/observations/' + filename
+                    (source / relative).write_bytes(content)
+                    records.append({'path': 'data/observation/' + filename,
+                                    'source_relative_path': relative, 'size': len(content),
+                                    'sha256': hashlib.sha256(content).hexdigest()})
+                old_root = module.CASE_DIR
+                module.CASE_DIR = root / 'case'
+                try:
+                    original = source / records[1]['source_relative_path']
+                    original.write_bytes(b'corrupt')
+                    with self.assertRaises(ValueError):
+                        module.restore_directory(source, {'files': records})
+                    self.assertFalse(module.CASE_DIR.exists())
+                    original.write_bytes(b'mask.tif')
+                    module.restore_directory(source, {'files': records})
+                    module.restore_directory(source, {'files': records})
+                    for record in records:
+                        module.check_file(module.destination(record), record)
+                    module.destination(records[0]).write_bytes(b'changed')
+                    with self.assertRaises(ValueError):
+                        module.restore_directory(source, {'files': records})
+                    for relative in ('../outside', '/private/tmp/outside'):
+                        with self.assertRaises(ValueError):
+                            module.restore_directory(source, {'files': [dict(records[0], source_relative_path=relative)]})
+                finally:
+                    module.CASE_DIR = old_root
+
     def test_restore_verify_and_refuse_changed_existing_files(self):
         for name, module in MODULES.items():
             with self.subTest(case=name), tempfile.TemporaryDirectory() as tmp:

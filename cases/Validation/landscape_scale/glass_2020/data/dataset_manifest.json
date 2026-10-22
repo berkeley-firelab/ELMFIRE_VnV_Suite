@@ -1,9 +1,626 @@
 {
   "schema_version": 1,
   "case_id": "glass_2020",
-  "dataset_version": "1.0.0",
-  "source_revision": "51453eb80806cf7e1389d1d1af1dacaacd294267",
+  "dataset_version": "2.1.0",
+  "source_revision": "9b2f5614fac60e1877221399db05a9bd73a86c52",
   "source_state": "working tree snapshot; file hashes are authoritative",
+  "archive_scope": "input data, observations and data-generation source only",
+  "source_metadata": {
+    "schema_version": 1,
+    "case_id": "glass_2020",
+    "fire_id": "Glass_2020",
+    "fire_name": "Glass Fire",
+    "fire_year": 2020,
+    "event_start_utc": "2020-09-27T10:00:00Z",
+    "event_end_utc": "2020-10-05T07:00:00Z",
+    "official_size_ac": 67484.0,
+    "model_domain": {
+      "crs": "EPSG:32610",
+      "crs_name": "UTM zone 10N (EPSG:32610)",
+      "cell_size_m": 30.0,
+      "extent": "518170.126344873 4243967.09646095 560170.126344873 4291967.09646095",
+      "margin_km": 10.0
+    },
+    "model_inputs": {
+      "provider": "CloudFire fuel, weather and ignition service (worldgen.cloudfire.io)",
+      "retrieval_date": "2026-10-20",
+      "fuel_source": "LANDFIRE",
+      "fuel_version": "2.1.0",
+      "weather_source": "Real-Time Mesoscale Analysis (RTMA), as stated by the case owner",
+      "offshore_cells_filled": 0,
+      "files": [
+        {
+          "name": "landscape.tif",
+          "role": "terrain, surface-fuel and canopy layers (8 bands, 30 m)",
+          "size": 10247299,
+          "path": "data/fuels_and_topography/landscape.tif",
+          "sha256": "5c0c3c617e3095b1458172c3ec1c3817779a582f35c1cc0b380e582106e661ba",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/landscape.tif"
+        },
+        {
+          "name": "adj.tif",
+          "role": "spread-rate adjustment factor",
+          "size": 61190,
+          "path": "data/fuels_and_topography/adj.tif",
+          "sha256": "c26294383d6426949b9da89359414262d2c6e40f984ae306ea7cb94a1af68bd8",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/adj.tif"
+        },
+        {
+          "name": "phi.tif",
+          "role": "initial level set",
+          "size": 61190,
+          "path": "data/fuels_and_topography/phi.tif",
+          "sha256": "c26294383d6426949b9da89359414262d2c6e40f984ae306ea7cb94a1af68bd8",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/phi.tif"
+        },
+        {
+          "name": "ws.tif",
+          "role": "hourly 20-ft wind speed",
+          "size": 5915945,
+          "path": "data/weather/ws.tif",
+          "sha256": "d14570db1c09c0b8fe51c6609b4946e11f66c042d4a3b91a978617f845ceef36",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/ws.tif"
+        },
+        {
+          "name": "wd.tif",
+          "role": "hourly wind direction",
+          "size": 824293,
+          "path": "data/weather/wd.tif",
+          "sha256": "35fecc7018a261e06e4c733441d47b7c7465649c7b8e25b82731b39089bcb963",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/wd.tif"
+        },
+        {
+          "name": "m1.tif",
+          "role": "hourly 1-h dead-fuel moisture",
+          "size": 5911847,
+          "path": "data/weather/m1.tif",
+          "sha256": "ac20978308749dd27611727f5888664cc244d55cabf7c56d6cff503b1dc768d9",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/m1.tif"
+        },
+        {
+          "name": "m10.tif",
+          "role": "hourly 10-h dead-fuel moisture",
+          "size": 5924791,
+          "path": "data/weather/m10.tif",
+          "sha256": "e556d079cac87cdd4c92a300b5b5501bbf152bac089191da36c4e24b7041494f",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/m10.tif"
+        },
+        {
+          "name": "m100.tif",
+          "role": "hourly 100-h dead-fuel moisture",
+          "size": 5899441,
+          "path": "data/weather/m100.tif",
+          "sha256": "a71151e166f4890792f099b5df78ab9622bc8e6ffda086b911ffab23bcbdeab9",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/m100.tif"
+        },
+        {
+          "name": "lh.tif",
+          "role": "hourly live herbaceous moisture",
+          "size": 1542576,
+          "path": "data/weather/lh.tif",
+          "sha256": "c80f07ef7500f8d09510f1cf6b8c5d474a9bb0c185c7c29a92214a84babe3fbe",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/lh.tif"
+        },
+        {
+          "name": "lw.tif",
+          "role": "hourly live woody moisture",
+          "size": 1486824,
+          "path": "data/weather/lw.tif",
+          "sha256": "ea3365d320dafc8c70f33e54bb143a09682c152db326797d2542c0b88f33ad82",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/lw.tif"
+        },
+        {
+          "name": "ignition_mask.tif",
+          "role": "300-m disk at the first ignition",
+          "size": 55526,
+          "path": "data/fuels_and_topography/ignition_mask.tif",
+          "sha256": "1259402d097578d73c5ba0b6990944d623799658417f450d066d310f6b60f884",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/ignition_mask.tif"
+        },
+        {
+          "name": "ignitions.csv",
+          "role": "ignition points used",
+          "size": 171,
+          "path": "data/misc/ignitions.csv",
+          "sha256": "84b4893d4c6fa105ba7670b57e3108703b5af931deedce29dfd3c349f8b29e81",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/ignitions.csv"
+        },
+        {
+          "name": "fuel_models.csv",
+          "role": "fuel-model parameters",
+          "size": 3948,
+          "path": "data/misc/fuel_models.csv",
+          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
+          "processing": "copied unchanged from the user-supplied updated directory",
+          "source_relative_path": "Glass_2020/inputs/fuel_models.csv"
+        }
+      ],
+      "updated_source": {
+        "kind": "user-supplied directory",
+        "name": "ELMFIRE_GOFER_validation",
+        "received_date": "2026-10-22"
+      }
+    },
+    "weather": {
+      "first_time_utc": "2020-09-27T10:00:00Z",
+      "band_count": 190,
+      "interval_s": 3600,
+      "offset_from_event_start_h": 0.0
+    },
+    "ignitions": [
+      {
+        "t_utc": "2020-09-27T10:00:00Z",
+        "lon": -122.48854989527548,
+        "lat": 38.56610553098071,
+        "x": 544556.704,
+        "y": 4268752.62,
+        "t_ign_s": 0.0,
+        "moved_m": 0.0
+      }
+    ],
+    "observation": {
+      "product": "GOFER arrival-time rasters and previews, plus CAL FIRE final-perimeter GeoPackages and aligned raster masks",
+      "derivation": "cumulative hourly perimeters rasterized to first arrival hour since the GOES ignition hour",
+      "hourly_perimeters": 189,
+      "gofer_final_area_km2": 352.521,
+      "area_series": {
+        "hours": [
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          5.0,
+          6.0,
+          7.0,
+          8.0,
+          9.0,
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0,
+          15.0,
+          16.0,
+          17.0,
+          18.0,
+          19.0,
+          20.0,
+          21.0,
+          22.0,
+          23.0,
+          24.0,
+          25.0,
+          26.0,
+          27.0,
+          28.0,
+          29.0,
+          30.0,
+          31.0,
+          32.0,
+          33.0,
+          34.0,
+          35.0,
+          36.0,
+          37.0,
+          38.0,
+          39.0,
+          40.0,
+          41.0,
+          42.0,
+          43.0,
+          44.0,
+          45.0,
+          46.0,
+          47.0,
+          48.0,
+          49.0,
+          50.0,
+          51.0,
+          52.0,
+          53.0,
+          54.0,
+          55.0,
+          56.0,
+          57.0,
+          58.0,
+          59.0,
+          60.0,
+          61.0,
+          62.0,
+          63.0,
+          64.0,
+          65.0,
+          66.0,
+          67.0,
+          68.0,
+          69.0,
+          70.0,
+          71.0,
+          72.0,
+          73.0,
+          74.0,
+          75.0,
+          76.0,
+          77.0,
+          78.0,
+          79.0,
+          80.0,
+          81.0,
+          82.0,
+          83.0,
+          84.0,
+          85.0,
+          86.0,
+          87.0,
+          88.0,
+          89.0,
+          90.0,
+          91.0,
+          92.0,
+          93.0,
+          94.0,
+          95.0,
+          96.0,
+          97.0,
+          98.0,
+          99.0,
+          100.0,
+          101.0,
+          102.0,
+          103.0,
+          104.0,
+          105.0,
+          106.0,
+          107.0,
+          108.0,
+          109.0,
+          110.0,
+          111.0,
+          112.0,
+          113.0,
+          114.0,
+          115.0,
+          116.0,
+          117.0,
+          118.0,
+          119.0,
+          120.0,
+          121.0,
+          122.0,
+          123.0,
+          124.0,
+          125.0,
+          126.0,
+          127.0,
+          128.0,
+          129.0,
+          130.0,
+          131.0,
+          132.0,
+          133.0,
+          134.0,
+          135.0,
+          136.0,
+          137.0,
+          138.0,
+          139.0,
+          140.0,
+          141.0,
+          142.0,
+          143.0,
+          144.0,
+          145.0,
+          146.0,
+          147.0,
+          148.0,
+          149.0,
+          150.0,
+          151.0,
+          152.0,
+          153.0,
+          154.0,
+          155.0,
+          156.0,
+          157.0,
+          158.0,
+          159.0,
+          160.0,
+          161.0,
+          162.0,
+          163.0,
+          164.0,
+          165.0,
+          166.0,
+          167.0,
+          168.0,
+          169.0,
+          170.0,
+          171.0,
+          172.0,
+          173.0,
+          174.0,
+          175.0,
+          176.0,
+          177.0,
+          178.0,
+          179.0,
+          180.0,
+          181.0,
+          182.0,
+          183.0,
+          184.0,
+          185.0,
+          186.0,
+          187.0,
+          188.0,
+          189.0
+        ],
+        "area_km2": [
+          1.205,
+          16.557,
+          16.557,
+          19.273,
+          19.273,
+          19.273,
+          19.273,
+          21.323,
+          24.175,
+          25.053,
+          25.053,
+          25.053,
+          25.898,
+          25.898,
+          26.164,
+          36.486,
+          37.912,
+          78.629,
+          106.603,
+          113.484,
+          149.228,
+          167.405,
+          179.711,
+          193.856,
+          197.904,
+          208.316,
+          228.204,
+          230.018,
+          237.404,
+          241.574,
+          241.574,
+          244.707,
+          244.707,
+          244.707,
+          261.155,
+          262.488,
+          271.821,
+          288.874,
+          289.781,
+          289.781,
+          293.092,
+          293.092,
+          293.092,
+          293.092,
+          293.092,
+          293.092,
+          293.092,
+          293.092,
+          293.092,
+          293.092,
+          293.092,
+          293.092,
+          293.207,
+          293.207,
+          297.214,
+          297.214,
+          297.214,
+          297.214,
+          297.214,
+          297.214,
+          297.214,
+          300.323,
+          300.323,
+          300.323,
+          300.323,
+          300.323,
+          300.323,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          300.486,
+          302.025,
+          302.025,
+          302.025,
+          304.977,
+          305.618,
+          312.985,
+          319.848,
+          329.304,
+          329.715,
+          329.715,
+          336.094,
+          336.094,
+          336.094,
+          336.094,
+          336.094,
+          336.094,
+          336.094,
+          336.094,
+          336.094,
+          336.094,
+          336.094,
+          336.109,
+          336.109,
+          336.109,
+          336.109,
+          336.109,
+          336.109,
+          336.109,
+          340.285,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          340.474,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          346.653,
+          352.521
+        ]
+      },
+      "path": "data/observation/Glass_2020_toa.tif",
+      "size": 19018,
+      "sha256": "0ff7991d3936b7a774e7918ed672e8956fb72a8cfd503203163bbd458a2e745d",
+      "archive_member": "ELMFIRE_GOFER_validation/Glass_2020/observations/Glass_2020_toa.tif",
+      "processing": "extracted unchanged from the user-supplied archive",
+      "files": [
+        {
+          "path": "data/observation/Glass_2020_final_perimeter.gpkg",
+          "size": 335872,
+          "sha256": "42c2e421b9177de588f44b0d7998f743ec0dacb5daf8e36be90ba4d694337b1b",
+          "source_relative_path": "Glass_2020/observations/Glass_2020_final_perimeter.gpkg",
+          "processing": "copied unchanged from the user-supplied updated directory"
+        },
+        {
+          "path": "data/observation/Glass_2020_final_perimeter_30m.tif",
+          "size": 11712,
+          "sha256": "5afed511becd0ec4ce29aa39062c4aabe97c7b40c443bece200dee2e8329f41c",
+          "source_relative_path": "Glass_2020/observations/Glass_2020_final_perimeter_30m.tif",
+          "processing": "copied unchanged from the user-supplied updated directory"
+        },
+        {
+          "path": "data/observation/Glass_2020_toa.png",
+          "size": 158369,
+          "sha256": "f4d287b81ad3a56ae15fcd7d9d817d710794dc02c222857e784eabe1c401a71b",
+          "source_relative_path": "Glass_2020/observations/Glass_2020_toa.png",
+          "processing": "copied unchanged from the user-supplied updated directory"
+        },
+        {
+          "path": "data/observation/Glass_2020_toa.tif",
+          "size": 19018,
+          "sha256": "0ff7991d3936b7a774e7918ed672e8956fb72a8cfd503203163bbd458a2e745d",
+          "source_relative_path": "Glass_2020/observations/Glass_2020_toa.tif",
+          "processing": "copied unchanged from the user-supplied updated directory"
+        }
+      ],
+      "products": {
+        "gofer_arrival": "data/observation/Glass_2020_toa.tif",
+        "gofer_preview": "data/observation/Glass_2020_toa.png",
+        "final_perimeter": "data/observation/Glass_2020_final_perimeter.gpkg",
+        "final_perimeter_mask": "data/observation/Glass_2020_final_perimeter_30m.tif"
+      },
+      "final_perimeter_source": {
+        "provider": "CAL FIRE FRAP",
+        "source_identification": "California Historic Fire Perimeters (2026-05-26), as identified by the supplied exploratory.py",
+        "generator": "scripts/generate_data/source/exploratory.py",
+        "layers": [
+          "calfire_final",
+          "calfire_records",
+          "gofer_final"
+        ],
+        "matching": "year, name/complex name, and more than 20 percent of each CAL FIRE record overlapping the final GOFER perimeter",
+        "mask": "cell-centre rasterization on the input landscape grid; burned=1, unburned=0, nodata=255",
+        "license_evidence": "not supplied in the referenced directory"
+      }
+    },
+    "generation": {
+      "input_scripts": "scripts/generate_data/prepare_inputs.py",
+      "observation_scripts": "scripts/generate_data/generate_observations.py",
+      "supplied_sources": "scripts/generate_data/source",
+      "limitations": "CAL FIRE final-perimeter generation is supplied in exploratory.py; GOFER arrival-time TIFF/PNG generation code is absent. Upstream CAL FIRE/GOFER files and CloudFire service access are external requirements."
+    }
+  },
   "zenodo": {
     "record_id": null,
     "version_doi": null,
@@ -14,89 +631,74 @@
       "role": "inputs",
       "filename": "inputs.tar.gz",
       "required": true,
-      "size": 34830875,
-      "sha256": "11815bbc19e3c368761a49ff56087530e52eb65d3a0ab198a69c5e2f35c02358",
+      "size": 34829177,
+      "sha256": "12cbdb1fd787b2c5de23161c2f27ded8f99741fe4b527dc7ae59237602cdbee3",
       "url": null,
       "files": [
         {
-          "path": "data/archive_payload/inputs/adj.tif",
-          "size": 61190,
-          "sha256": "c26294383d6426949b9da89359414262d2c6e40f984ae306ea7cb94a1af68bd8"
-        },
-        {
-          "path": "data/archive_payload/inputs/elmfire.data",
-          "size": 1230,
-          "sha256": "ca78df99161c81e4a6b0213a82f7a180a00c45a34102e5e2c7ac843b1628abef"
-        },
-        {
-          "path": "data/archive_payload/inputs/fuel_models.csv",
-          "size": 3948,
-          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b"
-        },
-        {
-          "path": "data/archive_payload/inputs/ignition_mask.tif",
-          "size": 55526,
-          "sha256": "1259402d097578d73c5ba0b6990944d623799658417f450d066d310f6b60f884"
-        },
-        {
-          "path": "data/archive_payload/inputs/ignitions.csv",
-          "size": 171,
-          "sha256": "84b4893d4c6fa105ba7670b57e3108703b5af931deedce29dfd3c349f8b29e81"
-        },
-        {
-          "path": "data/archive_payload/inputs/landscape.tif",
-          "size": 10247299,
-          "sha256": "5c0c3c617e3095b1458172c3ec1c3817779a582f35c1cc0b380e582106e661ba"
-        },
-        {
-          "path": "data/archive_payload/inputs/lh.tif",
+          "path": "data/weather/lh.tif",
           "size": 1542576,
           "sha256": "c80f07ef7500f8d09510f1cf6b8c5d474a9bb0c185c7c29a92214a84babe3fbe"
         },
         {
-          "path": "data/archive_payload/inputs/lw.tif",
+          "path": "data/weather/lw.tif",
           "size": 1486824,
           "sha256": "ea3365d320dafc8c70f33e54bb143a09682c152db326797d2542c0b88f33ad82"
         },
         {
-          "path": "data/archive_payload/inputs/m1.tif",
+          "path": "data/weather/m1.tif",
           "size": 5911847,
           "sha256": "ac20978308749dd27611727f5888664cc244d55cabf7c56d6cff503b1dc768d9"
         },
         {
-          "path": "data/archive_payload/inputs/m10.tif",
+          "path": "data/weather/m10.tif",
           "size": 5924791,
           "sha256": "e556d079cac87cdd4c92a300b5b5501bbf152bac089191da36c4e24b7041494f"
         },
         {
-          "path": "data/archive_payload/inputs/m100.tif",
+          "path": "data/weather/m100.tif",
           "size": 5899441,
           "sha256": "a71151e166f4890792f099b5df78ab9622bc8e6ffda086b911ffab23bcbdeab9"
         },
         {
-          "path": "data/archive_payload/inputs/metadata.in",
-          "size": 552,
-          "sha256": "07c2f8ceba4079d5ad7a736a82c14f3929b8d5d9807f56d072eaac3edda125cf"
-        },
-        {
-          "path": "data/archive_payload/inputs/metadata.out",
-          "size": 292,
-          "sha256": "1de1a0d9f94406b1cd65de8a3512635fcbb41350bca62bbcfcefe55ad3cb63bd"
-        },
-        {
-          "path": "data/archive_payload/inputs/phi.tif",
-          "size": 61190,
-          "sha256": "c26294383d6426949b9da89359414262d2c6e40f984ae306ea7cb94a1af68bd8"
-        },
-        {
-          "path": "data/archive_payload/inputs/wd.tif",
+          "path": "data/weather/wd.tif",
           "size": 824293,
           "sha256": "35fecc7018a261e06e4c733441d47b7c7465649c7b8e25b82731b39089bcb963"
         },
         {
-          "path": "data/archive_payload/inputs/ws.tif",
+          "path": "data/weather/ws.tif",
           "size": 5915945,
           "sha256": "d14570db1c09c0b8fe51c6609b4946e11f66c042d4a3b91a978617f845ceef36"
+        },
+        {
+          "path": "data/fuels_and_topography/adj.tif",
+          "size": 61190,
+          "sha256": "c26294383d6426949b9da89359414262d2c6e40f984ae306ea7cb94a1af68bd8"
+        },
+        {
+          "path": "data/fuels_and_topography/ignition_mask.tif",
+          "size": 55526,
+          "sha256": "1259402d097578d73c5ba0b6990944d623799658417f450d066d310f6b60f884"
+        },
+        {
+          "path": "data/fuels_and_topography/landscape.tif",
+          "size": 10247299,
+          "sha256": "5c0c3c617e3095b1458172c3ec1c3817779a582f35c1cc0b380e582106e661ba"
+        },
+        {
+          "path": "data/fuels_and_topography/phi.tif",
+          "size": 61190,
+          "sha256": "c26294383d6426949b9da89359414262d2c6e40f984ae306ea7cb94a1af68bd8"
+        },
+        {
+          "path": "data/misc/fuel_models.csv",
+          "size": 3948,
+          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b"
+        },
+        {
+          "path": "data/misc/ignitions.csv",
+          "size": 171,
+          "sha256": "84b4893d4c6fa105ba7670b57e3108703b5af931deedce29dfd3c349f8b29e81"
         }
       ]
     },
@@ -104,199 +706,99 @@
       "role": "observations",
       "filename": "observations.tar.gz",
       "required": true,
-      "size": 165405,
-      "sha256": "1f81d68bc863ff34cd99a1e786ace0f08954f7a7e2d4d6a65fc0132422e4ae62",
+      "size": 338401,
+      "sha256": "b2a4806afd2f35d671303f071d775ccd8dbbbc8357005e3e36ff91db976b18ab",
       "url": null,
       "files": [
         {
-          "path": "data/archive_payload/observations/Glass_2020_toa.png",
+          "path": "data/observation/Glass_2020_final_perimeter.gpkg",
+          "size": 335872,
+          "sha256": "42c2e421b9177de588f44b0d7998f743ec0dacb5daf8e36be90ba4d694337b1b"
+        },
+        {
+          "path": "data/observation/Glass_2020_final_perimeter_30m.tif",
+          "size": 11712,
+          "sha256": "5afed511becd0ec4ce29aa39062c4aabe97c7b40c443bece200dee2e8329f41c"
+        },
+        {
+          "path": "data/observation/Glass_2020_toa.png",
           "size": 158369,
           "sha256": "f4d287b81ad3a56ae15fcd7d9d817d710794dc02c222857e784eabe1c401a71b"
         },
         {
-          "path": "data/archive_payload/observations/Glass_2020_toa.tif",
+          "path": "data/observation/Glass_2020_toa.tif",
           "size": 19018,
           "sha256": "0ff7991d3936b7a774e7918ed672e8956fb72a8cfd503203163bbd458a2e745d"
         }
       ]
     },
     {
-      "role": "provenance",
-      "filename": "provenance.tar.gz",
+      "role": "generation",
+      "filename": "generation.tar.gz",
       "required": true,
-      "size": 35888,
-      "sha256": "b9f472df0a51bdc51a1805ba1e35447ce4fbf940be17331bbab232282c1dae26",
+      "size": 25981,
+      "sha256": "804031527ae0f015c1a10de357872828d9cca0c0287f582d15e5d9743160d08f",
       "url": null,
       "files": [
         {
-          "path": "case.yaml",
-          "size": 1281,
-          "sha256": "3756a06c79e01396a015e3e718e85b952919e9745d0d73d214163455caca46e7"
+          "path": "scripts/generate_data/README.txt",
+          "size": 1791,
+          "sha256": "2ee931f0f245b8c86efb7dbefe19079782db3ffe3a0ce71154e5b2f6182a99c7"
         },
         {
-          "path": "data/archive_manifest.json",
-          "size": 15132,
-          "sha256": "80a75e13838975196329ca76e6b30a94911f3e2fb288b59a7c71217f56d57f6e"
+          "path": "scripts/generate_data/fires.csv",
+          "size": 475,
+          "sha256": "25b9f9292a5d673c5de04393369652cc21975dc9df59f60f3fccad7e4e1c6576"
         },
         {
-          "path": "data/archive_payload/01-run.sh",
-          "size": 1881,
-          "sha256": "711f1492bb72f988c9fdcb54c2805025fc9758ce5e930aa33daa7169201a99b7"
+          "path": "scripts/generate_data/generate_observations.py",
+          "size": 3360,
+          "sha256": "504622c5a2c99679a5fab3b49b9c77bb5e6531ac48313bd381d5e9c957810ad1"
         },
         {
-          "path": "data/archive_validation.json",
-          "size": 8845,
-          "sha256": "78a8f89ba3352702aa17b910adf976fd16993f02e3db59feaf1b8f8e42c27967"
+          "path": "scripts/generate_data/make_fires.py",
+          "size": 3674,
+          "sha256": "db102eaee83a12ee43cc5430db56f9ac2f98e215a97b1eda473a5f22d640350b"
         },
         {
-          "path": "data/configuration_audit.json",
-          "size": 771,
-          "sha256": "3f7c0b2db761635f000977699793d822fab7cab6f63f530698ed213814283c98"
+          "path": "scripts/generate_data/prepare_inputs.py",
+          "size": 11078,
+          "sha256": "820365bdda8beebf082b3ef304d85a31f13317237d2faad07ceee113adde7757"
         },
         {
-          "path": "data/data_paths.json",
-          "size": 425,
-          "sha256": "9847466d399ed11372fb4e1ed8f7934505609c12665f57a45e72e3c8bf5b1f38"
+          "path": "scripts/generate_data/source/exploratory.py",
+          "size": 21531,
+          "sha256": "3ce3f69eb0bab864adbaab85d1032934c9bcdcc89c8e41cf6ef6f354b7ab851e"
         },
         {
-          "path": "data/provenance/archive/fires.csv",
-          "size": 7506,
-          "sha256": "ec179d623054018bfe3cd1f4566944feb737c29c2165df01527bf9cc11f248c3"
-        },
-        {
-          "path": "data/provenance/archive/inputs_log.csv",
-          "size": 4993,
-          "sha256": "4416ec2d34bd144fb76dd3696fd6e7a38bf32aba907c58e8458ea680bccc7364"
-        },
-        {
-          "path": "data/provenance/archive/make_fires.py",
+          "path": "scripts/generate_data/source/make_fires.py",
           "size": 3167,
           "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94"
         },
         {
-          "path": "data/provenance/archive/prepare_inputs.py",
+          "path": "scripts/generate_data/source/prepare_inputs.py",
           "size": 16402,
           "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c"
         },
         {
-          "path": "data/provenance/archive/run_all.sh",
-          "size": 728,
-          "sha256": "7ac9cb0b80c992278de3fc27db8351b85509f9ccd40024b0210f5610fc93185f"
-        },
-        {
-          "path": "data/provenance/archive/score_runs.py",
-          "size": 5456,
-          "sha256": "2c63477ed4f5db55e3ece74c641570815e6aa65a82979a57bb56c68418a558a0"
-        },
-        {
-          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
-          "size": 2379,
-          "sha256": "1fd3fbd75411b6145b2eb7edcdfb6f0d1abb349611077184fef89b30957168f8"
-        },
-        {
-          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
-          "size": 4459,
-          "sha256": "29318a6cd45fe91df6a1fe41827bcf1cdbb0b55fcf036397d6a8d74a991e9fd8"
-        },
-        {
-          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign.py",
+          "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign.py",
           "size": 15656,
           "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f"
         },
         {
-          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.py",
+          "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign_pb2.py",
           "size": 2623,
           "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6"
         },
         {
-          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+          "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign_pb2.pyi",
           "size": 3441,
           "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac"
         },
         {
-          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+          "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
           "size": 3384,
           "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee"
-        },
-        {
-          "path": "data/provenance/archive/tools/fuel_models.csv",
-          "size": 3948,
-          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b"
-        },
-        {
-          "path": "data/source_manifest.json",
-          "size": 16341,
-          "sha256": "1e71b2fefc90238a64afc781a2b9bd04e11203d53df0128aea100993e3bdf1d3"
-        },
-        {
-          "path": "elmfire.data.in",
-          "size": 1238,
-          "sha256": "93611e9dd7f912bc24016c5c440d8113fc938f4335cf5baa3ae93a26e3a67739"
-        }
-      ]
-    },
-    {
-      "role": "historical_outputs",
-      "filename": "historical_outputs.tar.gz",
-      "required": false,
-      "size": 8278810,
-      "sha256": "89fef0ddc065f97444851b836da3018cc31f6845cd86e1d12f3831d4202a6cfb",
-      "url": null,
-      "files": [
-        {
-          "path": "data/archive_payload/outputs/dump_times_0000001.csv",
-          "size": 69,
-          "sha256": "8da655d8cd447681764b2f4de7551ae9125e529a8f6112682ccee6427ab204e2"
-        },
-        {
-          "path": "data/archive_payload/outputs/fire_size_stats.csv",
-          "size": 495,
-          "sha256": "1dbd1ff35981c136ee44117a0c48efe61bfce6f24041754bd63b60719b3d1bc9"
-        },
-        {
-          "path": "data/archive_payload/outputs/flin_0000001_0680400.tif",
-          "size": 1214399,
-          "sha256": "f359ae896b12cbab95bd0f515a2813e42fe0fa74297f8cb03065054d9591f9e6"
-        },
-        {
-          "path": "data/archive_payload/outputs/hourly_isochrones.dbf",
-          "size": 297984,
-          "sha256": "205741d7af106188cd8fbe5444f979bcfdc2ba4d74aa4d54700325e4b2ef4a25"
-        },
-        {
-          "path": "data/archive_payload/outputs/hourly_isochrones.prj",
-          "size": 403,
-          "sha256": "ab78490474b2fb27a27ad2566802a7f49338602419540dd07cbcf22af5e50b6f"
-        },
-        {
-          "path": "data/archive_payload/outputs/hourly_isochrones.shp",
-          "size": 10136196,
-          "sha256": "302fce96115e814d42bf072e1d2f4240f8461bac363cbf5a5eb0ec38bfb6d3be"
-        },
-        {
-          "path": "data/archive_payload/outputs/hourly_isochrones.shx",
-          "size": 264916,
-          "sha256": "994a3c8983c18776f00960688cc69048fd7172f198d401496656368156f90cf6"
-        },
-        {
-          "path": "data/archive_payload/outputs/segments_0000001_0680400.tif",
-          "size": 53393,
-          "sha256": "372862d797c8c24d2dd5073d64505c1271d2be175a9db153e4c647e0bfe92251"
-        },
-        {
-          "path": "data/archive_payload/outputs/sts_0000001_0680400.tif",
-          "size": 96445,
-          "sha256": "21064767a648787dc81077e977d6452026725b1caa4cac8581030d30e5549b7f"
-        },
-        {
-          "path": "data/archive_payload/outputs/time_of_arrival_0000001_0680400.tif",
-          "size": 1127362,
-          "sha256": "e38d95e2cfe4c6adca6f9dfcb450b64384bfd83336553f57e1703398e8e69448"
-        },
-        {
-          "path": "data/archive_payload/outputs/vs_0000001_0680400.tif",
-          "size": 1201306,
-          "sha256": "28fb18cd74c2fe67722223452e837f160f52e5f4fb36bd3483672b7c9e9834de"
         }
       ]
     }

@@ -3,7 +3,7 @@
   "case_id": "bobcat_2020",
   "resource_type": "Dataset",
   "title": "ELMFIRE validation inputs and observations for bobcat 2020",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "creators": [
     {
       "name": "Chris Lautenberger",
@@ -34,9 +34,15 @@
       "The exact GOFER version used to prepare the supplied observation rasters has not been verified; this record is license evidence, not confirmation that local rasters derive from version 0.2.",
       "This record does not establish redistribution permission for separately supplied model inputs, historical outputs, or other third-party material."
     ],
-    "next_steps": "Confirm the source version and transformation history with the archive preparer; obtain product-specific licenses or written redistribution permission from the rights holders for all remaining bundled material."
+    "next_steps": "Confirm the source version and transformation history with the archive preparer; obtain product-specific licenses or written redistribution permission from the rights holders for all remaining bundled material.",
+    "CAL_FIRE": {
+      "source_identification": "California Historic Fire Perimeters (2026-05-26), as identified by supplied exploratory.py",
+      "provider": "CAL FIRE FRAP",
+      "coverage": "Final-perimeter GeoPackage layers and raster masks, excluding the GOFER layer",
+      "status": "License and redistribution evidence were not supplied in the referenced directory."
+    }
   },
-  "description": "Frozen model inputs, comparison observations and provenance for bobcat_2020. Optional bundles preserve supplied historical simulation results and distinct inactive older inputs. Source-data limitations are documented in the bundled source_manifest.json. This dataset does not establish a scientific PASS.\n\nGOFER source attribution: Liu, Tianjia; Randerson, James T.; Chen, Yang; Morton, Douglas C.; Wiggins, Elizabeth B.; Smyth, Padhraic; Foufoula-Georgiou, Efi; Nadler, Roy; Nevo, Omer. GOES-Observed Fire Event Representation (GOFER) product for 28 California wildfires from 2019-2021. Zenodo, https://doi.org/10.5281/zenodo.8327264 (all versions). The supplied observations are derived arrival-time rasters; the exact source version and complete transformation history remain unverified. GOFER source license: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. License evidence was checked against version 0.2 (2025), https://doi.org/10.5281/zenodo.14642378; this does not establish which version was used for the supplied rasters.",
+  "description": "Input rasters, required fuel-model and ignition tables, GOFER arrival-time TIFFs and PNG previews, CAL FIRE final-perimeter GeoPackages and aligned 30 m burned-mask TIFFs for bobcat_2020. Input preparation and CAL FIRE perimeter-generation source code are included. The original scripts are preserved with case-local entry points. External GOFER and CAL FIRE source data and CloudFire access are required; regeneration from external sources has not been verified against frozen hashes. The generator for the supplied GOFER arrival-time TIFF and PNG was not provided. Source identification and file hashes record the updated ELMFIRE_GOFER_validation directory. Historical simulation outputs, runners and model configurations are excluded.\n\nGOFER source attribution: Liu, Tianjia; Randerson, James T.; Chen, Yang; Morton, Douglas C.; Wiggins, Elizabeth B.; Smyth, Padhraic; Foufoula-Georgiou, Efi; Nadler, Roy; Nevo, Omer. GOES-Observed Fire Event Representation (GOFER) product for 28 California wildfires from 2019-2021. Zenodo, https://doi.org/10.5281/zenodo.8327264 (all versions). The supplied observations are derived arrival-time rasters; the exact source version and complete transformation history remain unverified. GOFER source license: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. License evidence was checked against version 0.2 (2025), https://doi.org/10.5281/zenodo.14642378; this does not establish which version was used for the supplied rasters.",
   "keywords": [
     "ELMFIRE",
     "wildfire",

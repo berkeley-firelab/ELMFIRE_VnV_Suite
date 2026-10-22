@@ -1,10 +1,10 @@
 &INPUTS
-FUELS_AND_TOPOGRAPHY_DIRECTORY = './inputs'
+FUELS_AND_TOPOGRAPHY_DIRECTORY = './data/fuels_and_topography'
 LANDSCAPE_FILENAME             = 'landscape'
 ADJ_FILENAME                   = 'adj'
 PHI_FILENAME                   = 'phi'
 DT_METEOROLOGY                 = 3600.0
-WEATHER_DIRECTORY              = './inputs'
+WEATHER_DIRECTORY              = './data/weather'
 WS_FILENAME                    = 'ws'
 WD_FILENAME                    = 'wd'
 M1_FILENAME                    = 'm1'
@@ -17,7 +17,7 @@ MLW_FILENAME                   = 'lw'
 /
 
 &OUTPUTS
-OUTPUTS_DIRECTORY    = './simulation'
+OUTPUTS_DIRECTORY    = './outputs'
 DTDUMP               = 482400.0
 DUMP_FLIN            = .TRUE.
 DUMP_SPREAD_RATE     = .TRUE.

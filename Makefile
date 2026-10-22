@@ -3,7 +3,7 @@
 	prepare-run configure test test-reports test-all report-check
 
 .PHONY: zenodo-build zenodo-verify zenodo-collection-build zenodo-collection-verify
-DATASET_VERSION ?= 1.0.0
+DATASET_VERSION ?= 2.1.0
 ZENODO_OUTPUT ?= $(ROOT_DIR)/zenodo/dist/$(DATASET_VERSION)
 
 SUITE ?= all

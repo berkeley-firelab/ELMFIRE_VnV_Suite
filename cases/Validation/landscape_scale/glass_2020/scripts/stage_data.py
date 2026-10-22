@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Restore this case's immutable source files from the pinned GOFER archive.
+"""Restore this case's checksum-pinned files from the supplied GOFER directory.
 
 Usage:
-    python3 scripts/stage_data.py /path/to/ELMFIRE_GOFER_validation.tar.gz
+    python3 scripts/stage_data.py --source-dir /path/to/ELMFIRE_GOFER_validation
     python3 scripts/stage_data.py --verify
 
 Only files listed in this case's archive manifest are restored. Existing files
@@ -43,10 +43,12 @@ def check_file(path: Path, record: dict) -> None:
     if not path.is_file():
         raise ValueError(f"Missing source file: {record['path']}")
     if path.stat().st_size != record['size'] or sha256(path) != record['sha256']:
-        raise ValueError(f"Source file differs from the pinned archive: {record['path']}")
+        raise ValueError(f"Source file differs from the pinned source: {record['path']}")
 
 
 def restore(archive: Path, manifest: dict) -> None:
+    if 'archive' not in manifest:
+        raise ValueError('This manifest uses the updated source directory; use --source-dir.')
     expected = manifest['archive']
     if archive.stat().st_size != expected['size'] or sha256(archive) != expected['sha256']:
         raise ValueError('Archive size or SHA-256 differs from the pinned source archive.')
@@ -88,15 +90,50 @@ def restore(archive: Path, manifest: dict) -> None:
         raise ValueError('Archive is missing required entries: ' + ', '.join(sorted(pending)))
 
 
+def restore_directory(source: Path, manifest: dict) -> None:
+    source = source.resolve()
+    pending = []
+    # Verify every source and existing destination before writing any files.
+    for record in manifest['files']:
+        relative = Path(record['source_relative_path'])
+        if relative.is_absolute() or '..' in relative.parts:
+            raise ValueError('Source path must stay within the supplied directory.')
+        original = source / relative
+        original.resolve().relative_to(source)
+        check_file(original, record)
+        path = destination(record)
+        if path.exists():
+            check_file(path, record)
+        else:
+            pending.append((original, path, record))
+    for original, path, record in pending:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = None
+        try:
+            with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as output:
+                temporary = Path(output.name)
+                with original.open('rb') as stream:
+                    for block in iter(lambda: stream.read(1024 * 1024), b''):
+                        output.write(block)
+            check_file(temporary, record)
+            os.link(temporary, path)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('archive', nargs='?', type=Path)
+    parser.add_argument('--source-dir', type=Path, help='updated source directory containing fire folders')
     parser.add_argument('--verify', action='store_true', help='verify case-local files without an archive')
     args = parser.parse_args()
-    if (args.archive is None) == (not args.verify):
-        parser.error('provide either an archive path or --verify')
+    if sum((args.archive is not None, args.source_dir is not None, args.verify)) != 1:
+        parser.error('provide --source-dir, a legacy archive path, or --verify')
     manifest = json.loads(MANIFEST.read_text(encoding='utf-8'))
     try:
+        if args.source_dir is not None:
+            restore_directory(args.source_dir.expanduser(), manifest)
         if args.archive is not None:
             restore(args.archive.expanduser(), manifest)
         for record in manifest['files']:

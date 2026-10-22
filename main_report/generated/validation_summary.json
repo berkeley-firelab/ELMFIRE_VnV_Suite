@@ -2,8 +2,8 @@
   "schema_version": 3,
   "suite": "validation",
   "aggregate_environment": {
-    "Captured at (UTC)": "2026-10-22T05:27:03+00:00",
-    "Repository revision": "51453eb80806",
+    "Captured at (UTC)": "2026-10-22T22:29:00+00:00",
+    "Repository revision": "9b2f5614fac6",
     "Repository state": "dirty",
     "Host platform": "macOS-15.7.7-arm64-arm-64bit",
     "Processor architecture": "arm64",
@@ -22,7 +22,7 @@
   },
   "case_count": 7,
   "decision_counts": {
-    "CHARACTERIZED": 7
+    "NOT EVALUABLE": 7
   },
   "cases": [
     {
@@ -35,12 +35,12 @@
       "namelist_schema": "1",
       "relative_directory": "cases/Validation/landscape_scale/caldor_2021",
       "report_pdf": "cases/Validation/landscape_scale/caldor_2021/report/case_report.pdf",
-      "report_available": true,
+      "report_available": false,
       "metrics_file": "cases/Validation/landscape_scale/caldor_2021/outputs/metrics.json",
       "metrics_available": true,
-      "raw_status": "CHARACTERIZED",
-      "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
+      "raw_status": "NOT EVALUABLE",
+      "decision": "NOT EVALUABLE",
+      "detail": "No simulation result is available for this case."
     },
     {
       "case_id": "camp_fire",
@@ -52,12 +52,12 @@
       "namelist_schema": "1",
       "relative_directory": "cases/Validation/landscape_scale/camp_fire",
       "report_pdf": "cases/Validation/landscape_scale/camp_fire/report/case_report.pdf",
-      "report_available": true,
+      "report_available": false,
       "metrics_file": "cases/Validation/landscape_scale/camp_fire/outputs/metrics.json",
       "metrics_available": true,
-      "raw_status": "CHARACTERIZED",
-      "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
+      "raw_status": "NOT EVALUABLE",
+      "decision": "NOT EVALUABLE",
+      "detail": "No current time_of_arrival GeoTIFFs were found for this case."
     },
     {
       "case_id": "czu_lightning_complex_2020",
@@ -69,12 +69,12 @@
       "namelist_schema": "1",
       "relative_directory": "cases/Validation/landscape_scale/czu_lightning_complex_2020",
       "report_pdf": "cases/Validation/landscape_scale/czu_lightning_complex_2020/report/case_report.pdf",
-      "report_available": true,
+      "report_available": false,
       "metrics_file": "cases/Validation/landscape_scale/czu_lightning_complex_2020/outputs/metrics.json",
       "metrics_available": true,
-      "raw_status": "CHARACTERIZED",
-      "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
+      "raw_status": "NOT EVALUABLE",
+      "decision": "NOT EVALUABLE",
+      "detail": "No simulation result is available for this case."
     },
     {
       "case_id": "glass_2020",
@@ -86,12 +86,12 @@
       "namelist_schema": "1",
       "relative_directory": "cases/Validation/landscape_scale/glass_2020",
       "report_pdf": "cases/Validation/landscape_scale/glass_2020/report/case_report.pdf",
-      "report_available": true,
+      "report_available": false,
       "metrics_file": "cases/Validation/landscape_scale/glass_2020/outputs/metrics.json",
       "metrics_available": true,
-      "raw_status": "CHARACTERIZED",
-      "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
+      "raw_status": "NOT EVALUABLE",
+      "decision": "NOT EVALUABLE",
+      "detail": "No simulation result is available for this case."
     },
     {
       "case_id": "kincade_2019",
@@ -103,12 +103,12 @@
       "namelist_schema": "1",
       "relative_directory": "cases/Validation/landscape_scale/kincade_2019",
       "report_pdf": "cases/Validation/landscape_scale/kincade_2019/report/case_report.pdf",
-      "report_available": true,
+      "report_available": false,
       "metrics_file": "cases/Validation/landscape_scale/kincade_2019/outputs/metrics.json",
       "metrics_available": true,
-      "raw_status": "CHARACTERIZED",
-      "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
+      "raw_status": "NOT EVALUABLE",
+      "decision": "NOT EVALUABLE",
+      "detail": "No simulation result is available for this case."
     },
     {
       "case_id": "thomas_fire",
@@ -120,12 +120,12 @@
       "namelist_schema": "1",
       "relative_directory": "cases/Validation/landscape_scale/thomas_fire",
       "report_pdf": "cases/Validation/landscape_scale/thomas_fire/report/case_report.pdf",
-      "report_available": true,
+      "report_available": false,
       "metrics_file": "cases/Validation/landscape_scale/thomas_fire/outputs/metrics.json",
       "metrics_available": true,
-      "raw_status": "CHARACTERIZED",
-      "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
+      "raw_status": "NOT EVALUABLE",
+      "decision": "NOT EVALUABLE",
+      "detail": "No current time_of_arrival GeoTIFFs were found for this case."
     },
     {
       "case_id": "tubbs_fire",
@@ -137,12 +137,12 @@
       "namelist_schema": "1",
       "relative_directory": "cases/Validation/landscape_scale/tubbs_fire",
       "report_pdf": "cases/Validation/landscape_scale/tubbs_fire/report/case_report.pdf",
-      "report_available": true,
+      "report_available": false,
       "metrics_file": "cases/Validation/landscape_scale/tubbs_fire/outputs/metrics.json",
       "metrics_available": true,
-      "raw_status": "CHARACTERIZED",
-      "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
+      "raw_status": "NOT EVALUABLE",
+      "decision": "NOT EVALUABLE",
+      "detail": "No current time_of_arrival GeoTIFFs were found for this case."
     }
   ]
 }

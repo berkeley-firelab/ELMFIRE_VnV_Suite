@@ -3,7 +3,7 @@
 
 The script is case-specific and non-destructive: it only reads the provided
 model inputs, ignition table and GOFER time-of-arrival raster (located through
-data/data_paths.json, overridable by environment variables) and writes
+data/data_paths.json, with an optional observation environment override) and writes
 outputs/input_statistics.json and the input figures in figures/.
 
 Conventions
@@ -64,11 +64,11 @@ QUANTILE_SAMPLE = 512  # deterministic nearest-neighbour sample size per band
 
 
 def resolve_paths() -> dict[str, Path]:
-    """Locate provided data: environment variable, else data_paths.json entry."""
+    """Use the same canonical model inputs as the case namelist."""
     record = json.loads(DATA_PATHS.read_text(encoding="utf-8"))
     paths = {}
-    for key, env in (("inputs", "GOFER_INPUTS_DIR"), ("observation", "GOFER_OBSERVATION_TOA")):
-        value = os.environ.get(env) or record[key]
+    for key in ("fuels_and_topography", "weather", "misc", "observation"):
+        value = (os.environ.get("GOFER_OBSERVATION_TOA") if key == "observation" else None) or record[key]
         path = Path(value).expanduser()
         paths[key] = path if path.is_absolute() else (CASE_DIR / path).resolve()
     return paths
@@ -118,11 +118,11 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def check_inputs(source: dict, inputs: Path, observation: Path) -> list[str]:
+def check_inputs(source: dict, inputs: Path, observation: Path, weather: Path) -> list[str]:
     """Return a list of integrity problems; empty when the inputs are usable."""
     errors = []
     for record in source["model_inputs"]["files"]:
-        path = inputs / record["name"]
+        path = CASE_DIR / record["path"]
         if not path.is_file():
             errors.append(f"missing provided input: {record['name']}")
         elif "size" in record and path.stat().st_size != record["size"]:
@@ -145,7 +145,7 @@ def check_inputs(source: dict, inputs: Path, observation: Path) -> list[str]:
             errors.append("landscape contains cells outside LANDFIRE coverage (value -10000)")
     n_bands = None
     for key in WEATHER:
-        with rasterio.open(inputs / f"{key}.tif") as src:
+        with rasterio.open(weather / f"{key}.tif") as src:
             if src.crs.to_string() != source["model_domain"]["crs"]:
                 errors.append(f"{key} CRS differs from the landscape")
             if not (src.bounds.left <= land_bounds.left and src.bounds.right >= land_bounds.right
@@ -359,7 +359,7 @@ def plot_observation(title: str, obs: dict, source: dict, ignitions: list[dict])
 def main() -> None:
     source = json.loads(SOURCE_RECORD.read_text(encoding="utf-8"))
     paths = resolve_paths()
-    errors = check_inputs(source, paths["inputs"], paths["observation"])
+    errors = check_inputs(source, paths["fuels_and_topography"], paths["observation"], paths["weather"])
     if errors:
         raise SystemExit("Input check failed:\n  - " + "\n  - ".join(errors))
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -372,9 +372,9 @@ def main() -> None:
     ignitions = source["ignitions"]
     ignition_hours = [r["t_ign_s"] / 3600.0 + offset_h for r in ignitions]
 
-    land, maps = landscape_statistics(paths["inputs"] / "landscape.tif")
+    land, maps = landscape_statistics(paths["fuels_and_topography"] / "landscape.tif")
     source["_fuel_fractions"] = land["fbfm40"]["group_fraction"]
-    weather, series, samples = weather_statistics(paths["inputs"], offset_h)
+    weather, series, samples = weather_statistics(paths["weather"], offset_h)
     obs_stats, obs = observation_statistics(paths["observation"], source)
 
     plot_inputs(title, maps, ignitions, source)

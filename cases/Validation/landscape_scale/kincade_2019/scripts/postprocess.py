@@ -2,7 +2,7 @@
 """Compare provided ELMFIRE results of this case with the GOFER observation.
 
 Each simulation result listed in data/data_paths.json (and the result of the
-current case configuration in simulation/, when present) is evaluated
+current case configuration in outputs/, when present) is evaluated
 separately; results from different configurations are never pooled.
 
 Selection rule: for a single-member run the time-of-arrival raster with the
@@ -41,7 +41,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 CASE_DIR = Path(__file__).resolve().parents[1]
 SOURCE_RECORD = CASE_DIR / "data" / "source_manifest.json"
 DATA_PATHS = CASE_DIR / "data" / "data_paths.json"
-CURRENT_RESULTS = CASE_DIR / "simulation"
+CURRENT_RESULTS = CASE_DIR / "outputs"
 OUTPUT_DIR = CASE_DIR / "outputs"
 FIGURE_DIR = CASE_DIR / "figures"
 
@@ -343,7 +343,7 @@ def plot_summary(results: list[dict], arrays: dict, source: dict, title: str) ->
 def main() -> None:
     source = json.loads(SOURCE_RECORD.read_text(encoding="utf-8"))
     record = json.loads(DATA_PATHS.read_text(encoding="utf-8"))
-    paths = {"inputs": resolve(os.environ.get("GOFER_INPUTS_DIR") or record["inputs"]),
+    paths = {"inputs": resolve(record["fuels_and_topography"]),
              "observation": resolve(os.environ.get("GOFER_OBSERVATION_TOA") or record["observation"])}
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)

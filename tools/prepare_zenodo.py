@@ -23,8 +23,8 @@ from zenodo_restore import check_file, destination, selected_bundles, sha256
 ROOT = Path(__file__).resolve().parents[1]
 CASE_ROOT = ROOT / 'cases/Validation/landscape_scale'
 DATASET_ROOT = ROOT / 'zenodo/datasets'
-ROLES = ('inputs', 'observations', 'provenance', 'historical_outputs', 'legacy_inputs')
-OPTIONAL = {'historical_outputs', 'legacy_inputs'}
+ROLES = ('inputs', 'observations', 'generation')
+OPTIONAL = set()
 GOFER_CREDIT = (
     'GOFER source attribution: Liu, Tianjia; Randerson, James T.; Chen, Yang; '
     'Morton, Douglas C.; Wiggins, Elizabeth B.; Smyth, Padhraic; '
@@ -85,55 +85,37 @@ def file_record(case: Path, relative: str) -> dict:
 
 
 def inventory(case: Path) -> dict[str, list[dict]]:
-    """Use existing provenance manifests as the authoritative source inventory."""
+    """Package only current data and explicitly pinned data-generation source files."""
     archive = json.loads((case / 'data/archive_manifest.json').read_text())
-    if 'source_files' in archive:
-        grouped = defaultdict(list)
-        for record in archive['source_files']:
-            check_file(source_file(case, record), record)
-            grouped[record['role']].append(record)
-        for name in ('archive_manifest.json', 'source_manifest.json'):
-            grouped['provenance'].append(file_record(case, 'data/' + name))
-        for files in grouped.values():
-            files.sort(key=lambda r: r['path'])
-        return grouped
     source = json.loads((case / 'data/source_manifest.json').read_text())
-    records = {}
-    for original in archive.get('files', archive.get('payload_files', [])):
-        relative = original.get('path', original.get('relative_path'))
-        check_file(destination(case, relative), original)
-        role = ('observations' if '/observations/' in relative else
-                'historical_outputs' if '/outputs/' in relative else
-                'provenance' if '/provenance/' in relative or relative.endswith('/01-run.sh') else
-                'inputs')
-        records[relative] = (role, file_record(case, relative))
-    for original in source.get('observation', {}).get('files', []):
-        relative = original.get('path', original.get('relative_path'))
-        check_file(destination(case, relative), original)
-        records[relative] = ('observations', file_record(case, relative))
-    # Small authored provenance/configuration records travel with the dataset.
-    for path in sorted((case / 'data').glob('*.json')):
-        if path.name != 'dataset_manifest.json':
-            relative = path.relative_to(case).as_posix()
-            records[relative] = ('provenance', file_record(case, relative))
-    for relative in ('case.yaml', 'elmfire.data.in'):
-        records[relative] = ('provenance', file_record(case, relative))
-    # Preserve distinct, inactive historical inputs as a clearly optional bundle.
-    for folder in ('fuels_and_topography', 'weather', 'misc'):
-        for path in sorted((case / 'data' / folder).rglob('*')):
-            if path.is_file() and not path.name.startswith(('.', '._')):
-                relative = path.relative_to(case).as_posix()
-                records[relative] = ('legacy_inputs', file_record(case, relative))
-    # Do not silently omit unmanifested scientific payload or observation files.
-    for folder in ('archive_payload', 'provenance/archive', 'viirs_observation'):
-        for path in (case / 'data' / folder).rglob('*'):
-            if path.is_file() and not path.name.startswith('.'):
-                relative = path.relative_to(case).as_posix()
-                if relative not in records:
-                    raise ValueError(f'Unmanifested source file: {path}')
+    known = {}
+    for record in (archive.get('source_files', archive.get('files', archive.get('payload_files', [])))
+                   + archive.get('generation_files', [])
+                   + source.get('observation', {}).get('files', [])):
+        relative = record.get('path', record.get('relative_path'))
+        if relative in known and (known[relative]['size'], known[relative]['sha256']) != (record['size'], record['sha256']):
+            raise ValueError(f'Conflicting source records: {relative}')
+        known[relative] = record
     grouped = defaultdict(list)
-    for relative, (role, record) in sorted(records.items()):
-        grouped[role].append(record)
+    folders = {'data/weather': 'inputs', 'data/fuels_and_topography': 'inputs',
+               'data/misc': 'inputs', 'data/observation': 'observations',
+               'scripts/generate_data': 'generation'}
+    actual = set()
+    for folder, role in folders.items():
+        for path in sorted((case / folder).rglob('*')):
+            relative = path.relative_to(case).as_posix()
+            if not path.is_file() or path.name.startswith(('.', '._')) or '__pycache__' in path.parts:
+                continue
+            if role == 'generation' and path.suffix not in {'.py', '.pyi', '.csv', '.txt'}:
+                raise ValueError(f'Unexpected generation asset: {path}')
+            if relative not in known:
+                raise ValueError(f'Unmanifested active input or generation file: {path}')
+            check_file(destination(case, relative), known[relative])
+            grouped[role].append(file_record(case, relative))
+            actual.add(relative)
+    for relative in known:
+        if any(relative.startswith(folder + '/') for folder in folders) and relative not in actual:
+            raise ValueError(f'Missing file: {case / relative}')
     if not grouped['inputs'] or not grouped['observations']:
         raise ValueError(f'Missing input or observation inventory: {case.name}')
     return grouped
@@ -156,82 +138,46 @@ def write_bundle(case: Path, path: Path, files: list[dict]) -> None:
 
 
 def dataset_readme(manifest: dict) -> str:
-    """Describe the contents and use of one archived fire dataset."""
-    future_case = manifest.get('dataset_kind') == 'future_validation_case'
-    observation_files = [record['path'].lower() for bundle in manifest['bundles']
-                         if bundle['role'] == 'observations' for record in bundle['files']]
-    observations = 'Fire observations and supporting files used for model comparison.'
-    if any('/viirs_observation/' in path for path in observation_files):
-        observations = 'VIIRS active-fire point observations and associated geospatial files.'
-    elif any(path.endswith('/' + manifest['case_id'].lower() + '_toa.tif')
-             for path in observation_files):
-        observations = 'GOFER-derived fire arrival-time rasters and preview images.'
-    descriptions = {
-        'inputs': 'Terrain, fuel, weather, fuel-moisture, and ignition inputs where supplied.',
-        'observations': observations,
-        'provenance': 'Source and archive manifests, preparation records, and '
-                      + ('the original launcher.' if future_case else 'case configuration files.'),
-        'historical_outputs': 'Results supplied from earlier model simulations.',
-        'legacy_inputs': 'Older input files retained separately from the active model inputs.',
-    }
-    lines = [
-        f'ELMFIRE validation dataset: {manifest["case_id"]}',
-        f'Dataset version: {manifest["dataset_version"]}', '',
-        'This dataset contains model inputs, fire observations, and provenance records',
-        'for one wildfire. The compressed archives preserve the source file contents',
-        'and store their paths relative to the case directory.', '',
-        'Contents', '--------',
-    ]
-    for bundle in manifest['bundles']:
-        lines.extend([bundle['filename'], textwrap.fill(descriptions[bundle['role']],
-                      width=78, initial_indent='  ', subsequent_indent='  ')])
-    lines.extend([
-        'dataset_manifest.json',
-        '  File inventory, dataset version, file sizes, and SHA-256 hashes for each',
-        '  compressed archive and its contents.',
-        'metadata-worksheet.json',
-        '  Dataset description, source citations, license, and redistribution evidence.',
-        'checksums.sha256',
-        '  SHA-256 hashes of the other files in this download.',
-        'stage_dataset.py',
-        '  Python script for extracting the archives and verifying file integrity.',
-        'README.txt',
-        '  Description of the dataset contents and restoration procedure.', '',
-        'Restoration', '-----------',
-        'Run the following command from the directory containing the downloaded files.',
-        'Python 3 is required; no additional Python packages are needed.', '',
-        'python3 stage_dataset.py --case-dir /path/to/restored-case '
-        '--manifest dataset_manifest.json --bundle-dir .', '',
-        'Replace /path/to/restored-case with the destination directory. The script',
-        'restores inputs, observations, and provenance, verifies their hashes, and',
-        'preserves existing files whose contents differ from the archived files.',
-    ])
-    optional_names = [name for role, name in (('historical_outputs', 'historical outputs'),
-                                             ('legacy_inputs', 'older inputs'))
-                      if any(bundle['role'] == role for bundle in manifest['bundles'])]
-    if optional_names:
-        lines.extend(['', 'Add --include-optional to restore the ' + ' and '.join(optional_names) + '.'])
-    lines.extend(['', 'Provenance and use', '------------------'])
-    if future_case:
-        lines.extend([
-            'These data are prepared for a future validation case. A current runnable',
-            'case configuration and evaluation criteria are not included.',
-            'Inputs and observations restore under data/archive_payload/; original',
-            'preparation records restore under data/provenance/archive/.', '',
-        ])
-    lines.extend([
-        'The archived source and archive manifests describe data origins, preparation',
-        'steps, and known provenance gaps. File integrity checks establish agreement',
-        'with the archived snapshot; model accuracy requires a separate evaluation.', '',
-        'The dataset license is CC BY 4.0. Source citations, source-specific terms,',
-        'and unresolved redistribution permissions are recorded in metadata-worksheet.json',
-        'and the archived provenance manifests.', '',
-        'Case definitions, processing scripts, and evaluation methods are maintained at:',
-        'https://github.com/berkeley-firelab/ELMFIRE_VnV_Suite', '',
-        'Acknowledgement', '---------------',
-        'OpenAI Codex assisted with archive preparation, metadata organization, and',
-        'drafting the accompanying documentation.', '',
-    ])
+    """Describe a data-only wildfire archive and its regeneration limits."""
+    lines = [f'ELMFIRE validation data: {manifest["case_id"]}',
+             f'Dataset version: {manifest["dataset_version"]}', '',
+             'This archive contains model input rasters, necessary input tables, and',
+             'comparison observations. Data-generation source code is included where',
+             'it was supplied. Historical simulations, runners, model configurations,',
+             'reports, caches, and superseded inputs are excluded.', '',
+             'Contents', '--------',
+             'inputs.tar.gz: weather and moisture rasters in data/weather/, terrain,',
+             'fuel, canopy and ignition rasters in data/fuels_and_topography/, and',
+             'necessary fuel-model and ignition CSV tables in data/misc/.',
+             'observations.tar.gz: comparison data and components in data/observation/.']
+    if any(b['role'] == 'generation' for b in manifest['bundles']):
+        lines += ['generation.tar.gz: source code, client dependencies and a fire table',
+                  'under scripts/generate_data/. See its README.txt for requirements.']
+    lines += ['', 'dataset_manifest.json records file sizes, SHA-256 hashes and source',
+              'metadata. metadata-worksheet.json records attribution, license and known',
+              'permission gaps. checksums.sha256 verifies the download files.', '',
+              'Restoration', '-----------',
+              'Python 3 is required; restoration needs no additional Python packages.',
+              'From the folder containing the downloaded files, run:', '',
+              'python3 stage_dataset.py --case-dir /path/to/restored-data '
+              '--manifest dataset_manifest.json --bundle-dir .', '',
+              'The script verifies hashes and refuses to overwrite differing files.',
+              'Current case configurations and validation workflows are maintained at:',
+              'https://github.com/berkeley-firelab/ELMFIRE_VnV_Suite', '',
+              'Generation limits', '-----------------',
+              'GOFER input-generation scripts require external source files and service',
+              'access. Their generated data have not been verified against these frozen',
+              'hashes. For the 28 GOFER fires, CAL FIRE final-perimeter GeoPackages and',
+              'aligned mask TIFFs are included with their supplied generation source.',
+              'Use scripts/generate_data/generate_observations.py with upstream CAL FIRE',
+              'and GOFER vectors. No generator for the GOFER arrival-time TIFF or PNG',
+              'was supplied. Camp, Thomas and Tubbs have no supplied input generator.', '',
+              'License: CC BY 4.0. Source attribution, source-specific terms and unresolved',
+              'redistribution evidence are recorded in the metadata worksheet. Integrity',
+              'verification does not establish model accuracy.', '',
+              'Acknowledgement', '---------------',
+              'OpenAI Codex assisted with archive preparation, metadata organization, and',
+              'drafting the accompanying documentation.', '']
     return '\n'.join(lines)
 
 
@@ -249,6 +195,9 @@ def build_case(case: Path, output: Path, version: str, source_revision: str) -> 
         manifest = {'schema_version': 1, 'case_id': dataset_id, 'dataset_version': version,
                     'source_revision': source_revision,
                     'source_state': 'working tree snapshot; file hashes are authoritative',
+                    'archive_scope': 'input data, observations and data-generation source only',
+                    'source_metadata': {k: v for k, v in json.loads((case / 'data/source_manifest.json').read_text()).items()
+                                        if k not in {'simulation', 'configurations', 'archive_staging'}},
                     'zenodo': {'record_id': None, 'version_doi': None, 'concept_doi': None},
                     'bundles': []}
         definition = json.loads((case / 'data/archive_manifest.json').read_text())
@@ -277,7 +226,7 @@ def build_case(case: Path, output: Path, version: str, source_revision: str) -> 
 def worksheet(case: Path, version: str) -> dict:
     source = json.loads((case / 'data/source_manifest.json').read_text())
     archive = json.loads((case / 'data/archive_manifest.json').read_text())
-    gofer = 'archive' in archive
+    gofer = 'fire_id' in archive
     return {'worksheet_format': 'human review fields; not a Zenodo API payload',
             'case_id': case.name, 'resource_type': 'Dataset',
             'title': f'ELMFIRE validation inputs and observations for {case.name.replace("_", " ")}',
@@ -285,11 +234,10 @@ def worksheet(case: Path, version: str) -> dict:
             'license': 'CC-BY-4.0', 'redistribution_permission_evidence': None,
             'license_scope': 'Selected license for this prepared dataset; upstream licenses, '
                 'attribution requirements and redistribution permission must still be reviewed.',
-            'description': 'Frozen model inputs, comparison observations and provenance for '
-                + case.name + '. Optional bundles preserve supplied historical simulation '
-                'results and distinct inactive older inputs. Source-data limitations are '
-                'documented in the bundled source_manifest.json. This dataset does not '
-                'establish a scientific PASS.' + ('\n\n' + GOFER_CREDIT if gofer else ''),
+            'description': 'Frozen input rasters, necessary input tables, comparison observations '
+                'and supplied data-generation scripts for ' + case.name + '. Historical '
+                'outputs, runners and model configurations are excluded. Source limitations '
+                'are recorded in dataset_manifest.json. This dataset does not establish a scientific PASS.' + ('\n\n' + GOFER_CREDIT if gofer else ''),
             'keywords': ['ELMFIRE', 'wildfire', 'validation', case.name],
             'related_identifiers': [{'identifier': 'https://github.com/berkeley-firelab/ELMFIRE_VnV_Suite',
                                      'relation': 'is supplement to', 'resource_type': 'Software'}]
@@ -336,7 +284,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('build', 'verify', 'metadata', 'register'))
     parser.add_argument('--case', default='all', help='individual fire/case ID, gofer (24 future cases), or all')
-    parser.add_argument('--version', default='1.0.0')
+    parser.add_argument('--version', default='2.1.0')
     parser.add_argument('--output', type=Path, help='defaults to zenodo/dist/<version>')
     parser.add_argument('--record-id')
     parser.add_argument('--doi')
