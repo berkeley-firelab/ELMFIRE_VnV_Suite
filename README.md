@@ -130,7 +130,8 @@ validation cases. Each record includes its own inputs, observations and provenan
 
 Run `make zenodo-verify` to check the prepared upload files.
 Follow [the Zenodo upload guide](docs/zenodo-upload-guide.md) to complete the
-blank creator and license fields, upload one record per fire, register each
+creator affiliation/ORCID checks and redistribution review under the selected CC BY 4.0
+license, upload one record per fire, register each
 version DOI, and verify a fresh download to complete the migration.
 The [dataset overview](zenodo/README.md) lists folders and initial upload sizes.
 

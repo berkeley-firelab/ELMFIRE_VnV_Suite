@@ -53,10 +53,18 @@ described in Step 9.
 ## Step 2 Complete the metadata worksheets
 
 Edit `zenodo/metadata/<case_id>.json`. Creator names, affiliations, and ORCIDs
-are intentionally left blank for you to supply. Complete the publication date,
-license, and redistribution evidence after checking the actual upstream terms.
+require review; all worksheets contain the user-supplied creator groups. Complete any
+missing publication dates and review redistribution evidence against the actual
+upstream terms. The selected dataset license is CC BY 4.0.
 Keep upstream creators credited separately from the creators responsible for
 this prepared dataset, using the appropriate creator or contributor role.
+
+Camp, Thomas, and Tubbs list Dwi M. J. Purnomo, Maria Theodori, and Kasra
+Shamsaei. All other fires list Chris Lautenberger and Daniel San Martin.
+Kasra's ORCID, `0000-0003-3396-7683`, is linked from the author details of
+[the published Lahaina wildfire paper](https://nhess.copernicus.org/articles/24/47/2024/nhess-24-47-2024-relations.html).
+Other creator ORCIDs remain unknown. Omit the literal `unknown` from Zenodo's
+ORCID input when transferring these human review worksheets to the web form.
 
 The existing manifests do not establish redistribution terms for all supplied
 inputs. Camp, Thomas, and Tubbs also have incomplete upstream product and VIIRS
@@ -64,12 +72,36 @@ collection provenance. Preserve these statements in the record description;
 do not apply the repository software license automatically to the datasets.
 Leave a record as a draft while its redistribution permission is unresolved.
 
+The [GOFER version 0.2 record](https://zenodo.org/records/14642378), published
+January 13, 2025, lists **Creative Commons Attribution 4.0 International** under
+**Rights → License**. The 28 GOFER-derived worksheets record this evidence and
+its authors. Their descriptions also credit all nine GOFER authors and identify
+the supplied observations as derived arrival-time rasters. Copy this attribution
+with the description when creating the Zenodo record. Under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
+retain appropriate attribution, the license link, and an indication of changes
+such as rasterization. Confirm the exact source version with the archive
+preparer before citing version 0.2 as the source of the local rasters. Keep the
+existing all-versions DOI until the version used is established.
+
+GOFER's license does not establish permissions for separately supplied model
+inputs or historical outputs, or for Camp (2018), Thomas (2017), and Tubbs
+(2017). For those files, obtain the original product/version and license URL
+from the archive provider, or written redistribution permission from the rights
+holder. For VIIRS observations, establish the exact NASA FIRMS product and
+collection and retain its applicable terms and attribution. Evidence should
+identify the covered files, rights holder, source/version, permission or license
+URL/document, date, and conditions. The worksheet's selected license does not
+resolve these gaps. Historical source manifests remain a record of what was
+documented in the supplied archives.
+
 GOFER worksheets already include the source dataset and article as related
 identifiers. Credit the prepared observation rasters as derived products, while
 retaining the original GOFER citation. The record description should distinguish
 model inputs, observations, and historical model outputs.
 
-After editing the worksheets, refresh their upload copies and checksums:
+After editing the worksheets, refresh the upload copies, archive READMEs, and
+checksums:
 
 ```bash
 python3 tools/prepare_zenodo.py metadata
@@ -211,7 +243,9 @@ Each of the 24 remaining GOFER fires has its own upload folder under
 Zenodo Dataset record per folder. Each contains `inputs.tar.gz`,
 `observations.tar.gz`, `provenance.tar.gz`, and five sidecars. For example,
 Antelope uses `zenodo/dist/1.0.0/antelope_2021/` and the worksheet
-`zenodo/metadata/antelope_2021.json`. Creator fields remain blank.
+`zenodo/metadata/antelope_2021.json`. All 24 future-case worksheets list
+Chris Lautenberger and Daniel San Martin as creators; review their affiliations
+and unresolved ORCIDs before publication.
 
 Each provenance bundle includes that fire's original launcher, the shared
 preparation scripts, retrieval log, fire table, full original archive inventory,

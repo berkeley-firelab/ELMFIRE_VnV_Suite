@@ -4,11 +4,39 @@
   "resource_type": "Dataset",
   "title": "ELMFIRE validation inputs and observations for knp complex 2021",
   "version": "1.0.0",
-  "creators": [],
+  "creators": [
+    {
+      "name": "Chris Lautenberger",
+      "affiliation": "Cloudfire, Inc.",
+      "orcid": "unknown"
+    },
+    {
+      "name": "Daniel San Martin",
+      "affiliation": "University of California, Berkeley",
+      "orcid": "unknown"
+    }
+  ],
   "publication_date": null,
-  "license": null,
-  "redistribution_permission_evidence": null,
-  "description": "Frozen model inputs, comparison observations and provenance for knp_complex_2021. Optional bundles preserve supplied historical simulation results and distinct inactive older inputs. Source-data limitations are documented in the bundled source_manifest.json. This dataset does not establish a scientific PASS.",
+  "license": "CC-BY-4.0",
+  "redistribution_permission_evidence": {
+    "status": "partial; GOFER source license verified, complete bundle permissions unresolved",
+    "checked_on": "2026-10-22",
+    "source_record": "https://zenodo.org/records/14642378",
+    "source_doi": "10.5281/zenodo.14642378",
+    "source_title": "GOES-Observed Fire Event Representation (GOFER) product for 28 California wildfires from 2019-2021",
+    "source_version": "0.2",
+    "source_publication_date": "2025-01-13",
+    "source_license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "coverage": "GOFER source observations may be redistributed and adapted with attribution, a license link, and an indication of changes.",
+    "attribution": "Liu, T.; Randerson, J. T.; Chen, Y.; Morton, D. C.; Wiggins, E. B.; Smyth, P.; Foufoula-Georgiou, E.; Nadler, R.; Nevo, O. (2025). GOES-Observed Fire Event Representation (GOFER) product for 28 California wildfires from 2019-2021, version 0.2. Zenodo. https://doi.org/10.5281/zenodo.14642378",
+    "limitations": [
+      "The exact GOFER version used to prepare the supplied observation rasters has not been verified; this record is license evidence, not confirmation that local rasters derive from version 0.2.",
+      "This record does not establish redistribution permission for separately supplied model inputs, historical outputs, or other third-party material."
+    ],
+    "next_steps": "Confirm the source version and transformation history with the archive preparer; obtain product-specific licenses or written redistribution permission from the rights holders for all remaining bundled material."
+  },
+  "description": "Frozen model inputs, comparison observations and provenance for knp_complex_2021. Optional bundles preserve supplied historical simulation results and distinct inactive older inputs. Source-data limitations are documented in the bundled source_manifest.json. This dataset does not establish a scientific PASS.\n\nGOFER source attribution: Liu, Tianjia; Randerson, James T.; Chen, Yang; Morton, Douglas C.; Wiggins, Elizabeth B.; Smyth, Padhraic; Foufoula-Georgiou, Efi; Nadler, Roy; Nevo, Omer. GOES-Observed Fire Event Representation (GOFER) product for 28 California wildfires from 2019-2021. Zenodo, https://doi.org/10.5281/zenodo.8327264 (all versions). The supplied observations are derived arrival-time rasters; the exact source version and complete transformation history remain unverified. GOFER source license: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. License evidence was checked against version 0.2 (2025), https://doi.org/10.5281/zenodo.14642378; this does not establish which version was used for the supplied rasters.",
   "keywords": [
     "ELMFIRE",
     "wildfire",
@@ -37,5 +65,6 @@
     "Upstream access and redistribution terms remain undocumented.",
     "A runnable case, scientific configuration and acceptance basis have not yet been authored."
   ],
-  "review_status": "needs creator, attribution and redistribution review"
+  "review_status": "creators supplied; affiliation, ORCID and complete-bundle redistribution review pending",
+  "license_scope": "Selected license for this prepared dataset, subject to completion of upstream rights review. Existing third-party licenses and attribution requirements remain applicable; this selection does not establish permission for unidentified source products."
 }

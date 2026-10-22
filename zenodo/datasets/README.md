@@ -1,13 +1,13 @@
-# GOFER datasets for future validation cases
+# Data for future ELMFIRE validation cases
 
-Each fire below has an independent Zenodo upload folder and metadata worksheet.
-The redundant source collection has been removed after checking archive contents.
-These small definitions retain the manifests and independent restore helpers;
-source bytes are preserved in the per-fire upload sets under `../dist/1.0.0/`.
+This directory contains dataset definitions for 24 wildfires. Each fire has an
+independent archive under `../dist/1.0.0/<fire_id>/`, containing model inputs,
+GOFER-derived arrival-time observations, and provenance records.
 
 Each definition contains `data/archive_manifest.json`, `data/source_manifest.json`,
-`data/dataset_manifest.json`, and `scripts/stage_dataset.py`. No run configuration
-or scientific acceptance basis is implied by preparing a dataset definition.
+`data/dataset_manifest.json`, and `scripts/stage_dataset.py`. The manifests record
+file inventories, hashes, and source information. A current runnable case
+configuration and scientific evaluation criteria are not included.
 
 | Fire ID | Upload folder from repository root |
 | --- | --- |
@@ -36,16 +36,22 @@ or scientific acceptance basis is implied by preparing a dataset definition.
 | `windy_2021` | `zenodo/dist/1.0.0/windy_2021/` |
 | `zogg_2020` | `zenodo/dist/1.0.0/zogg_2020/` |
 
-For one dataset, run `make zenodo-verify CASE=antelope_2021` from the repository
-root. Use `CASE=gofer` for all 24 future cases, or omit CASE for all 31 datasets.
-The [upload guide](../../docs/zenodo-upload-guide.md) describes registering
-a separate DOI per fire and restoring into a chosen future case directory.
+From the repository root, verify one retained archive with
+`make zenodo-verify CASE=antelope_2021`. Use `CASE=gofer` to check all 24 datasets,
+or omit `CASE` to check all 31 fire datasets.
 
-A future validation case can own the dataset manifest and restoration helper
-without importing any other case or relying on the original collection at runtime.
-Legacy `repository_source` fields identify the original locations only; no tool
-uses them to find source bytes. To build a new dataset version, restore its
-bundles into this definition directory first, using its helper, then build from
-the normalized case-local paths. Restored bulk files are ignored by Git.
-Author its configuration,
-processing, scientific rationale, metrics, and report separately.
+To restore a dataset, run its `stage_dataset.py` helper with the archive folder
+specified by `--bundle-dir`. File paths within the compressed archives are
+relative to the destination case directory. Inputs and observations restore to
+`data/archive_payload/`; preparation records restore to `data/provenance/archive/`.
+The helper verifies the archived files and protects differing existing files.
+
+The [collection overview](../README.md) describes the archive contents and
+license. The [upload guide](../../docs/zenodo-upload-guide.md) provides commands
+for restoration, versioning, and DOI registration. Source-version limitations
+and redistribution evidence are recorded in the per-fire metadata worksheets.
+
+## Acknowledgement
+
+OpenAI Codex assisted with archive preparation, metadata organization, and
+drafting the accompanying documentation.
