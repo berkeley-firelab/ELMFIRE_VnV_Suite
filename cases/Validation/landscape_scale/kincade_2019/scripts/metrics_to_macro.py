@@ -12,6 +12,7 @@ from __future__ import annotations
 from report_language import report_text
 
 import json
+import math
 from pathlib import Path
 
 CASE_DIR = Path(__file__).resolve().parents[1]
@@ -221,10 +222,84 @@ def summary_block(metrics: dict) -> str:
     ])
 
 
+def validate_metrics(metrics: object) -> None:
+    """Check the report's required fields, independently of version labels."""
+    def require(condition: bool, field: str, expected: str) -> None:
+        if not condition:
+            raise ValueError(f"Invalid GOFER metrics: {field} must be {expected}.")
+
+    def fields(record: object, names: tuple, location: str) -> None:
+        require(isinstance(record, dict), location, "an object")
+        for name in names:
+            require(name in record, f"{location}.{name}", "present")
+
+    def number(value: object, field: str, nullable: bool = False) -> None:
+        require((nullable and value is None) or
+                (type(value) in (int, float) and math.isfinite(value)),
+                field, "a finite number" + (" or null" if nullable else ""))
+
+    def strings(value: object, field: str) -> None:
+        require(isinstance(value, list) and all(isinstance(v, str) for v in value),
+                field, "a list of strings")
+
+    fields(metrics, ("status", "reason", "simulations_found", "runs", "summary_figures"), "metrics")
+    require(metrics["status"] in ("CHARACTERIZED", "NOT EVALUABLE"),
+            "metrics.status", "CHARACTERIZED or NOT EVALUABLE")
+    require(isinstance(metrics["reason"], str), "metrics.reason", "text")
+    require(type(metrics["simulations_found"]) is int and metrics["simulations_found"] >= 0,
+            "metrics.simulations_found", "a nonnegative integer")
+    require(isinstance(metrics["runs"], list), "metrics.runs", "a list")
+    strings(metrics["summary_figures"], "metrics.summary_figures")
+    evaluated = 0
+    for index, run in enumerate(metrics["runs"]):
+        location = f"metrics.runs[{index}]"
+        fields(run, ("run_id", "label", "configuration", "status"), location)
+        for key in ("run_id", "label", "configuration"):
+            require(isinstance(run[key], str) and bool(run[key]), f"{location}.{key}", "nonempty text")
+        strings(run.get("notes", []), f"{location}.notes")
+        require(run["status"] in ("CHARACTERIZED", "NOT EVALUABLE"),
+                f"{location}.status", "CHARACTERIZED or NOT EVALUABLE")
+        if run["status"] != "CHARACTERIZED":
+            require(isinstance(run.get("reason"), str), f"{location}.reason", "text")
+            continue
+        evaluated += 1
+        fields(run, ("overlap", "arrival_time_error", "final_comparison_h", "simulation_end_h",
+                     "domain_edge_contact_h", "stopped_early"), location)
+        require(isinstance(run["overlap"], list) and bool(run["overlap"]),
+                f"{location}.overlap", "a nonempty list")
+        for row_index, row in enumerate(run["overlap"]):
+            row_location = f"{location}.overlap[{row_index}]"
+            names = ("t_h", "observed_area_km2", "simulated_area_km2", "area_ratio",
+                     "jaccard", "precision", "recall", "f1")
+            fields(row, names, row_location)
+            for key in names:
+                number(row[key], f"{row_location}.{key}", nullable=key != "t_h")
+        error = run["arrival_time_error"]
+        fields(error, ("co_burned_cells",), f"{location}.arrival_time_error")
+        require(type(error["co_burned_cells"]) is int and error["co_burned_cells"] >= 0,
+                f"{location}.arrival_time_error.co_burned_cells", "a nonnegative integer")
+        if error["co_burned_cells"]:
+            fields(error, ("bias_h", "mae_h", "rmse_h", "median_error_h"), f"{location}.arrival_time_error")
+            for key in ("bias_h", "mae_h", "rmse_h", "median_error_h"):
+                number(error[key], f"{location}.arrival_time_error.{key}")
+        for key in ("final_comparison_h", "simulation_end_h", "domain_edge_contact_h"):
+            number(run[key], f"{location}.{key}", nullable=key == "domain_edge_contact_h")
+        require(type(run["stopped_early"]) is bool, f"{location}.stopped_early", "a boolean")
+        require(isinstance(run.get("fire_size_stats", {}), dict), f"{location}.fire_size_stats", "an object")
+        strings(run.get("figures", []), f"{location}.figures")
+        for figure in run.get("figures", []):
+            require(figure.split("_")[0] in ("comparison", "arrival", "fields"),
+                    f"{location}.figures", "recognized result figure names")
+    require(metrics["simulations_found"] == evaluated, "metrics.simulations_found", "the number of characterized runs")
+    require((metrics["status"] == "CHARACTERIZED") == (evaluated > 0),
+            "metrics.status", "consistent with the available characterized runs")
+
+
 def main() -> None:
-    metrics = read_json(CASE_DIR / "outputs" / "metrics.json")
-    if metrics.get("method_version") != "gofer_validation_v1":
-        metrics = {}
+    metrics_path = CASE_DIR / "outputs" / "metrics.json"
+    metrics = read_json(metrics_path)
+    if metrics_path.is_file():
+        validate_metrics(metrics)
     inputs = read_json(CASE_DIR / "outputs" / "input_statistics.json")
     if inputs.get("method_version") != "gofer_inputs_v1":
         inputs = {}

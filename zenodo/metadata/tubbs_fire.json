@@ -1,0 +1,33 @@
+{
+  "worksheet_format": "human review fields; not a Zenodo API payload",
+  "case_id": "tubbs_fire",
+  "resource_type": "Dataset",
+  "title": "ELMFIRE validation inputs and observations for tubbs fire",
+  "version": "1.0.0",
+  "creators": [],
+  "publication_date": null,
+  "license": null,
+  "redistribution_permission_evidence": null,
+  "description": "Frozen model inputs, comparison observations and provenance for tubbs_fire. Optional bundles preserve supplied historical simulation results and distinct inactive older inputs. Source-data limitations are documented in the bundled source_manifest.json. This dataset does not establish a scientific PASS.",
+  "keywords": [
+    "ELMFIRE",
+    "wildfire",
+    "validation",
+    "tubbs_fire"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/berkeley-firelab/ELMFIRE_VnV_Suite",
+      "relation": "is supplement to",
+      "resource_type": "Software"
+    }
+  ],
+  "source_license_statement": "unknown",
+  "known_provenance_gaps": [
+    "Upstream fuel, terrain, weather, moisture, WUI, and ignition products are not identified in the received archive.",
+    "The local VIIRS files do not record the exact FIRMS collection/granules, download URL, acquisition date, filtering history, or license.",
+    "The archive contains 16 alternate modified-building rasters that are not selected by the active namelist; they remain preserved in the original RAR.",
+    "The archive does not state whether model parameters were calibrated against this event."
+  ],
+  "review_status": "needs creator, attribution and redistribution review"
+}

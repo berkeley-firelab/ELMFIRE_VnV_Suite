@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "case_id": "caldor_2021",
+  "dataset_version": "1.0.0",
+  "source_revision": "51453eb80806cf7e1389d1d1af1dacaacd294267",
+  "source_state": "working tree snapshot; file hashes are authoritative",
+  "zenodo": {
+    "record_id": null,
+    "version_doi": null,
+    "concept_doi": null
+  },
+  "bundles": [
+    {
+      "role": "inputs",
+      "filename": "inputs.tar.gz",
+      "required": true,
+      "size": 195336314,
+      "sha256": "2ad867e07bfe165adcfe629d8e518018842be06de45c9a25024fbbf335119939",
+      "url": null,
+      "files": [
+        {
+          "path": "data/archive_payload/inputs/adj.tif",
+          "size": 89308,
+          "sha256": "2d06c04bdab7c697b28755a4d33a06355fcef3e7c8048bc211b32e2d348d2619"
+        },
+        {
+          "path": "data/archive_payload/inputs/elmfire.data",
+          "size": 1232,
+          "sha256": "3d4bfefd4f0d2ca6e34cbad2b77bf6f291d69e1a2ed2d73a97828ec29c8ed2c3"
+        },
+        {
+          "path": "data/archive_payload/inputs/fuel_models.csv",
+          "size": 3948,
+          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b"
+        },
+        {
+          "path": "data/archive_payload/inputs/ignition_mask.tif",
+          "size": 80482,
+          "sha256": "c8d42d3106d266be2e3a31cc10272bdd423187f435e6635d037e2c6cca98ebde"
+        },
+        {
+          "path": "data/archive_payload/inputs/ignitions.csv",
+          "size": 174,
+          "sha256": "afe343383e8709ba7e17c1f2aec0a39439bf18f4fb8c6e71b83e72ac247289b5"
+        },
+        {
+          "path": "data/archive_payload/inputs/landscape.tif",
+          "size": 28778893,
+          "sha256": "7ae5f56f6e2070835a306a04cf79ca67142778df1e0ea7d4315b9d0b2edff76b"
+        },
+        {
+          "path": "data/archive_payload/inputs/lh.tif",
+          "size": 16048680,
+          "sha256": "9a4c4c02876c83882526b6f6c598c15b45bafb6d7c57a315d41425fc15904f86"
+        },
+        {
+          "path": "data/archive_payload/inputs/lw.tif",
+          "size": 15729781,
+          "sha256": "33a44eb9225991c079d6bffb78131ac95ecc0b6040dce9f0658bcdac77a7567a"
+        },
+        {
+          "path": "data/archive_payload/inputs/m1.tif",
+          "size": 39628331,
+          "sha256": "bf41ee5e7453f654274ff28233d9b8091101450dd210889c35319c008beaf1ff"
+        },
+        {
+          "path": "data/archive_payload/inputs/m10.tif",
+          "size": 39349321,
+          "sha256": "774a7ca4095b2eb15a9979ab7a7059be8e570f0b7f9054bfea81492dd142c048"
+        },
+        {
+          "path": "data/archive_payload/inputs/m100.tif",
+          "size": 39291415,
+          "sha256": "ddc8b4094e570ea5a18ecbf2a9a380bbc36fdfc5bbe297da34c4ccb0da4206b5"
+        },
+        {
+          "path": "data/archive_payload/inputs/metadata.in",
+          "size": 555,
+          "sha256": "d3eeb2ddb56c18076bb09da1090f0f8ec1332c18afe3c0516aaa9159b5938483"
+        },
+        {
+          "path": "data/archive_payload/inputs/metadata.out",
+          "size": 292,
+          "sha256": "e99e3865b633452eed0db05b9816cd85fbfbc4d33b3a7ea5b8b18a1061360848"
+        },
+        {
+          "path": "data/archive_payload/inputs/phi.tif",
+          "size": 89308,
+          "sha256": "2d06c04bdab7c697b28755a4d33a06355fcef3e7c8048bc211b32e2d348d2619"
+        },
+        {
+          "path": "data/archive_payload/inputs/wd.tif",
+          "size": 5935392,
+          "sha256": "fa01de71fa60b51ab7e0a91a31b920c7d267ce0066b205848541286a24fcd2b8"
+        },
+        {
+          "path": "data/archive_payload/inputs/ws.tif",
+          "size": 41020785,
+          "sha256": "760984f7062d3b1877a823ceaea4a695f1d2380af9dbbc35d28e6612688d69b0"
+        }
+      ]
+    },
+    {
+      "role": "observations",
+      "filename": "observations.tar.gz",
+      "required": true,
+      "size": 271195,
+      "sha256": "f82f65f7098f1a5c4b1d9d74126b532212f9cab155c49d8e1f55b4a56d3b8d04",
+      "url": null,
+      "files": [
+        {
+          "path": "data/archive_payload/observations/Caldor_2021_toa.png",
+          "size": 194969,
+          "sha256": "e7e3dc23d1ab8d8fe6daf07a5271effda5f718d7621e625d251f19649ff6a4c5"
+        },
+        {
+          "path": "data/archive_payload/observations/Caldor_2021_toa.tif",
+          "size": 103192,
+          "sha256": "bfc257527333ebdffda60e08c40f2a5d3d930bebbfae38accb19dc17fd15e733"
+        }
+      ]
+    },
+    {
+      "role": "provenance",
+      "filename": "provenance.tar.gz",
+      "required": true,
+      "size": 38072,
+      "sha256": "68f05a5e710d1dc5afd7711ad97ba65ab9003822b275828ef3f05adb7323c3f5",
+      "url": null,
+      "files": [
+        {
+          "path": "case.yaml",
+          "size": 1284,
+          "sha256": "392f7a8e7968fb0b910c3440e2471bafa8bfd96e22e39de6bf22505e0b242f21"
+        },
+        {
+          "path": "data/archive_manifest.json",
+          "size": 15178,
+          "sha256": "fa247a932370932b037c05e4ca640e1d583c14d1383c13834c0650fd79861da8"
+        },
+        {
+          "path": "data/archive_payload/01-run.sh",
+          "size": 1882,
+          "sha256": "934ee13de67f4e64a38b5c9e647c3084f10de92e7813685fe7099e735c648835"
+        },
+        {
+          "path": "data/archive_validation.json",
+          "size": 8883,
+          "sha256": "c420ba23c3947b601fe17d4c1d2ac7e613726fa0eb7ca8ea392982d8e6049b24"
+        },
+        {
+          "path": "data/configuration_audit.json",
+          "size": 771,
+          "sha256": "ca5dcab72cba8e501d733da0796e8ca48db8f3d8d94231ce0eb169e987f3a643"
+        },
+        {
+          "path": "data/data_paths.json",
+          "size": 426,
+          "sha256": "1b22b78272283c8d8492709a146aee3163fa49c924e0293a0c71adc85fbbb81a"
+        },
+        {
+          "path": "data/provenance/archive/fires.csv",
+          "size": 7506,
+          "sha256": "ec179d623054018bfe3cd1f4566944feb737c29c2165df01527bf9cc11f248c3"
+        },
+        {
+          "path": "data/provenance/archive/inputs_log.csv",
+          "size": 4993,
+          "sha256": "4416ec2d34bd144fb76dd3696fd6e7a38bf32aba907c58e8458ea680bccc7364"
+        },
+        {
+          "path": "data/provenance/archive/make_fires.py",
+          "size": 3167,
+          "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94"
+        },
+        {
+          "path": "data/provenance/archive/prepare_inputs.py",
+          "size": 16402,
+          "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c"
+        },
+        {
+          "path": "data/provenance/archive/run_all.sh",
+          "size": 728,
+          "sha256": "7ac9cb0b80c992278de3fc27db8351b85509f9ccd40024b0210f5610fc93185f"
+        },
+        {
+          "path": "data/provenance/archive/score_runs.py",
+          "size": 5456,
+          "sha256": "2c63477ed4f5db55e3ece74c641570815e6aa65a82979a57bb56c68418a558a0"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
+          "size": 2379,
+          "sha256": "1fd3fbd75411b6145b2eb7edcdfb6f0d1abb349611077184fef89b30957168f8"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
+          "size": 4459,
+          "sha256": "29318a6cd45fe91df6a1fe41827bcf1cdbb0b55fcf036397d6a8d74a991e9fd8"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign.py",
+          "size": 15656,
+          "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.py",
+          "size": 2623,
+          "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+          "size": 3441,
+          "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+          "size": 3384,
+          "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee"
+        },
+        {
+          "path": "data/provenance/archive/tools/fuel_models.csv",
+          "size": 3948,
+          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b"
+        },
+        {
+          "path": "data/source_manifest.json",
+          "size": 29965,
+          "sha256": "d645e9ee955ab8d361601b4da12505353177bc5279e758053a6ab625cf59c6ad"
+        },
+        {
+          "path": "elmfire.data.in",
+          "size": 1240,
+          "sha256": "a39e945a65c069d06d3b58e02932ee032f9d5cc01785913ff692e30f2b383d38"
+        }
+      ]
+    },
+    {
+      "role": "historical_outputs",
+      "filename": "historical_outputs.tar.gz",
+      "required": false,
+      "size": 15454978,
+      "sha256": "9aa30163efff230406e270f070b313c00913f0636b73a9116c97b0ab606742f8",
+      "url": null,
+      "files": [
+        {
+          "path": "data/archive_payload/outputs/dump_times_0000001.csv",
+          "size": 69,
+          "sha256": "f04ae466ee2f30f4c0633f80b6d6fe72d066db2d605f3c04bcd15ed681a5704d"
+        },
+        {
+          "path": "data/archive_payload/outputs/fire_size_stats.csv",
+          "size": 495,
+          "sha256": "9cda2ccfc2bc77af9d8f5c4be994d8c9fd48f55803e2ac2ab22cb51364f6f4ae"
+        },
+        {
+          "path": "data/archive_payload/outputs/flin_0000001_2232000.tif",
+          "size": 2505990,
+          "sha256": "861ff071023521e6e7522a5f49ea9ee263c920465d689c4ac8817219f2f22f59"
+        },
+        {
+          "path": "data/archive_payload/outputs/hourly_isochrones.dbf",
+          "size": 453099,
+          "sha256": "0d5dc4b53cafe223bf39b9f47aad981d3a56ba8e2a5dbac6ab6000c6e16369b9"
+        },
+        {
+          "path": "data/archive_payload/outputs/hourly_isochrones.prj",
+          "size": 403,
+          "sha256": "ab78490474b2fb27a27ad2566802a7f49338602419540dd07cbcf22af5e50b6f"
+        },
+        {
+          "path": "data/archive_payload/outputs/hourly_isochrones.shp",
+          "size": 17217132,
+          "sha256": "696221bda158f991d4c9f54c12c7ec04f7701b82c296ccca88ae229b864e49ee"
+        },
+        {
+          "path": "data/archive_payload/outputs/hourly_isochrones.shx",
+          "size": 402796,
+          "sha256": "d887d346476c4db93ad9cf28217412b8e7dced9137f3b9aa398fcff320340c09"
+        },
+        {
+          "path": "data/archive_payload/outputs/segments_0000001_2232000.tif",
+          "size": 104572,
+          "sha256": "39dcd8d017b7693cabdc577ae1abb4023e7f3bdc462fec2ea83eec2363b05c44"
+        },
+        {
+          "path": "data/archive_payload/outputs/sts_0000001_2232000.tif",
+          "size": 131079,
+          "sha256": "41604ef527f4e8fa3b08570cbc3a94c16503f683027f7753ddb5ac08cfd60bf9"
+        },
+        {
+          "path": "data/archive_payload/outputs/time_of_arrival_0000001_2232000.tif",
+          "size": 2291483,
+          "sha256": "6575fc834082a025e0976b0738cb1758cca6d66b7803a26150a77da56031e6f1"
+        },
+        {
+          "path": "data/archive_payload/outputs/vs_0000001_2232000.tif",
+          "size": 2482340,
+          "sha256": "40b284bef79d5cf78513f0a44560950034a89c1ab018a3b41e28935b0affe539"
+        }
+      ]
+    }
+  ]
+}

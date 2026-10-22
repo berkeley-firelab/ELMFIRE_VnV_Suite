@@ -35,6 +35,7 @@ doi:10.5281/zenodo.8327264. The other 24 fires are not implemented here.
 ├── data/
 │   ├── source_manifest.json   source and observation provenance
 │   ├── archive_manifest.json  archive-input SHA-256 records, where available
+│   ├── dataset_manifest.json  prepared Zenodo bundles and SHA-256 file inventory
 │   └── data_paths.json        external data locations, for GOFER cases
 ├── scripts/                   all case-local processing and supporting functions
 ├── outputs/                   input_statistics.json and metrics.json
@@ -48,6 +49,28 @@ for Python. Reports require LuaLaTeX, latexmk, and genuine Times New Roman
 fonts. Compilation reads saved evidence; it does not run ELMFIRE or require
 another case or the aggregate guide.
 
+## Prepared Zenodo datasets
+
+Each of the seven cases has a `scripts/stage_dataset.py` helper for the new
+per-case bundles. Use `--bundle-dir /path/to/upload-folder` for offline
+restoration, `--verify` for local integrity checks, and `--download` only after
+the published version DOI and record have been registered in
+`data/dataset_manifest.json`. Add `--include-optional` for historical results
+and distinct inactive older inputs. Differing existing files are never replaced.
+
+The [upload guide](../../../docs/zenodo-upload-guide.md) documents the prepared
+files under `zenodo/dist/1.0.0/`, metadata review, publication, and fresh-download
+checks. Archived inputs, observations, historical results and distinct older
+inputs are ignored by Git; existing local copies remain in place. A fresh
+clone must restore each selected case from its upload folder or registered
+Zenodo record before preprocessing. Manifests, configurations, restore helpers
+and report evidence remain in the repository. The original
+GOFER `stage_data.py` helpers still restore from the supplied collection archive.
+All seven preprocessors operate on the extracted inputs and observations;
+original compressed archives are not used during case execution. Camp, Thomas,
+and Tubbs retain the original archive hashes in their provenance manifests,
+while preprocessing checks the required extracted files directly.
+
 ## Camp, Thomas, and Tubbs reconstructions
 
 These cases were assembled from RAR archives historically tracked under
@@ -56,6 +79,14 @@ are retained inside each case. The original archives and legacy notebook are
 absent from the current working tree; repository history retains their
 provenance. The notebook is not part of the active workflow because it contains
 hard-coded paths and destructive file operations.
+
+The active input paths are under `data/archive_payload/`. Byte-identical copies
+in the older `data/fuels_and_topography/`, `data/weather/`, and `data/misc/`
+folders have been removed, with exact-path rules in each case's `.gitignore`
+to prevent reintroduction. Files in those older folders that differ from the
+archive payload remain retained; they are distinct data, including Camp's older
+grid, and are not used by the current runners. Observations remain under
+`data/viirs_observation/`.
 
 Each case includes an archive-derived configuration, a source/observation
 manifest, a read-only preprocessor, and a non-destructive postprocessor.
@@ -98,8 +129,10 @@ references. Environment overrides remain available for verified copies.
 
 The archive supplies inputs and observations for all four active cases and
 historical outputs for Kincade, Glass, and Caldor. It contains neither historical
-CZU run. The other 24 fires' source data are retained under
-`../GOFER/data/archive_payload/`; current cases do not depend on that directory.
+CZU run. The other 24 fires' source data are preserved in
+independent per-fire upload sets under `zenodo/dist/1.0.0/`. The former
+`cases/Validation/GOFER/` source collection has been removed; definitions for
+these future cases live under `zenodo/datasets/`.
 
 Every extracted file is recorded by original archive member, case-local path,
 byte size, and SHA-256 in `data/archive_manifest.json`. The source manifest also
@@ -189,24 +222,23 @@ tests exercise these checks in all four independent implementations, including
 an exact synthetic comparison. Relative historical-result overrides are
 resolved from the case root consistently with the other data paths.
 
-These stricter checks identify future calculations as `gofer_validation_v3`.
-Retained metrics and figures remain the original `gofer_validation_v1`
-calculations and have not been overwritten. `data/archive_validation.json`
-records read-only input checks and comparisons with the retained historical
+Result metrics do not require a manually maintained method-version label.
+Report converters validate the fields they consume and ignore any legacy
+version label; the postprocessors retain the evidence checks described above.
+`data/archive_validation.json` records read-only input checks and comparisons with historical
 metrics, including differences at floating-point rounding precision and the
 missing CZU runs. Observation coverage/censoring and simulation completeness
 still require scientific review. Synthetic software tests do not establish
 scientific validation of these fires.
 
-### Legacy construction tools
+### Retired construction tools
 
-The builder and templates remain at `../GOFER/tools/`. They are legacy
-construction material, not dependencies of any current case. The builder
-historically reads the fire list, retrieval log, GOFER summary, and hard-coded
-result locations, then generates case files. **Do not use it to rebuild the
-relocated cases:** it still targets `../GOFER/` and would recreate duplicate
-cases there. Maintain each case's own files directly. Future cases should
+The old GOFER case builder and templates have been removed along with the
+source collection. Maintain each case's own files directly. Future cases should
 follow the validation skill and be created independently in `landscape_scale/`.
+The original collection inventory is retained at
+`zenodo/provenance/gofer_archive_inventory.json` for traceability; historical
+paths in its records identify the former layout and are not runtime dependencies.
 
 ## Suite discovery and reports
 

@@ -2,8 +2,8 @@
   "schema_version": 3,
   "suite": "validation",
   "aggregate_environment": {
-    "Captured at (UTC)": "2026-10-21T21:13:49+00:00",
-    "Repository revision": "4de95c48e33a",
+    "Captured at (UTC)": "2026-10-22T05:27:03+00:00",
+    "Repository revision": "51453eb80806",
     "Repository state": "dirty",
     "Host platform": "macOS-15.7.7-arm64-arm-64bit",
     "Processor architecture": "arm64",
@@ -40,7 +40,7 @@
       "metrics_available": true,
       "raw_status": "CHARACTERIZED",
       "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available. Only results from earlier simulation configurations are available; the current case configuration has not been simulated."
+      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
     },
     {
       "case_id": "camp_fire",
@@ -74,7 +74,7 @@
       "metrics_available": true,
       "raw_status": "CHARACTERIZED",
       "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available. Only results from earlier simulation configurations are available; the current case configuration has not been simulated."
+      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
     },
     {
       "case_id": "glass_2020",
@@ -91,7 +91,7 @@
       "metrics_available": true,
       "raw_status": "CHARACTERIZED",
       "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available. Only results from earlier simulation configurations are available; the current case configuration has not been simulated."
+      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
     },
     {
       "case_id": "kincade_2019",
@@ -108,7 +108,7 @@
       "metrics_available": true,
       "raw_status": "CHARACTERIZED",
       "decision": "CHARACTERIZED",
-      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available. Only results from earlier simulation configurations are available; the current case configuration has not been simulated."
+      "detail": "Metrics are descriptive because no independent predeclared acceptance thresholds are available."
     },
     {
       "case_id": "thomas_fire",

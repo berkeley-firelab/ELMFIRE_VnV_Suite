@@ -1,9 +1,8 @@
 {
-  "method_version": "gofer_validation_v1",
   "status": "CHARACTERIZED",
-  "reason": "Metrics are descriptive because no independent predeclared acceptance thresholds are available. Only results from earlier simulation configurations are available; the current case configuration has not been simulated.",
-  "simulations_found": 2,
-  "current_configuration_simulated": false,
+  "reason": "Metrics are descriptive because no independent predeclared acceptance thresholds are available.",
+  "simulations_found": 1,
+  "current_configuration_simulated": true,
   "summary_figures": [
     "burned_area_growth.pdf"
   ],
@@ -16,9 +15,29 @@
         "The configuration file was not retained with this result; the configuration is documented from the case owner's preparation record.",
         "This result was produced before offshore cells outside LANDFIRE coverage were filled with open-water values; those cells then held a fill value read as data. They lie offshore beyond a band of open water that the simulated fire did not reach, but the result is not from the corrected inputs."
       ],
+      "status": "NOT EVALUABLE",
+      "reason": "No time-of-arrival result was found for this simulation."
+    },
+    {
+      "run_id": "reference_spotting",
+      "label": "Reference-case spotting configuration",
+      "configuration": "reference_spotting",
+      "notes": [
+        "The configuration file used was retained with this result.",
+        "This result was produced before offshore cells outside LANDFIRE coverage were filled with open-water values; those cells then held a fill value read as data. They lie offshore beyond a band of open water that the simulated fire did not reach, but the result is not from the corrected inputs."
+      ],
+      "status": "NOT EVALUABLE",
+      "reason": "No time-of-arrival result was found for this simulation."
+    },
+    {
+      "run_id": "current",
+      "label": "Current case configuration",
+      "configuration": "current",
+      "notes": [],
       "status": "CHARACTERIZED",
       "output_time_s": 450000,
       "comparison_region": "valid landscape cells",
+      "grid_alignment": "matching cells with identical coordinates or verified ELMFIRE REAL/F12.2 header rounding; no landscape resampling",
       "observation_alignment": "nearest-neighbour transfer of GOFER arrival time to the 30 m model grid",
       "final_comparison_h": 134.0,
       "simulation_end_h": 134.0,
@@ -26,9 +45,9 @@
       "domain_edge_contact_h": null,
       "fire_size_stats": {
         "stop_h": 125.0,
-        "total_area_ac": 4240.2,
-        "crown_area_ac": 9.3,
-        "wall_clock_s": 10.873
+        "total_area_ac": 7858.3,
+        "crown_area_ac": 160.3,
+        "wall_clock_s": 60.864
       },
       "overlap": [
         {
@@ -46,144 +65,55 @@
         },
         {
           "t_h": 48,
-          "true_positive_cells": 1192,
+          "true_positive_cells": 1560,
           "false_positive_cells": 713,
-          "false_negative_cells": 7004,
-          "jaccard": 0.1337972836457515,
-          "precision": 0.6257217847769029,
-          "recall": 0.14543679843826257,
-          "f1": 0.236016236016236,
-          "simulated_area_km2": 1.7145,
+          "false_negative_cells": 6636,
+          "jaccard": 0.17510382759007745,
+          "precision": 0.6863176418829741,
+          "recall": 0.1903367496339678,
+          "f1": 0.29802273378546185,
+          "simulated_area_km2": 2.0457,
           "observed_area_km2": 7.376399999999999,
-          "area_ratio": 0.23243045387994143
+          "area_ratio": 0.27733040507564666
         },
         {
           "t_h": 72,
-          "true_positive_cells": 5563,
+          "true_positive_cells": 7204,
           "false_positive_cells": 0,
-          "false_negative_cells": 224170,
-          "jaccard": 0.02421506705610426,
+          "false_negative_cells": 222529,
+          "jaccard": 0.031358141842922,
           "precision": 1.0,
-          "recall": 0.02421506705610426,
-          "f1": 0.04728512171902625,
-          "simulated_area_km2": 5.0066999999999995,
+          "recall": 0.031358141842922,
+          "f1": 0.06080941347277968,
+          "simulated_area_km2": 6.4836,
           "observed_area_km2": 206.75969999999998,
-          "area_ratio": 0.02421506705610426
+          "area_ratio": 0.031358141842922
         },
         {
           "t_h": 134.0,
-          "true_positive_cells": 15037,
-          "false_positive_cells": 4029,
-          "false_negative_cells": 299237,
-          "jaccard": 0.04724115072745152,
-          "precision": 0.7886814224273576,
-          "recall": 0.0478467833801078,
-          "f1": 0.09022019559608807,
-          "simulated_area_km2": 17.159399999999998,
+          "true_positive_cells": 24467,
+          "false_positive_cells": 10868,
+          "false_negative_cells": 289807,
+          "jaccard": 0.07525019837486391,
+          "precision": 0.6924296023772464,
+          "recall": 0.07785244722757849,
+          "f1": 0.13996779259115186,
+          "simulated_area_km2": 31.8015,
           "observed_area_km2": 282.84659999999997,
-          "area_ratio": 0.060666806671885044
+          "area_ratio": 0.11243373616652984
         }
       ],
       "arrival_time_error": {
-        "co_burned_cells": 15037,
-        "bias_h": 33.20888282544685,
-        "mae_h": 34.63342974224641,
-        "rmse_h": 42.049840569280676,
-        "median_error_h": 30.919192708333327
+        "co_burned_cells": 24467,
+        "bias_h": 32.872867937550595,
+        "mae_h": 33.75105114413177,
+        "rmse_h": 40.28020220234866,
+        "median_error_h": 30.097695312500008
       },
       "figures": [
-        "comparison_baseline.pdf",
-        "arrival_baseline.pdf",
-        "fields_baseline.pdf"
-      ]
-    },
-    {
-      "run_id": "reference_spotting",
-      "label": "Reference-case spotting configuration",
-      "configuration": "reference_spotting",
-      "notes": [
-        "The configuration file used was retained with this result.",
-        "This result was produced before offshore cells outside LANDFIRE coverage were filled with open-water values; those cells then held a fill value read as data. They lie offshore beyond a band of open water that the simulated fire did not reach, but the result is not from the corrected inputs."
-      ],
-      "status": "CHARACTERIZED",
-      "output_time_s": 450000,
-      "comparison_region": "valid landscape cells",
-      "observation_alignment": "nearest-neighbour transfer of GOFER arrival time to the 30 m model grid",
-      "final_comparison_h": 134.0,
-      "simulation_end_h": 134.0,
-      "stopped_early": false,
-      "domain_edge_contact_h": 102.75317708333333,
-      "fire_size_stats": {
-        "stop_h": 125.0,
-        "total_area_ac": 193155.6,
-        "crown_area_ac": 14872.9,
-        "wall_clock_s": 2504.6831
-      },
-      "overlap": [
-        {
-          "t_h": 24,
-          "true_positive_cells": 404,
-          "false_positive_cells": 8278,
-          "false_negative_cells": 30,
-          "jaccard": 0.046372819100091826,
-          "precision": 0.04653305689933195,
-          "recall": 0.9308755760368663,
-          "f1": 0.088635366388767,
-          "simulated_area_km2": 7.8138,
-          "observed_area_km2": 0.3906,
-          "area_ratio": 20.004608294930875
-        },
-        {
-          "t_h": 48,
-          "true_positive_cells": 4890,
-          "false_positive_cells": 96858,
-          "false_negative_cells": 3306,
-          "jaccard": 0.0465474898623565,
-          "precision": 0.048059912725557256,
-          "recall": 0.5966325036603221,
-          "f1": 0.08895437677363022,
-          "simulated_area_km2": 91.5732,
-          "observed_area_km2": 7.376399999999999,
-          "area_ratio": 12.414348462664714
-        },
-        {
-          "t_h": 72,
-          "true_positive_cells": 206209,
-          "false_positive_cells": 263705,
-          "false_negative_cells": 23524,
-          "jaccard": 0.41790255310697594,
-          "precision": 0.4388228484360968,
-          "recall": 0.8976028694179765,
-          "f1": 0.5894658306260157,
-          "simulated_area_km2": 422.9226,
-          "observed_area_km2": 206.75969999999998,
-          "area_ratio": 2.045478882006503
-        },
-        {
-          "t_h": 134.0,
-          "true_positive_cells": 307431,
-          "false_positive_cells": 565375,
-          "false_negative_cells": 6843,
-          "jaccard": 0.34949280906361513,
-          "precision": 0.35223291315595906,
-          "recall": 0.9782260066057008,
-          "f1": 0.5179617211982344,
-          "simulated_area_km2": 785.5254,
-          "observed_area_km2": 282.84659999999997,
-          "area_ratio": 2.7772135143218977
-        }
-      ],
-      "arrival_time_error": {
-        "co_burned_cells": 307431,
-        "bias_h": -14.02902054356975,
-        "mae_h": 19.591616818675597,
-        "rmse_h": 22.429514040616418,
-        "median_error_h": -15.745983072916665
-      },
-      "figures": [
-        "comparison_reference_spotting.pdf",
-        "arrival_reference_spotting.pdf",
-        "fields_reference_spotting.pdf"
+        "comparison_current.pdf",
+        "arrival_current.pdf",
+        "fields_current.pdf"
       ]
     }
   ]

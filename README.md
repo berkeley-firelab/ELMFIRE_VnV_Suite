@@ -44,6 +44,7 @@ ELMFIRE_VnV_Suite/
 ├── main_report/            # Separate verification and validation summary reports
 ├── gcp_config/             # Dockerfile, Cloud Build + Batch templates for Google Cloud runs
 ├── tools/                  # Workflow helpers (create case, rebuild reports)
+├── zenodo/                 # Dataset metadata and ignored local upload bundles
 └── Makefile                # Convenience targets that wrap the scripts
 ```
 
@@ -113,6 +114,31 @@ correct packages and versions are available.
    before running any scripts.
 
 ---
+
+## Preparing validation data for Zenodo
+
+Seven per-case upload sets are prepared under `zenodo/dist/1.0.0/`. Each keeps
+inputs, observations, provenance, and optional historical/legacy data separate,
+with SHA-256 hashes for bundles and individual files. Generated upload binaries
+are ignored by Git; dataset manifests, metadata worksheets, and independent
+case-local `scripts/stage_dataset.py` helpers belong in the repository.
+
+The 24 additional GOFER fires also have individual upload folders, bringing the
+total to 31 independent fire datasets. Their definitions and restoration helpers
+are under `zenodo/datasets/<fire_id>/`, preparing data for future
+validation cases. Each record includes its own inputs, observations and provenance.
+
+Run `make zenodo-verify` to check the prepared upload files.
+Follow [the Zenodo upload guide](docs/zenodo-upload-guide.md) to complete the
+blank creator and license fields, upload one record per fire, register each
+version DOI, and verify a fresh download to complete the migration.
+The [dataset overview](zenodo/README.md) lists folders and initial upload sizes.
+
+Archived validation inputs, observations and optional historical/legacy payloads
+are no longer tracked by Git. Existing local copies are preserved and ignored.
+A fresh clone must restore the selected case's data using its
+`scripts/stage_dataset.py` helper before preprocessing or running the case.
+Use the local upload folder until that dataset's Zenodo record is registered.
 
 ## Running an existing case
 
@@ -236,6 +262,20 @@ make run-all SUITE=verification
 ```
 
 ## Building the aggregate reports
+
+Check the report tools, packages, writable font cache, and all four genuine
+Times New Roman faces before building:
+
+```bash
+make report-check PYTHON_BIN=python
+make reports PYTHON_BIN=python
+```
+
+Use the Python from the activated suite environment. The report configuration
+uses a local `tex-cache/` directory to avoid restricted home-cache and TeX
+file-access failures. For separate font files, set `ELMFIRE_REPORT_FONT_DIR`.
+See [report build troubleshooting](docs/report-build-troubleshooting.md) for
+workstation, Savio, container, missing-package, and font setup instructions.
 
 Generate both report indexes and their status tables, then aggregate the current
 standalone case PDFs with:

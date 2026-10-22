@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "case_id": "czu_lightning_complex_2020",
+  "dataset_version": "1.0.0",
+  "source_revision": "51453eb80806cf7e1389d1d1af1dacaacd294267",
+  "source_state": "working tree snapshot; file hashes are authoritative",
+  "zenodo": {
+    "record_id": null,
+    "version_doi": null,
+    "concept_doi": null
+  },
+  "bundles": [
+    {
+      "role": "inputs",
+      "filename": "inputs.tar.gz",
+      "required": true,
+      "size": 30331670,
+      "sha256": "2a95f97597dd742aab821dd8a0cf00cb9b2c9d598c7940db4a5c760e848873bf",
+      "url": null,
+      "files": [
+        {
+          "path": "data/archive_payload/inputs/adj.tif",
+          "size": 58644,
+          "sha256": "f0f00a75cdcdc3ed73208455246176c3ca36ebb5d949ac339f9ec03e7b6112f6"
+        },
+        {
+          "path": "data/archive_payload/inputs/elmfire.data",
+          "size": 1359,
+          "sha256": "cbe9d864cd98a05bdbe1ee44127724e5c9a7498816b78c9da03c684b078db2c6"
+        },
+        {
+          "path": "data/archive_payload/inputs/fuel_models.csv",
+          "size": 3948,
+          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b"
+        },
+        {
+          "path": "data/archive_payload/inputs/ignition_mask.tif",
+          "size": 53246,
+          "sha256": "7e645e4adf94a4ccb5b0e9ce6958afd46a9d9c82da72635d4a2e1bf88674f148"
+        },
+        {
+          "path": "data/archive_payload/inputs/ignitions.csv",
+          "size": 418,
+          "sha256": "9907eebdf7a3f96efbd14d8f09c1f9cc1ab958fa2e98cfab8c83613d94d63d8f"
+        },
+        {
+          "path": "data/archive_payload/inputs/landscape.tif",
+          "size": 15003456,
+          "sha256": "5be12190ad95c7a375277bbc5394ecf12f30366c0472614a2a13e29dbc9b05af"
+        },
+        {
+          "path": "data/archive_payload/inputs/lh.tif",
+          "size": 1931218,
+          "sha256": "069289a09a00b5f8e7ec8948d90eb42f763edc183b74a229b1600c9dad7ac236"
+        },
+        {
+          "path": "data/archive_payload/inputs/lw.tif",
+          "size": 1907194,
+          "sha256": "8ae5ba6a68e960c2c1759f1c935845f0bd0a59529571f431d882b417c91688bd"
+        },
+        {
+          "path": "data/archive_payload/inputs/m1.tif",
+          "size": 3654895,
+          "sha256": "64ce9f211044c6fb50766db1edf0b0d69dac3b09f177f8be4e5fb22e6f31f229"
+        },
+        {
+          "path": "data/archive_payload/inputs/m10.tif",
+          "size": 3649992,
+          "sha256": "54d0e1887d9d1fba30448f12c9e3f1e44a502ee7a1e1d47b9f20bdc771ba6c08"
+        },
+        {
+          "path": "data/archive_payload/inputs/m100.tif",
+          "size": 3612249,
+          "sha256": "d007142366c029d8f88df863e3eabe6aab0f2364c3bdccc07c28dd429dc0c5a8"
+        },
+        {
+          "path": "data/archive_payload/inputs/metadata.in",
+          "size": 567,
+          "sha256": "05859038973fd48c2dc32ee855f5645545e6db339d62995cddcf591cce51b70f"
+        },
+        {
+          "path": "data/archive_payload/inputs/metadata.out",
+          "size": 291,
+          "sha256": "237514df85ec0d267543e96413e4b72b43240d014707cd24ffa313e50ed2c99d"
+        },
+        {
+          "path": "data/archive_payload/inputs/phi.tif",
+          "size": 58644,
+          "sha256": "f0f00a75cdcdc3ed73208455246176c3ca36ebb5d949ac339f9ec03e7b6112f6"
+        },
+        {
+          "path": "data/archive_payload/inputs/wd.tif",
+          "size": 499648,
+          "sha256": "0b75f233bc2e258e9c6bd5524ecb83fe39c1b70efb7ecaf4d67444b026c10cb1"
+        },
+        {
+          "path": "data/archive_payload/inputs/ws.tif",
+          "size": 3757869,
+          "sha256": "a5e839bcca109ed798cfab99419743dbe7b03984871a8ffa2310f6851b785c90"
+        }
+      ]
+    },
+    {
+      "role": "observations",
+      "filename": "observations.tar.gz",
+      "required": true,
+      "size": 188938,
+      "sha256": "f490f8803021366475b5de9ac23a7b9ca4ff6ba02f699771ae551ebf09c5a934",
+      "url": null,
+      "files": [
+        {
+          "path": "data/archive_payload/observations/CZU_Lightning_Complex_2020_toa.png",
+          "size": 182516,
+          "sha256": "642e1de2a6e817f65854a0f11044d67236f03b11ce399f7ccb5548342c53108b"
+        },
+        {
+          "path": "data/archive_payload/observations/CZU_Lightning_Complex_2020_toa.tif",
+          "size": 18998,
+          "sha256": "f6528b4767a8796a535838b1071d4e78fc621aedd7262d0cc6ad171884b7e98e"
+        }
+      ]
+    },
+    {
+      "role": "provenance",
+      "filename": "provenance.tar.gz",
+      "required": true,
+      "size": 34851,
+      "sha256": "9d625b48d1f33e460d35bf7453863125e3774110e6430aab2d90e9e5347e25ac",
+      "url": null,
+      "files": [
+        {
+          "path": "case.yaml",
+          "size": 1451,
+          "sha256": "cf3d401fe99fa8d3094f30312e38fc05dd2435ed5ff5231b69df90e264cbf26c"
+        },
+        {
+          "path": "data/archive_manifest.json",
+          "size": 11604,
+          "sha256": "59460913732f9910be5a05638957ad3d282a995ca520649ee96f876cb84a3434"
+        },
+        {
+          "path": "data/archive_payload/01-run.sh",
+          "size": 1897,
+          "sha256": "fcb15453329f06f27c46b357f7de74b77a3ac0a2edea02a0d97c0e64e813887f"
+        },
+        {
+          "path": "data/archive_validation.json",
+          "size": 5868,
+          "sha256": "f6e9a598b189f8bf15ead52a994b8d7e54cff978a195e3aa5979092ec07f5527"
+        },
+        {
+          "path": "data/configuration_audit.json",
+          "size": 771,
+          "sha256": "654e41aa6130b8badec4c2acc6221e790b90125305bfc67760a09552f37651e1"
+        },
+        {
+          "path": "data/data_paths.json",
+          "size": 1437,
+          "sha256": "70b8abbbfaa8512b25eca2ea19104135a8c7aa206945a8d670e0a25c701e1c2a"
+        },
+        {
+          "path": "data/provenance/archive/fires.csv",
+          "size": 7506,
+          "sha256": "ec179d623054018bfe3cd1f4566944feb737c29c2165df01527bf9cc11f248c3"
+        },
+        {
+          "path": "data/provenance/archive/inputs_log.csv",
+          "size": 4993,
+          "sha256": "4416ec2d34bd144fb76dd3696fd6e7a38bf32aba907c58e8458ea680bccc7364"
+        },
+        {
+          "path": "data/provenance/archive/make_fires.py",
+          "size": 3167,
+          "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94"
+        },
+        {
+          "path": "data/provenance/archive/prepare_inputs.py",
+          "size": 16402,
+          "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c"
+        },
+        {
+          "path": "data/provenance/archive/run_all.sh",
+          "size": 728,
+          "sha256": "7ac9cb0b80c992278de3fc27db8351b85509f9ccd40024b0210f5610fc93185f"
+        },
+        {
+          "path": "data/provenance/archive/score_runs.py",
+          "size": 5456,
+          "sha256": "2c63477ed4f5db55e3ece74c641570815e6aa65a82979a57bb56c68418a558a0"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
+          "size": 2379,
+          "sha256": "1fd3fbd75411b6145b2eb7edcdfb6f0d1abb349611077184fef89b30957168f8"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
+          "size": 4459,
+          "sha256": "29318a6cd45fe91df6a1fe41827bcf1cdbb0b55fcf036397d6a8d74a991e9fd8"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign.py",
+          "size": 15656,
+          "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.py",
+          "size": 2623,
+          "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+          "size": 3441,
+          "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+          "size": 3384,
+          "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee"
+        },
+        {
+          "path": "data/provenance/archive/tools/fuel_models.csv",
+          "size": 3948,
+          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b"
+        },
+        {
+          "path": "data/source_manifest.json",
+          "size": 15038,
+          "sha256": "2aa22f74717184da6093bba591e1f4c45a8f048a3b99fd3b6255c0f0ef528271"
+        },
+        {
+          "path": "elmfire.data.in",
+          "size": 1367,
+          "sha256": "fa2ee9eff5187ad8d15640a6170f91d4fed5f1711e115f7396923dc52beede3d"
+        }
+      ]
+    }
+  ]
+}

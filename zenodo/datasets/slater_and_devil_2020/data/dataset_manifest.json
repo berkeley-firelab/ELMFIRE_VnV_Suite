@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "case_id": "slater_and_devil_2020",
+  "dataset_version": "1.0.0",
+  "source_revision": "51453eb80806cf7e1389d1d1af1dacaacd294267",
+  "source_state": "working tree snapshot; file hashes are authoritative",
+  "zenodo": {
+    "record_id": null,
+    "version_doi": null,
+    "concept_doi": null
+  },
+  "bundles": [
+    {
+      "role": "inputs",
+      "filename": "inputs.tar.gz",
+      "required": true,
+      "size": 101009089,
+      "sha256": "f1b0a96972d25f873166c96ba1b826b6a0fcc1337d173884b8d3f4735c139d0e",
+      "url": null,
+      "files": [
+        {
+          "path": "data/archive_payload/inputs/adj.tif",
+          "role": "inputs",
+          "size": 85442,
+          "sha256": "4f0d1e0a4cee2ce49114b56f9710ef02305c5d589aabf9d3a99512999f56d07c",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/adj.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/adj.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/elmfire.data",
+          "role": "inputs",
+          "size": 1425,
+          "sha256": "83f12e3d1e4b1e3a4b45faca8d2dd23b14262941f046c5d196e7fa4722194b42",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/elmfire.data",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/elmfire.data"
+        },
+        {
+          "path": "data/archive_payload/inputs/fuel_models.csv",
+          "role": "inputs",
+          "size": 3948,
+          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/fuel_models.csv",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/fuel_models.csv"
+        },
+        {
+          "path": "data/archive_payload/inputs/ignition_mask.tif",
+          "role": "inputs",
+          "size": 78529,
+          "sha256": "a7d059c563ccbd07581be3b2d3778ad01b99ee95a2dfd03c7936b1d515339245",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/ignition_mask.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/ignition_mask.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/ignitions.csv",
+          "role": "inputs",
+          "size": 536,
+          "sha256": "d12aeb3645c4179f7ec014890021873612f0f43bd7acc149e67a32497ad6df8d",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/ignitions.csv",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/ignitions.csv"
+        },
+        {
+          "path": "data/archive_payload/inputs/landscape.tif",
+          "role": "inputs",
+          "size": 25022353,
+          "sha256": "27a324d6bab03b80044df37e7f281541815cc3b545c74474308b9557a10e4a6c",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/landscape.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/landscape.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/lh.tif",
+          "role": "inputs",
+          "size": 5715778,
+          "sha256": "41f7c7befca229a7717de1099cad270d869df7b0da7fe3bc35fd099896aaf8ac",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/lh.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/lh.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/lw.tif",
+          "role": "inputs",
+          "size": 5493587,
+          "sha256": "d9ff93e2eb5ea62a0aaa0e874d2376b03247377edea584a81bd8f456ed0c08a7",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/lw.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/lw.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/m1.tif",
+          "role": "inputs",
+          "size": 18175969,
+          "sha256": "cb0705452b56670047a51a0f53ef1dbe0630e784f16bd0c1dfacaf6353df9bc8",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/m1.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/m1.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/m10.tif",
+          "role": "inputs",
+          "size": 18062051,
+          "sha256": "7ebe1171af80417a900fcb9baae3a8534fa0297574e02049f78ca62a88f4c887",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/m10.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/m10.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/m100.tif",
+          "role": "inputs",
+          "size": 18029967,
+          "sha256": "f86ca764f6ea11007b194fef0415ee569ca6dfbe63a7aa3f8f2dee24ffc6edd1",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/m100.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/m100.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/metadata.in",
+          "role": "inputs",
+          "size": 565,
+          "sha256": "e6373ccd40b041da3358f6f244d1d385e21a233a31e4459de881130aa8e4c425",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/metadata.in",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/metadata.in"
+        },
+        {
+          "path": "data/archive_payload/inputs/metadata.out",
+          "role": "inputs",
+          "size": 292,
+          "sha256": "0cf0e782db19b9f9f0ed25cb39fa1e142b880c07c49b41a6c4d2e371894a07b4",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/metadata.out",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/metadata.out"
+        },
+        {
+          "path": "data/archive_payload/inputs/phi.tif",
+          "role": "inputs",
+          "size": 85442,
+          "sha256": "4f0d1e0a4cee2ce49114b56f9710ef02305c5d589aabf9d3a99512999f56d07c",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/phi.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/phi.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/wd.tif",
+          "role": "inputs",
+          "size": 2757532,
+          "sha256": "bfb41663f5ec606b38225ccd727b3177bf8d6a8b7338b950090e4b960668934a",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/wd.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/wd.tif"
+        },
+        {
+          "path": "data/archive_payload/inputs/ws.tif",
+          "role": "inputs",
+          "size": 18516637,
+          "sha256": "98a68a36ea112d8e4785ef28fefcefabaf6960f41e834dcc1467e470c801e3fb",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/inputs/ws.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/inputs/ws.tif"
+        }
+      ]
+    },
+    {
+      "role": "observations",
+      "filename": "observations.tar.gz",
+      "required": true,
+      "size": 224255,
+      "sha256": "ea88835acd8ed7662b7c8f32a2baf96c06a0ef0739a9faeaaa2721078061fad2",
+      "url": null,
+      "files": [
+        {
+          "path": "data/archive_payload/observations/Slater_and_Devil_2020_toa.png",
+          "role": "observations",
+          "size": 185363,
+          "sha256": "3e14626511a648cd6ef49b15f72f7779bf9b434ac2606d5de8b30bb9d127ff14",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/observations/Slater_and_Devil_2020_toa.png",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/observations/Slater_and_Devil_2020_toa.png"
+        },
+        {
+          "path": "data/archive_payload/observations/Slater_and_Devil_2020_toa.tif",
+          "role": "observations",
+          "size": 72741,
+          "sha256": "8804407d51fe3c7de5d212abc835c32df46afb3ca4a7737cf99d216a70c87174",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/observations/Slater_and_Devil_2020_toa.tif",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/observations/Slater_and_Devil_2020_toa.tif"
+        }
+      ]
+    },
+    {
+      "role": "provenance",
+      "filename": "provenance.tar.gz",
+      "required": true,
+      "size": 59811,
+      "sha256": "d8a719be4700b1988bd827835c842acd2a981dbeac798d2980d122665b2dcad8",
+      "url": null,
+      "files": [
+        {
+          "path": "data/archive_manifest.json",
+          "size": 13808,
+          "sha256": "9be2fbf1c813cb8066fbbe7195b89486f91aa575602512f64b81329c99744f02"
+        },
+        {
+          "path": "data/provenance/archive/Slater_and_Devil_2020/01-run.sh",
+          "role": "provenance",
+          "size": 1890,
+          "sha256": "50a0ea20054a50f760259303491b88faa563a149390d0f25f227b4c51e993e4f",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/Slater_and_Devil_2020/01-run.sh",
+          "archive_member": "ELMFIRE_GOFER_validation/Slater_and_Devil_2020/01-run.sh"
+        },
+        {
+          "path": "data/provenance/archive/archive_inventory.json",
+          "role": "provenance",
+          "size": 182529,
+          "sha256": "bf4f8f8ca202fded62c71bee5f227580790d2c04fb1d541336d3befaa2f71dec",
+          "repository_source": "cases/Validation/GOFER/data/archive_inventory.json"
+        },
+        {
+          "path": "data/provenance/archive/fires.csv",
+          "role": "provenance",
+          "size": 7506,
+          "sha256": "ec179d623054018bfe3cd1f4566944feb737c29c2165df01527bf9cc11f248c3",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/fires.csv",
+          "archive_member": "ELMFIRE_GOFER_validation/fires.csv"
+        },
+        {
+          "path": "data/provenance/archive/inputs_log.csv",
+          "role": "provenance",
+          "size": 4993,
+          "sha256": "4416ec2d34bd144fb76dd3696fd6e7a38bf32aba907c58e8458ea680bccc7364",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/inputs_log.csv",
+          "archive_member": "ELMFIRE_GOFER_validation/inputs_log.csv"
+        },
+        {
+          "path": "data/provenance/archive/make_fires.py",
+          "role": "provenance",
+          "size": 3167,
+          "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/make_fires.py",
+          "archive_member": "ELMFIRE_GOFER_validation/make_fires.py"
+        },
+        {
+          "path": "data/provenance/archive/prepare_inputs.py",
+          "role": "provenance",
+          "size": 16402,
+          "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/prepare_inputs.py",
+          "archive_member": "ELMFIRE_GOFER_validation/prepare_inputs.py"
+        },
+        {
+          "path": "data/provenance/archive/run_all.sh",
+          "role": "provenance",
+          "size": 728,
+          "sha256": "7ac9cb0b80c992278de3fc27db8351b85509f9ccd40024b0210f5610fc93185f",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/run_all.sh",
+          "archive_member": "ELMFIRE_GOFER_validation/run_all.sh"
+        },
+        {
+          "path": "data/provenance/archive/score_runs.py",
+          "role": "provenance",
+          "size": 5456,
+          "sha256": "2c63477ed4f5db55e3ece74c641570815e6aa65a82979a57bb56c68418a558a0",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/score_runs.py",
+          "archive_member": "ELMFIRE_GOFER_validation/score_runs.py"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
+          "role": "provenance",
+          "size": 2379,
+          "sha256": "1fd3fbd75411b6145b2eb7edcdfb6f0d1abb349611077184fef89b30957168f8",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
+          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
+          "role": "provenance",
+          "size": 4459,
+          "sha256": "29318a6cd45fe91df6a1fe41827bcf1cdbb0b55fcf036397d6a8d74a991e9fd8",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
+          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign.py",
+          "role": "provenance",
+          "size": 15656,
+          "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign.py",
+          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign.py"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.py",
+          "role": "provenance",
+          "size": 2623,
+          "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2.py",
+          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.py"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+          "role": "provenance",
+          "size": 3441,
+          "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.pyi"
+        },
+        {
+          "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+          "role": "provenance",
+          "size": 3384,
+          "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+          "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2_grpc.py"
+        },
+        {
+          "path": "data/provenance/archive/tools/fuel_models.csv",
+          "role": "provenance",
+          "size": 3948,
+          "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
+          "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/fuel_models.csv",
+          "archive_member": "ELMFIRE_GOFER_validation/tools/fuel_models.csv"
+        },
+        {
+          "path": "data/source_manifest.json",
+          "size": 1126,
+          "sha256": "ea988ccea1d9a7b70914b12b7f0c5af0c4f25b9900dcb5a06f986da5ccca888e"
+        }
+      ]
+    }
+  ],
+  "dataset_kind": "future_validation_case",
+  "fire_id": "Slater_and_Devil_2020"
+}

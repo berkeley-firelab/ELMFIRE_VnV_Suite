@@ -1,0 +1,3 @@
+# Redundant copies removed after SHA-256 verification against data/archive_payload/.
+# Keep these paths ignored if old data folders are copied back into this case.
+/data/misc/fuel_models.csv

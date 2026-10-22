@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "case_id": "red_salmon_complex_2020",
+  "fire_id": "Red_Salmon_Complex_2020",
+  "archive": {
+    "filename": "ELMFIRE_GOFER_validation.tar.gz",
+    "size": 7038832441,
+    "sha256": "714b9f2b3c3417336ea200bfc6f2bba2955376bf3088d675a811a11d28b0fffe",
+    "files": 583,
+    "skipped_macos_metadata": 682,
+    "received_date_utc": "2026-10-21",
+    "provider": "User-supplied archive",
+    "license": "Not documented in the supplied archive; upstream access and redistribution terms still apply."
+  },
+  "source_files": [
+    {
+      "path": "data/provenance/archive/Red_Salmon_Complex_2020/01-run.sh",
+      "role": "provenance",
+      "size": 1894,
+      "sha256": "554b5340901864122e323215ca78e1a21e79e5cd75e8d87725574f8c112ec216",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/01-run.sh",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/01-run.sh"
+    },
+    {
+      "path": "data/archive_payload/inputs/adj.tif",
+      "role": "inputs",
+      "size": 71443,
+      "sha256": "cb9a419576975a3f83e37976e690ae00e9c2d8e2a9d053351069ed124eeecc9b",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/adj.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/adj.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/elmfire.data",
+      "role": "inputs",
+      "size": 1299,
+      "sha256": "d584cafb33b80f4619177c75d45e56025119b3c5fed25862e11ce62dcf435722",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/elmfire.data",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/elmfire.data"
+    },
+    {
+      "path": "data/archive_payload/inputs/fuel_models.csv",
+      "role": "inputs",
+      "size": 3948,
+      "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/fuel_models.csv",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/fuel_models.csv"
+    },
+    {
+      "path": "data/archive_payload/inputs/ignition_mask.tif",
+      "role": "inputs",
+      "size": 65283,
+      "sha256": "3192bda6d7d687f7ef9fd1cac0597308b0a547aeea044159cd7ea02228554b92",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/ignition_mask.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/ignition_mask.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/ignitions.csv",
+      "role": "inputs",
+      "size": 294,
+      "sha256": "06ea4f9821837139d2c6a471a56d90b386c71f592538e605c3fce659af0082f2",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/ignitions.csv",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/ignitions.csv"
+    },
+    {
+      "path": "data/archive_payload/inputs/landscape.tif",
+      "role": "inputs",
+      "size": 15993887,
+      "sha256": "dfebd4d196a145c94e69fe59177ed720ea59adf2d8f35bf0308490999bc5937a",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/landscape.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/landscape.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/lh.tif",
+      "role": "inputs",
+      "size": 38052464,
+      "sha256": "c9a83d315da19006adce2c9f208e718ddb1c360c5499455b8ff8c08a253d6e76",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/lh.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/lh.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/lw.tif",
+      "role": "inputs",
+      "size": 37061129,
+      "sha256": "f833648bc4096bab54bac4013edf887c41a217fffa05f9ebf136da7e6d374f77",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/lw.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/lw.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/m1.tif",
+      "role": "inputs",
+      "size": 67613401,
+      "sha256": "9cbbe3b7099c5a2d8c69252e32cd5981c6ae0bd1cc1f3318f9f4500f00aa52ae",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/m1.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/m1.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/m10.tif",
+      "role": "inputs",
+      "size": 67418616,
+      "sha256": "fa5198d8baf57e4be33fb1e5a333aae972b432bf2d954ff92be41c193d09ee6f",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/m10.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/m10.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/m100.tif",
+      "role": "inputs",
+      "size": 67290666,
+      "sha256": "da10d25563733a2faf8e562c6a7a311570106f3e3d9c48ba15792c650b9be86b",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/m100.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/m100.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/metadata.in",
+      "role": "inputs",
+      "size": 565,
+      "sha256": "e7f7226ddc853d2171dfd42ebec40466595558f1ffd5dc60fa58a181da65fee1",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/metadata.in",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/metadata.in"
+    },
+    {
+      "path": "data/archive_payload/inputs/metadata.out",
+      "role": "inputs",
+      "size": 293,
+      "sha256": "f2adbb6055eee7d2e611a51e1de4152c5797b6e73f4f13586157c20d76d6ffee",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/metadata.out",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/metadata.out"
+    },
+    {
+      "path": "data/archive_payload/inputs/phi.tif",
+      "role": "inputs",
+      "size": 71443,
+      "sha256": "cb9a419576975a3f83e37976e690ae00e9c2d8e2a9d053351069ed124eeecc9b",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/phi.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/phi.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/wd.tif",
+      "role": "inputs",
+      "size": 9976217,
+      "sha256": "e11d24601a77cccbf47980e5d95ff801d8e70c85b7b2e85ab9b571cf0624b32d",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/wd.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/wd.tif"
+    },
+    {
+      "path": "data/archive_payload/inputs/ws.tif",
+      "role": "inputs",
+      "size": 69360783,
+      "sha256": "b170a3479319647baa1dbf788ecb3d83247a972c381c1387dd90200f97b08478",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/inputs/ws.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/inputs/ws.tif"
+    },
+    {
+      "path": "data/archive_payload/observations/Red_Salmon_Complex_2020_toa.png",
+      "role": "observations",
+      "size": 231681,
+      "sha256": "1b46f4c2cae00af3c2d5ca4bc95aeacb7ff44201b99d3a2b82a66b50084ce85c",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/observations/Red_Salmon_Complex_2020_toa.png",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/observations/Red_Salmon_Complex_2020_toa.png"
+    },
+    {
+      "path": "data/archive_payload/observations/Red_Salmon_Complex_2020_toa.tif",
+      "role": "observations",
+      "size": 43710,
+      "sha256": "0086fc62e334c0a16f0e49e8c18cc3d229c4175d204b7ae963967245ef054bcc",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/Red_Salmon_Complex_2020/observations/Red_Salmon_Complex_2020_toa.tif",
+      "archive_member": "ELMFIRE_GOFER_validation/Red_Salmon_Complex_2020/observations/Red_Salmon_Complex_2020_toa.tif"
+    },
+    {
+      "path": "data/provenance/archive/fires.csv",
+      "role": "provenance",
+      "size": 7506,
+      "sha256": "ec179d623054018bfe3cd1f4566944feb737c29c2165df01527bf9cc11f248c3",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/fires.csv",
+      "archive_member": "ELMFIRE_GOFER_validation/fires.csv"
+    },
+    {
+      "path": "data/provenance/archive/inputs_log.csv",
+      "role": "provenance",
+      "size": 4993,
+      "sha256": "4416ec2d34bd144fb76dd3696fd6e7a38bf32aba907c58e8458ea680bccc7364",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/inputs_log.csv",
+      "archive_member": "ELMFIRE_GOFER_validation/inputs_log.csv"
+    },
+    {
+      "path": "data/provenance/archive/make_fires.py",
+      "role": "provenance",
+      "size": 3167,
+      "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/make_fires.py",
+      "archive_member": "ELMFIRE_GOFER_validation/make_fires.py"
+    },
+    {
+      "path": "data/provenance/archive/prepare_inputs.py",
+      "role": "provenance",
+      "size": 16402,
+      "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/prepare_inputs.py",
+      "archive_member": "ELMFIRE_GOFER_validation/prepare_inputs.py"
+    },
+    {
+      "path": "data/provenance/archive/run_all.sh",
+      "role": "provenance",
+      "size": 728,
+      "sha256": "7ac9cb0b80c992278de3fc27db8351b85509f9ccd40024b0210f5610fc93185f",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/run_all.sh",
+      "archive_member": "ELMFIRE_GOFER_validation/run_all.sh"
+    },
+    {
+      "path": "data/provenance/archive/score_runs.py",
+      "role": "provenance",
+      "size": 5456,
+      "sha256": "2c63477ed4f5db55e3ece74c641570815e6aa65a82979a57bb56c68418a558a0",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/score_runs.py",
+      "archive_member": "ELMFIRE_GOFER_validation/score_runs.py"
+    },
+    {
+      "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
+      "role": "provenance",
+      "size": 2379,
+      "sha256": "1fd3fbd75411b6145b2eb7edcdfb6f0d1abb349611077184fef89b30957168f8",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc",
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2.cpython-311.pyc"
+    },
+    {
+      "path": "data/provenance/archive/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
+      "role": "provenance",
+      "size": 4459,
+      "sha256": "29318a6cd45fe91df6a1fe41827bcf1cdbb0b55fcf036397d6a8d74a991e9fd8",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc",
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/__pycache__/fuel_wx_ign_pb2_grpc.cpython-311.pyc"
+    },
+    {
+      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign.py",
+      "role": "provenance",
+      "size": 15656,
+      "sha256": "15520e8dcf4e666e234a6a1d789f2b13be555e414ce3f9910fceaa80f440a96f",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign.py",
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign.py"
+    },
+    {
+      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.py",
+      "role": "provenance",
+      "size": 2623,
+      "sha256": "e86063cc2999ca121bd3cc35330c66c31ac5ea6a8a78d119e1a2220b981db8d6",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2.py",
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.py"
+    },
+    {
+      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+      "role": "provenance",
+      "size": 3441,
+      "sha256": "e4d1df13858c591316fc077d2d5d1fbafcb9a7c03540eaba1e92156e41f94eac",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2.pyi",
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2.pyi"
+    },
+    {
+      "path": "data/provenance/archive/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+      "role": "provenance",
+      "size": 3384,
+      "sha256": "e36e6f35b1fe672a57e9e6535b4cd79cadced48016b473d2dc3a0dbb2487b8ee",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/cloudfire/fuel_wx_ign_pb2_grpc.py",
+      "archive_member": "ELMFIRE_GOFER_validation/tools/cloudfire/fuel_wx_ign_pb2_grpc.py"
+    },
+    {
+      "path": "data/provenance/archive/tools/fuel_models.csv",
+      "role": "provenance",
+      "size": 3948,
+      "sha256": "bf32ba154b230bf16e38941d662c9a49e72652307ffe5e1468a511b514eaaf5b",
+      "repository_source": "cases/Validation/GOFER/data/archive_payload/tools/fuel_models.csv",
+      "archive_member": "ELMFIRE_GOFER_validation/tools/fuel_models.csv"
+    },
+    {
+      "path": "data/provenance/archive/archive_inventory.json",
+      "role": "provenance",
+      "size": 182529,
+      "sha256": "bf4f8f8ca202fded62c71bee5f227580790d2c04fb1d541336d3befaa2f71dec",
+      "repository_source": "cases/Validation/GOFER/data/archive_inventory.json"
+    }
+  ]
+}

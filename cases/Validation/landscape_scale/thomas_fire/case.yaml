@@ -2,7 +2,6 @@ case_id: "thomas_fire"
 case_title: "2017 Thomas Fire landscape reconstruction"
 case_type: "validation"
 category: "landscape_scale"
-source_archive: "../../3_FIRES/Thomas_VAL.rar"
 
 elmfire:
   bin: "elmfire"

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "case_id": "w_5_cold_springs_2020",
+  "fire_id": "W_5_Cold_Springs_2020",
+  "case_status": "data prepared for a future validation case",
+  "model_inputs": {
+    "source": {
+      "filename": "ELMFIRE_GOFER_validation.tar.gz",
+      "size": 7038832441,
+      "sha256": "714b9f2b3c3417336ea200bfc6f2bba2955376bf3088d675a811a11d28b0fffe",
+      "files": 583,
+      "skipped_macos_metadata": 682,
+      "received_date_utc": "2026-10-21",
+      "provider": "User-supplied archive",
+      "license": "Not documented in the supplied archive; upstream access and redistribution terms still apply."
+    },
+    "processing": "unchanged file contents; case-relative paths normalized"
+  },
+  "observation": {
+    "product": "Prepared GOFER arrival-time observations as supplied",
+    "source_dataset": "https://doi.org/10.5281/zenodo.8327264",
+    "reference": "https://doi.org/10.5194/essd-16-1395-2024"
+  },
+  "known_provenance_gaps": [
+    "Upstream access and redistribution terms remain undocumented.",
+    "A runnable case, scientific configuration and acceptance basis have not yet been authored."
+  ]
+}

@@ -2,7 +2,6 @@ case_id: "tubbs_fire"
 case_title: "2017 Tubbs Fire landscape reconstruction"
 case_type: "validation"
 category: "landscape_scale"
-source_archive: "../../3_FIRES/Tubbs_VAL.rar"
 
 elmfire:
   bin: "elmfire"

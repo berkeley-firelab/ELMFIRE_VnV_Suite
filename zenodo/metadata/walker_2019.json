@@ -1,0 +1,41 @@
+{
+  "worksheet_format": "human review fields; not a Zenodo API payload",
+  "case_id": "walker_2019",
+  "resource_type": "Dataset",
+  "title": "ELMFIRE validation inputs and observations for walker 2019",
+  "version": "1.0.0",
+  "creators": [],
+  "publication_date": null,
+  "license": null,
+  "redistribution_permission_evidence": null,
+  "description": "Frozen model inputs, comparison observations and provenance for walker_2019. Optional bundles preserve supplied historical simulation results and distinct inactive older inputs. Source-data limitations are documented in the bundled source_manifest.json. This dataset does not establish a scientific PASS.",
+  "keywords": [
+    "ELMFIRE",
+    "wildfire",
+    "validation",
+    "walker_2019"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/berkeley-firelab/ELMFIRE_VnV_Suite",
+      "relation": "is supplement to",
+      "resource_type": "Software"
+    },
+    {
+      "identifier": "https://doi.org/10.5281/zenodo.8327264",
+      "relation": "is derived from",
+      "resource_type": "Dataset"
+    },
+    {
+      "identifier": "https://doi.org/10.5194/essd-16-1395-2024",
+      "relation": "references",
+      "resource_type": "Publication"
+    }
+  ],
+  "source_license_statement": "Not documented in the supplied archive; upstream access and redistribution terms still apply.",
+  "known_provenance_gaps": [
+    "Upstream access and redistribution terms remain undocumented.",
+    "A runnable case, scientific configuration and acceptance basis have not yet been authored."
+  ],
+  "review_status": "needs creator, attribution and redistribution review"
+}

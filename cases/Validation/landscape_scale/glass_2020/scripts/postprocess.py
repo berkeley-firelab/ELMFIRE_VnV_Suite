@@ -44,7 +44,6 @@ DATA_PATHS = CASE_DIR / "data" / "data_paths.json"
 CURRENT_RESULTS = CASE_DIR / "simulation"
 OUTPUT_DIR = CASE_DIR / "outputs"
 FIGURE_DIR = CASE_DIR / "figures"
-METHOD_VERSION = "gofer_validation_v3"
 
 FIXED_TIMES_H = [24, 48, 72]  # plus the final GOFER arrival time
 AGREEMENT = ListedColormap(["white", "#4daf4a", "#e41a1c", "#377eb8"])
@@ -372,7 +371,7 @@ def main() -> None:
     else:
         status, reason = "NOT EVALUABLE", NO_SIMULATION
     metrics = {
-        "method_version": METHOD_VERSION, "status": status, "reason": reason,
+        "status": status, "reason": reason,
         "simulations_found": len(evaluated),
         "current_configuration_simulated": any(r["configuration"] == "current" for r in evaluated),
         "summary_figures": figures, "runs": results,

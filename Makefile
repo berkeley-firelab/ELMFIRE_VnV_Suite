@@ -1,6 +1,10 @@
 .PHONY: new run run-all run-verification run-validation build-all \
 	report-inputs verification-report validation-report reports main clean \
-	prepare-run configure test test-reports test-all
+	prepare-run configure test test-reports test-all report-check
+
+.PHONY: zenodo-build zenodo-verify
+DATASET_VERSION ?= 1.0.0
+ZENODO_OUTPUT ?= $(ROOT_DIR)/zenodo/dist/$(DATASET_VERSION)
 
 SUITE ?= all
 PYTHON_BIN ?= python3
@@ -38,12 +42,15 @@ build-all:
 
 # Generate aggregate include lists and scientific decision tables.
 report-inputs:
-	@python3 ./tools/generate_summary_reports.py
+	@$(PYTHON_BIN) ./tools/generate_summary_reports.py
 
-verification-report: report-inputs
+report-check:
+	@$(PYTHON_BIN) ./tools/check_report_environment.py
+
+verification-report: report-check report-inputs
 	@cd main_report && latexmk -lualatex -silent verification_report.tex
 
-validation-report: report-inputs
+validation-report: report-check report-inputs
 	@cd main_report && latexmk -lualatex -silent validation_report.tex
 
 reports: verification-report validation-report
@@ -86,3 +93,10 @@ test-reports:
 	@PYTHONDONTWRITEBYTECODE=1 "$(PYTHON_BIN)" -m unittest discover -s tools/tests -p '*_checks.py' -v
 
 test-all: test test-reports
+
+# Prepare local upload files only; no upload, publication or data removal.
+zenodo-build:
+	@$(PYTHON_BIN) tools/prepare_zenodo.py build --case "$(if $(CASE),$(CASE),all)" --version "$(DATASET_VERSION)" --output "$(ZENODO_OUTPUT)"
+
+zenodo-verify:
+	@$(PYTHON_BIN) tools/prepare_zenodo.py verify --case "$(if $(CASE),$(CASE),all)" --output "$(ZENODO_OUTPUT)"
