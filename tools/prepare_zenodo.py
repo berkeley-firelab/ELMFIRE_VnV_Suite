@@ -371,6 +371,7 @@ def main() -> None:
                     raise ValueError(f'Build the upload set first: {directory}')
                 metadata = ROOT / 'zenodo/metadata' / (identifier(case) + '.json')
                 shutil.copyfile(metadata, directory / 'metadata-worksheet.json')
+                shutil.copyfile(ROOT / 'tools/zenodo_restore.py', directory / 'stage_dataset.py')
                 manifest = json.loads((directory / 'dataset_manifest.json').read_text())
                 (directory / 'README.txt').write_text(dataset_readme(manifest))
                 upload_checksums(directory)

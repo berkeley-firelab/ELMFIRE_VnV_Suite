@@ -1,15 +1,15 @@
 # Data for future ELMFIRE validation cases
 
 This directory contains dataset definitions for 24 wildfires. Each fire has an
-independent archive under `../dist/1.0.0/<fire_id>/`, containing model inputs,
-GOFER-derived arrival-time observations, and provenance records.
+archive in the combined record under `../dist/collection-1.0.0/<fire_id>.tar`,
+containing model inputs, GOFER-derived arrival-time observations, and provenance records.
 
 Each definition contains `data/archive_manifest.json`, `data/source_manifest.json`,
 `data/dataset_manifest.json`, and `scripts/stage_dataset.py`. The manifests record
 file inventories, hashes, and source information. A current runnable case
 configuration and scientific evaluation criteria are not included.
 
-| Fire ID | Upload folder from repository root |
+| Fire ID | Local staging folder from repository root |
 | --- | --- |
 | `antelope_2021` | `zenodo/dist/1.0.0/antelope_2021/` |
 | `august_complex_2020` | `zenodo/dist/1.0.0/august_complex_2020/` |
@@ -36,20 +36,25 @@ configuration and scientific evaluation criteria are not included.
 | `windy_2021` | `zenodo/dist/1.0.0/windy_2021/` |
 | `zogg_2020` | `zenodo/dist/1.0.0/zogg_2020/` |
 
-From the repository root, verify one retained archive with
-`make zenodo-verify CASE=antelope_2021`. Use `CASE=gofer` to check all 24 datasets,
-or omit `CASE` to check all 31 fire datasets.
+The staging folders contain the inner compressed bundles used to build the
+combined upload. Verify the combined record with `make zenodo-collection-verify`.
+The staging folders can be checked independently with
+`make zenodo-verify CASE=gofer`.
 
-To restore a dataset, run its `stage_dataset.py` helper with the archive folder
-specified by `--bundle-dir`. File paths within the compressed archives are
-relative to the destination case directory. Inputs and observations restore to
-`data/archive_payload/`; preparation records restore to `data/provenance/archive/`.
-The helper verifies the archived files and protects differing existing files.
+To restore a fire directly from the combined archive, run from the repository root:
+
+```bash
+python3 tools/restore_zenodo_collection.py --case antelope_2021 --case-dir /path/to/antelope_2021 --manifest zenodo/collection_manifest.json --archive-dir zenodo/dist/collection-1.0.0
+```
+
+Inputs and observations restore to `data/archive_payload/`; preparation records
+restore to `data/provenance/archive/`. The helper verifies hashes and protects
+differing existing files. All fires share one Zenodo record and DOI.
 
 The [collection overview](../README.md) describes the archive contents and
 license. The [upload guide](../../docs/zenodo-upload-guide.md) provides commands
-for restoration, versioning, and DOI registration. Source-version limitations
-and redistribution evidence are recorded in the per-fire metadata worksheets.
+for restoration, versioning, and shared DOI registration. Source-version
+limitations and redistribution evidence are recorded in the metadata worksheets.
 
 ## Acknowledgement
 

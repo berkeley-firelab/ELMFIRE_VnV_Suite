@@ -40,6 +40,43 @@ def fixture(root):
 
 
 class ZenodoDataTests(unittest.TestCase):
+    def test_combined_record_download_and_restore(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            case = fixture(root)
+            manifest = packaging.build_case(case, root / 'inner', '1.0.0', 'revision')
+            folder = root / 'inner/example_fire'
+            files = []
+            outer = root / 'example_fire.tar'
+            with tarfile.open(outer, 'w') as archive:
+                for file in sorted(folder.iterdir()):
+                    files.append({'path': file.name, 'size': file.stat().st_size,
+                                  'sha256': staging.sha256(file)})
+                    archive.add(file, arcname=file.name)
+            container = {'filename': outer.name, 'size': outer.stat().st_size,
+                         'sha256': staging.sha256(outer), 'files': files,
+                         'url': 'https://zenodo.org/records/123/files/example_fire.tar?download=1'}
+            manifest['zenodo'] = {'record_id': '123', 'version_doi': '10.5281/zenodo.123',
+                                  'collection_archive': container}
+            bundles = staging.selected_bundles(manifest)
+            cache = root / 'download-cache'
+            with patch.object(staging.urllib.request, 'urlopen',
+                              return_value=io.BytesIO(outer.read_bytes())) as fetch:
+                staging.download(manifest, bundles, cache)
+                fetch.assert_called_once_with(container['url'], timeout=120)
+            target = root / 'restored'
+            staging.restore(target, cache, bundles)
+            self.assertEqual((target / 'data/archive_payload/inputs/landscape.tif').read_bytes(),
+                             b'canonical input')
+            self.assertFalse((target / 'data/archive_payload/outputs/result.bil').exists())
+            # Cached corruption must fail rather than silently downloading or overwriting it.
+            (cache / outer.name).write_bytes(b'corrupt')
+            with self.assertRaisesRegex(ValueError, 'mismatch'):
+                staging.download(manifest, bundles, cache)
+            container['filename'] = '../escape.tar'
+            with self.assertRaisesRegex(ValueError, 'Unsafe relative path'):
+                staging.download(manifest, bundles, cache)
+
     def future_fixture(self, root, fire):
         case = root / 'zenodo/datasets' / fire.lower()
         records = []

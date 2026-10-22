@@ -83,7 +83,7 @@ def restore(root: Path, bundle_dir: Path, bundles: list[dict]) -> None:
                 check_file(path, record)
     for bundle in bundles:
         pending = {r['path']: r for r in bundle['files']}
-        with tarfile.open(bundle_dir / bundle['filename'], 'r|gz') as source:
+        with tarfile.open(bundle_dir / bundle['filename'], 'r|*') as source:
             seen = set()
             for member in source:
                 if member.name not in pending or member.name in seen:
@@ -118,8 +118,9 @@ def download(manifest: dict, bundles: list[dict], cache: Path) -> None:
     if not publication.get('record_id') or not publication.get('version_doi'):
         raise ValueError('No Zenodo record is registered yet. Use --bundle-dir for local bundles.')
     cache.mkdir(parents=True, exist_ok=True)
-    for bundle in bundles:
-        path = cache / bundle['filename']
+    container = publication.get('collection_archive')
+    for bundle in ([container] if container else bundles):
+        path = destination(cache, bundle['filename'])
         if path.exists():
             check_file(path, bundle)
             continue
@@ -139,6 +140,10 @@ def download(manifest: dict, bundles: list[dict], cache: Path) -> None:
         finally:
             if temporary is not None:
                 temporary.unlink(missing_ok=True)
+    if container:
+        restore(cache, cache, [container])
+        for bundle in bundles:
+            check_file(cache / bundle['filename'], bundle)
 
 
 def main() -> None:

@@ -117,29 +117,30 @@ correct packages and versions are available.
 
 ## Preparing validation data for Zenodo
 
-Seven per-case upload sets are prepared under `zenodo/dist/1.0.0/`. Each keeps
-inputs, observations, provenance, and optional historical/legacy data separate,
-with SHA-256 hashes for bundles and individual files. Generated upload binaries
-are ignored by Git; dataset manifests, metadata worksheets, and independent
-case-local `scripts/stage_dataset.py` helpers belong in the repository.
+One combined Zenodo Dataset record contains all 31 fire datasets. Its upload
+folder, `zenodo/dist/collection-1.0.0/`, contains 31 fire archives and six
+supporting files. Each fire archive preserves separate input, observation, and
+provenance bundles, with historical results and older inputs where available.
+The collection uses one version DOI; per-fire metadata records the relevant
+creators and source citations.
 
-The 24 additional GOFER fires also have individual upload folders, bringing the
-total to 31 independent fire datasets. Their definitions and restoration helpers
-are under `zenodo/datasets/<fire_id>/`, preparing data for future
-validation cases. Each record includes its own inputs, observations and provenance.
+The seven implemented cases remain under `cases/Validation/landscape_scale/`.
+Definitions for the 24 additional fires remain under `zenodo/datasets/`,
+preparing data for future validation cases. Dataset manifests record SHA-256
+hashes for the archives and their contents. Restoration helpers support
+selecting one fire from the shared record.
 
-Run `make zenodo-verify` to check the prepared upload files.
-Follow [the Zenodo upload guide](docs/zenodo-upload-guide.md) to complete the
-creator affiliation/ORCID checks and redistribution review under the selected CC BY 4.0
-license, upload one record per fire, register each
-version DOI, and verify a fresh download to complete the migration.
-The [dataset overview](zenodo/README.md) lists folders and initial upload sizes.
+Run `python3 tools/prepare_zenodo_collection.py verify` to check the combined
+upload. Follow [the Zenodo upload guide](docs/zenodo-upload-guide.md) to review
+metadata and source permissions, prepare the browser draft, register the shared
+version DOI after publication, and verify a fresh download.
+The [dataset overview](zenodo/README.md) lists all fire archives.
 
 Archived validation inputs, observations and optional historical/legacy payloads
 are no longer tracked by Git. Existing local copies are preserved and ignored.
 A fresh clone must restore the selected case's data using its
 `scripts/stage_dataset.py` helper before preprocessing or running the case.
-Use the local upload folder until that dataset's Zenodo record is registered.
+Use the local collection archive until the shared Zenodo record is registered.
 
 ## Running an existing case
 

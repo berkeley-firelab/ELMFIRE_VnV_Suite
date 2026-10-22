@@ -1,123 +1,100 @@
 # ELMFIRE validation datasets
 
 This collection contains model inputs, fire observations, and provenance records
-for 31 wildfires. Each fire has a separate dataset under
-`dist/1.0.0/<fire_id>/`. Seven datasets support implemented validation cases in
-`cases/Validation/landscape_scale/`. The other 24 contain data for future cases,
-with dataset definitions in `datasets/<fire_id>/`.
+for 31 wildfires in one Zenodo dataset record. Seven datasets support implemented
+validation cases; 24 contain data for future cases. Each fire has its own `.tar`
+file within the combined record. The complete upload is prepared in
+`dist/collection-1.0.0/`: 31 fire archives and six supporting files, about 7.10 GB.
 
-Each dataset preserves a fixed set of source files. Model inputs, observations,
-and results from earlier simulations are stored in separate compressed archives.
-File inventories and SHA-256 hashes support verification and reproducible
-restoration.
+## Contents
 
-## Archive contents
+Each fire archive contains compressed input, observation, and provenance bundles,
+a dataset manifest, a metadata worksheet, a README, checksums, and a restoration
+script. Historical model results and older inputs are included where available.
+Source file contents and the inner bundle hashes are preserved.
 
-| File | Contents |
-| --- | --- |
-| `inputs.tar.gz` | Model inputs, including terrain, fuels, weather, fuel moisture, and ignition data where supplied. |
-| `observations.tar.gz` | Fire observations and supporting files used for model comparison. |
-| `provenance.tar.gz` | Source and archive manifests, preparation records, and case configuration files where available. |
-| `historical_outputs.tar.gz` | Results supplied from earlier model simulations; included only where available. |
-| `legacy_inputs.tar.gz` | Older inputs retained separately from the active inputs; included only where available. |
-| `dataset_manifest.json` | Dataset version, file inventory, sizes, and SHA-256 hashes for the archives and their contents. |
-| `metadata-worksheet.json` | Dataset description, source citations, license, and redistribution evidence. |
-| `checksums.sha256` | SHA-256 hashes of the other files in the dataset folder. |
-| `stage_dataset.py` | Standalone Python script for extraction and integrity verification. |
-| `README.txt` | Description of the individual dataset and its restoration procedure. |
+The collection also contains `README.txt`, `collection_manifest.json`,
+`metadata-worksheet.json`, `checksums.sha256`, `stage_collection.py`, and
+`stage_dataset.py`. The collection manifest records each fire archive's size,
+SHA-256 hash, member inventory, and original dataset manifest. The metadata
+worksheet describes the collection and credits the dataset and upstream authors.
 
-Camp, Thomas, and Tubbs include VIIRS active-fire observations. The other 28
-datasets contain arrival-time observations derived from
-[GOFER](https://doi.org/10.5281/zenodo.8327264). Full GOFER attribution and
-source-version limitations are recorded in their metadata worksheets. The source
-manifests document known gaps in data origins and processing history.
+Camp, Thomas, and Tubbs contain VIIRS active-fire point observations. The other
+28 fires contain arrival-time observations derived from
+[GOFER](https://doi.org/10.5281/zenodo.8327264). Full GOFER attribution and source
+limitations are retained in the collection and per-fire metadata. The selected
+license is CC BY 4.0; source-specific terms and unresolved redistribution
+permissions remain documented.
 
-## Dataset inventory
+## Fire inventory
 
-| Fire ID | Case status | Upload folder | Compressed size |
-| --- | --- | --- | ---: |
-| `antelope_2021` | Prepared data | `dist/1.0.0/antelope_2021/` | 200.35 MB |
-| `august_complex_2020` | Prepared data | `dist/1.0.0/august_complex_2020/` | 1226.38 MB |
-| `beckwourth_complex_2021` | Prepared data | `dist/1.0.0/beckwourth_complex_2021/` | 155.53 MB |
-| `bobcat_2020` | Prepared data | `dist/1.0.0/bobcat_2020/` | 91.38 MB |
-| `caldor_2021` | Implemented case | `dist/1.0.0/caldor_2021/` | 211.13 MB |
-| `camp_fire` | Implemented case | `dist/1.0.0/camp_fire/` | 24.07 MB |
-| `creek_2020` | Prepared data | `dist/1.0.0/creek_2020/` | 755.26 MB |
-| `czu_lightning_complex_2020` | Implemented case | `dist/1.0.0/czu_lightning_complex_2020/` | 30.58 MB |
-| `dixie_2021` | Prepared data | `dist/1.0.0/dixie_2021/` | 1149.70 MB |
-| `dolan_2020` | Prepared data | `dist/1.0.0/dolan_2020/` | 145.91 MB |
-| `glass_2020` | Implemented case | `dist/1.0.0/glass_2020/` | 43.34 MB |
-| `july_complex_2020` | Prepared data | `dist/1.0.0/july_complex_2020/` | 64.94 MB |
-| `kincade_2019` | Implemented case | `dist/1.0.0/kincade_2019/` | 57.98 MB |
-| `knp_complex_2021` | Prepared data | `dist/1.0.0/knp_complex_2021/` | 120.24 MB |
-| `lnu_lightning_complex_2020` | Prepared data | `dist/1.0.0/lnu_lightning_complex_2020/` | 252.15 MB |
-| `mccash_2021` | Prepared data | `dist/1.0.0/mccash_2021/` | 207.27 MB |
-| `mcfarland_2021` | Prepared data | `dist/1.0.0/mcfarland_2021/` | 124.80 MB |
-| `monument_2021` | Prepared data | `dist/1.0.0/monument_2021/` | 279.47 MB |
-| `north_complex_2020` | Prepared data | `dist/1.0.0/north_complex_2020/` | 385.52 MB |
-| `red_salmon_complex_2020` | Prepared data | `dist/1.0.0/red_salmon_complex_2020/` | 302.29 MB |
-| `river_complex_2021` | Prepared data | `dist/1.0.0/river_complex_2021/` | 389.76 MB |
-| `scu_lightning_complex_2020` | Prepared data | `dist/1.0.0/scu_lightning_complex_2020/` | 146.57 MB |
-| `slater_and_devil_2020` | Prepared data | `dist/1.0.0/slater_and_devil_2020/` | 101.32 MB |
-| `sqf_complex_2020` | Prepared data | `dist/1.0.0/sqf_complex_2020/` | 311.29 MB |
-| `tamarack_2021` | Prepared data | `dist/1.0.0/tamarack_2021/` | 83.66 MB |
-| `thomas_fire` | Implemented case | `dist/1.0.0/thomas_fire/` | 22.91 MB |
-| `tubbs_fire` | Implemented case | `dist/1.0.0/tubbs_fire/` | 6.03 MB |
-| `w_5_cold_springs_2020` | Prepared data | `dist/1.0.0/w_5_cold_springs_2020/` | 51.48 MB |
-| `walker_2019` | Prepared data | `dist/1.0.0/walker_2019/` | 30.98 MB |
-| `windy_2021` | Prepared data | `dist/1.0.0/windy_2021/` | 103.02 MB |
-| `zogg_2020` | Prepared data | `dist/1.0.0/zogg_2020/` | 18.73 MB |
+| Fire ID | File in the combined record | Archive size |
+| --- | --- | ---: |
+| `antelope_2021` | `antelope_2021.tar` | 200.37 MB |
+| `august_complex_2020` | `august_complex_2020.tar` | 1226.39 MB |
+| `beckwourth_complex_2021` | `beckwourth_complex_2021.tar` | 155.55 MB |
+| `bobcat_2020` | `bobcat_2020.tar` | 91.39 MB |
+| `caldor_2021` | `caldor_2021.tar` | 211.14 MB |
+| `camp_fire` | `camp_fire.tar` | 24.08 MB |
+| `creek_2020` | `creek_2020.tar` | 755.27 MB |
+| `czu_lightning_complex_2020` | `czu_lightning_complex_2020.tar` | 30.60 MB |
+| `dixie_2021` | `dixie_2021.tar` | 1149.72 MB |
+| `dolan_2020` | `dolan_2020.tar` | 145.92 MB |
+| `glass_2020` | `glass_2020.tar` | 43.35 MB |
+| `july_complex_2020` | `july_complex_2020.tar` | 64.95 MB |
+| `kincade_2019` | `kincade_2019.tar` | 57.99 MB |
+| `knp_complex_2021` | `knp_complex_2021.tar` | 120.25 MB |
+| `lnu_lightning_complex_2020` | `lnu_lightning_complex_2020.tar` | 252.17 MB |
+| `mccash_2021` | `mccash_2021.tar` | 207.28 MB |
+| `mcfarland_2021` | `mcfarland_2021.tar` | 124.81 MB |
+| `monument_2021` | `monument_2021.tar` | 279.48 MB |
+| `north_complex_2020` | `north_complex_2020.tar` | 385.54 MB |
+| `red_salmon_complex_2020` | `red_salmon_complex_2020.tar` | 302.31 MB |
+| `river_complex_2021` | `river_complex_2021.tar` | 389.77 MB |
+| `scu_lightning_complex_2020` | `scu_lightning_complex_2020.tar` | 146.59 MB |
+| `slater_and_devil_2020` | `slater_and_devil_2020.tar` | 101.34 MB |
+| `sqf_complex_2020` | `sqf_complex_2020.tar` | 311.30 MB |
+| `tamarack_2021` | `tamarack_2021.tar` | 83.67 MB |
+| `thomas_fire` | `thomas_fire.tar` | 22.93 MB |
+| `tubbs_fire` | `tubbs_fire.tar` | 6.04 MB |
+| `w_5_cold_springs_2020` | `w_5_cold_springs_2020.tar` | 51.50 MB |
+| `walker_2019` | `walker_2019.tar` | 30.99 MB |
+| `windy_2021` | `windy_2021.tar` | 103.03 MB |
+| `zogg_2020` | `zogg_2020.tar` | 18.74 MB |
 
-Sizes include all files in each dataset folder and use decimal MB.
+Sizes use decimal MB. The outer `.tar` files contain already compressed bundles.
 
 ## Restore and verify
 
-From a downloaded dataset folder, run:
+Download the desired fire archive, `collection_manifest.json`, and both Python
+scripts. From the download folder, run:
 
 ```bash
-python3 stage_dataset.py --case-dir /path/to/restored-case --manifest dataset_manifest.json --bundle-dir .
+python3 stage_collection.py --case camp_fire --case-dir /path/to/camp_fire --archive-dir .
 ```
 
-Replace `/path/to/restored-case` with the destination directory. The script
-restores inputs, observations, and provenance and verifies their file sizes and
-SHA-256 hashes. Add `--include-optional` to restore historical outputs and older
-inputs when included. Python 3 is required; no additional packages are needed.
+Replace `camp_fire` with the desired fire ID. Add `--include-optional` for supplied
+historical model results or older inputs. The script verifies hashes and
+protects differing existing files. Python 3 is required; no additional packages
+are needed. File integrity establishes agreement with the archived snapshot;
+scientific validation requires a separate evaluation of model results.
 
-From the repository root, verify the retained dataset folders with:
+From the repository root, verify the complete upload with:
 
 ```bash
-make zenodo-verify
-make zenodo-verify CASE=antelope_2021
+python3 tools/prepare_zenodo_collection.py verify
 ```
 
-After restoration, the following command also checks the extracted source files:
+The original per-fire folders under `dist/1.0.0/` are local staging material.
+They are preserved for rebuilding the collection; they are not separate Zenodo
+records. Dataset definitions remain in `cases/Validation/landscape_scale/` for
+the seven implemented cases and `datasets/` for the 24 future cases.
 
-```bash
-python3 tools/prepare_zenodo.py verify --case FIRE_ID --check-sources
-```
- File integrity checks
-establish agreement with the archived snapshot. Scientific validation requires
-running the corresponding case and evaluating its results. The 24 datasets prepared
-for future cases do not include current runnable case configurations or
-evaluation criteria.
-
-## License and provenance
-
-The selected dataset license is CC BY 4.0. Metadata worksheets under `metadata/`
-contain source citations, applicable terms, and redistribution evidence. Known
-permission gaps remain documented for separately supplied inputs and other
-third-party material. The archived source manifests retain the provenance
-available when the files were received.
-
-The [upload guide](../docs/zenodo-upload-guide.md) describes metadata review,
-publication, DOI registration, and verification of downloaded records. To update
-the README and metadata copies in the retained dataset folders and refresh their
-checksums, run `python3 tools/prepare_zenodo.py metadata`. For a new dataset
-version, restore its source files and run:
-
-```bash
-make zenodo-build CASE=FIRE_ID DATASET_VERSION=1.0.1
-```
+The [upload guide](../docs/zenodo-upload-guide.md) describes preparing the single
+record, registering its version DOI after publication, and downloading selected
+fires. The tracked `collection_manifest.json` supplies download locations after
+registration. Each case's standard restoration helper then downloads its fire
+archive from the shared record.
 
 ## Acknowledgement
 

@@ -2,7 +2,7 @@
 	report-inputs verification-report validation-report reports main clean \
 	prepare-run configure test test-reports test-all report-check
 
-.PHONY: zenodo-build zenodo-verify
+.PHONY: zenodo-build zenodo-verify zenodo-collection-build zenodo-collection-verify
 DATASET_VERSION ?= 1.0.0
 ZENODO_OUTPUT ?= $(ROOT_DIR)/zenodo/dist/$(DATASET_VERSION)
 
@@ -100,3 +100,9 @@ zenodo-build:
 
 zenodo-verify:
 	@$(PYTHON_BIN) tools/prepare_zenodo.py verify --case "$(if $(CASE),$(CASE),all)" --output "$(ZENODO_OUTPUT)"
+
+zenodo-collection-build:
+	@$(PYTHON_BIN) tools/prepare_zenodo_collection.py build --version "$(DATASET_VERSION)"
+
+zenodo-collection-verify:
+	@$(PYTHON_BIN) tools/prepare_zenodo_collection.py verify --version "$(DATASET_VERSION)"
