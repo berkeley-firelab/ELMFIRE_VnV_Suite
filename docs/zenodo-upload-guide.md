@@ -42,7 +42,11 @@ https://zenodo.org/records/14642378. The exact GOFER version used in the supplie
 rasters is unverified. Permission evidence for other source products remains
 incomplete and must be reviewed before publication.
 
-The browser draft has not been updated with this new local file set.
+The [existing draft](https://zenodo.org/uploads/23574586) was updated to version
+2.1.0 on 2026-10-22. All 37 file checksums match the local upload set. The
+35 outdated files were replaced; the two identical restoration helpers were
+retained. The draft is saved and unpublished. Verification is recorded in
+`zenodo/upload-verification.json`.
 
 ## Register and restore
 

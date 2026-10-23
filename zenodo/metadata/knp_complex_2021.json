@@ -69,8 +69,14 @@
   "source_license_statement": "Not documented in the supplied archive; upstream access and redistribution terms still apply.",
   "known_provenance_gaps": [
     "Upstream access and redistribution terms remain undocumented.",
-    "A runnable case, scientific configuration and acceptance basis have not yet been authored."
+    "No independently predeclared acceptance thresholds were supplied; the implemented case provides descriptive comparison only."
   ],
   "review_status": "creators supplied; affiliation, ORCID and complete-bundle redistribution review pending",
-  "license_scope": "Selected license for this prepared dataset, subject to completion of upstream rights review. Existing third-party licenses and attribution requirements remain applicable; this selection does not establish permission for unidentified source products."
+  "license_scope": "Selected license for this prepared dataset, subject to completion of upstream rights review. Existing third-party licenses and attribution requirements remain applicable; this selection does not establish permission for unidentified source products.",
+  "case_implementation": {
+    "status": "implemented; simulation not run",
+    "path": "cases/Validation/landscape_scale/knp_complex_2021",
+    "target_source_revision": "8981f14e0170ced6cc28c4d308d4545ba925f5ef",
+    "note": "Current repository implementation; frozen version 2.1.0 upload files remain unchanged."
+  }
 }

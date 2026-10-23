@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
 import tempfile
+import tarfile
 import unittest
 from unittest.mock import patch
 
@@ -32,6 +33,57 @@ def raster(path, value, count=1):
 
 @unittest.skipIf(GEN is None, "Input-generation tests require pyproj; use elmfire_input_gen_env.")
 class InputGenerationTests(unittest.TestCase):
+    def test_optional_gusts_use_prepared_weather_and_keep_sustained_wind(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            generation = root / 'case/scripts/generate_data'
+            generation.mkdir(parents=True)
+            table = root / 'case/data/misc/fuel_models.csv'
+            table.parent.mkdir(parents=True)
+            table.write_text('fuel table fixture\n')
+            pd.DataFrame([{'fire_id': 'Fixture_2021', 't_ign_utc': '2021-08-15T07:15:00Z'}]).to_csv(
+                generation / 'fires.csv', index=False)
+            ignitions = root / 'ignitions.shp'
+            ignitions.touch()
+            incoming = root / 'incoming'
+            incoming.mkdir()
+            for name in GEN.LANDSCAPE_LAYERS:
+                raster(incoming / (name + '.tif'), 101)
+            for name in GEN.WX_LAYERS:
+                raster(incoming / (name + '.tif'), 5, count=2)
+            archive = root / 'cloudfire.tar'
+            with tarfile.open(archive, 'w') as destination:
+                for path in incoming.iterdir():
+                    destination.add(path, arcname=path.name)
+            output = root / 'prepared'
+            def ignition_table(row, work):
+                (work / 'inputs/ignitions.csv').write_text('used,x,y,t_ign_s\nTrue,1,2,0\n')
+            def gust_command(command, **kwargs):
+                self.assertEqual(command[0], '/fixture/grib-python')
+                self.assertEqual(command[command.index('--weather-start-utc') + 1],
+                                 '2021-08-15T07:00:00+00:00')
+                template = Path(command[command.index('--weather-template') + 1])
+                target = Path(command[command.index('--output-file') + 1])
+                self.assertEqual(template.parent, target.parent)
+                self.assertEqual(target.name, 'ws_gust.tif')
+                raster(target, 20, count=2)
+                target.with_suffix('.generation.json').write_text('{}\n')
+            argv = ['prepare_inputs.py', '--output-dir', str(output),
+                    '--gofer-ignitions', str(ignitions), '--gusts',
+                    '--grib-python', '/fixture/grib-python']
+            with patch.object(GEN, 'ROOT', generation), patch.object(GEN.sys, 'argv', argv), \
+                 patch.object(GEN, 'fetch', return_value=archive), \
+                 patch.object(GEN, 'prepare_ignitions', side_effect=ignition_table), \
+                 patch.object(GEN.subprocess, 'run', side_effect=gust_command) as command:
+                GEN.main()
+            command.assert_called_once()
+            with rasterio.open(output / 'data/weather/ws.tif') as wind:
+                np.testing.assert_array_equal(wind.read(), np.full((2, 2, 2), 5))
+            self.assertTrue((output / 'data/weather/ws_gust.tif').is_file())
+            self.assertTrue((output / 'data/weather/ws_gust.generation.json').is_file())
+            self.assertFalse((output / 'elmfire.data.in').exists())
+            self.assertFalse((output / 'run_case.sh').exists())
+
     def test_landscape_stacking_preserves_band_order_and_fills_offshore(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

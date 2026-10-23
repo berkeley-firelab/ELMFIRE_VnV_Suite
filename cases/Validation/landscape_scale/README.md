@@ -1,18 +1,43 @@
 # Landscape-scale validation
 
-These seven cases compare ELMFIRE landscape reconstructions with independent
-fire observations. Each case owns its current configuration, runner, processing
-scripts, input metadata, metrics and report sources.
+The suite contains 31 independently runnable historical-fire cases: three use
+VIIRS active-fire observations and 28 use GOFER-derived arrival times with
+supporting CAL FIRE final-perimeter data. Each case owns its configuration,
+runner, processing code, source metadata, metrics and standalone report.
 
 | Case | Comparison observations |
 | --- | --- |
 | `camp_fire` | VIIRS active-fire points |
 | `thomas_fire` | VIIRS active-fire points |
 | `tubbs_fire` | VIIRS active-fire points |
-| `kincade_2019` | GOFER-derived arrival times |
-| `czu_lightning_complex_2020` | GOFER-derived arrival times |
-| `glass_2020` | GOFER-derived arrival times |
-| `caldor_2021` | GOFER-derived arrival times |
+| `kincade_2019` | GOFER arrival times; CAL FIRE final extent |
+| `walker_2019` | GOFER arrival times; CAL FIRE final extent |
+| `august_complex_2020` | GOFER arrival times; CAL FIRE final extent |
+| `bobcat_2020` | GOFER arrival times; CAL FIRE final extent |
+| `creek_2020` | GOFER arrival times; CAL FIRE final extent |
+| `czu_lightning_complex_2020` | GOFER arrival times; CAL FIRE final extent |
+| `dolan_2020` | GOFER arrival times; CAL FIRE final extent |
+| `glass_2020` | GOFER arrival times; CAL FIRE final extent |
+| `july_complex_2020` | GOFER arrival times; CAL FIRE final extent |
+| `lnu_lightning_complex_2020` | GOFER arrival times; CAL FIRE final extent |
+| `north_complex_2020` | GOFER arrival times; CAL FIRE final extent |
+| `red_salmon_complex_2020` | GOFER arrival times; CAL FIRE final extent |
+| `scu_lightning_complex_2020` | GOFER arrival times; CAL FIRE final extent |
+| `slater_and_devil_2020` | GOFER arrival times; CAL FIRE final extent |
+| `sqf_complex_2020` | GOFER arrival times; CAL FIRE final extent |
+| `w_5_cold_springs_2020` | GOFER arrival times; CAL FIRE final extent |
+| `zogg_2020` | GOFER arrival times; CAL FIRE final extent |
+| `antelope_2021` | GOFER arrival times; CAL FIRE final extent |
+| `beckwourth_complex_2021` | GOFER arrival times; CAL FIRE final extent |
+| `caldor_2021` | GOFER arrival times; CAL FIRE final extent |
+| `dixie_2021` | GOFER arrival times; CAL FIRE final extent |
+| `knp_complex_2021` | GOFER arrival times; CAL FIRE final extent |
+| `mccash_2021` | GOFER arrival times; CAL FIRE final extent |
+| `mcfarland_2021` | GOFER arrival times; CAL FIRE final extent |
+| `monument_2021` | GOFER arrival times; CAL FIRE final extent |
+| `river_complex_2021` | GOFER arrival times; CAL FIRE final extent |
+| `tamarack_2021` | GOFER arrival times; CAL FIRE final extent |
+| `windy_2021` | GOFER arrival times; CAL FIRE final extent |
 
 ## Current layout
 
@@ -23,92 +48,143 @@ scripts, input metadata, metrics and report sources.
   run_case.sh
   compile_case.sh
   data/
-    weather/                 wind and fuel-moisture rasters
+    weather/                 wind, fuel moisture and supplementary gust rasters
     fuels_and_topography/    terrain, fuel, canopy, WUI and ignition rasters
-    misc/                    required fuel-model and ignition tables
-    observation/             comparison observations and supporting components
+    misc/                    fuel-model and timed-ignition CSV tables
+    observation/             observation TIFFs, PNGs, GeoPackages or VIIRS components
     archive_manifest.json    source identity and pinned data/generation files
     source_manifest.json     sources, units, time conventions and known gaps
-    dataset_manifest.json    Zenodo bundle inventory and hashes
-    data_paths.json          GOFER data locations, where applicable
+    dataset_manifest.json    frozen Zenodo bundle inventory and hashes
+    data_paths.json          GOFER data locations
+    configuration_audit.json source compatibility and configuration-preservation checks
   scripts/
     preprocess.py
     postprocess.py
     metrics_to_macro.py
-    stage_dataset.py
-    generate_data/           GOFER input-generation code, where supplied
-  outputs/                   ELMFIRE results, input statistics and evaluation status
-  figures/                   input/observation figures and future result figures
-  report/                    standalone report source
+    report_language.py
+    stage_data.py            GOFER source-directory restoration
+    stage_dataset.py         checksum-verified Zenodo restoration
+    generate_data/           supplied GOFER input/perimeter-generation sources
+  outputs/                   ELMFIRE results, input statistics and evaluation metrics
+  figures/                   input, observation and available simulation comparisons
+  logs/                      standard output, errors and temporary scratch files
+  report/                    standalone LaTeX report and local build settings
 ```
 
-All prior simulation outputs, historical runners and original model
-configurations have been removed. The seven current case runners and namelists
-remain in the repository. Evaluation status is **NOT EVALUABLE** until new
-simulation results are supplied or generated. Old result figures and compiled
-reports have been removed; input and observation characterizations remain.
+There are no archived payload directories. Current scientific files live directly
+in the four canonical data folders. Model results go to `outputs/`; log files
+remain in `logs/`, with scratch files under `logs/scratch/`. Preprocessing and
+postprocessing use case-relative paths and do not depend on the supplied
+Downloads directory, another case, or a source checkout at runtime.
 
-## Restore the data
+The 24 cases added from the supplied GOFER collection retain every scientific
+assignment in their original namelists. Only the fuel/topography, weather and
+scratch directory strings were adapted. All timed ignitions were checked against
+the supplied ignition CSVs. Their target is the inspected `elmfire-nick` source,
+branch `yiren`, revision `8981f14e0170`; source fingerprints and static check
+results are recorded per case. Simulation results have not been generated for
+these added cases, so their status remains **NOT EVALUABLE**.
 
-The combined local upload is `zenodo/dist/collection-2.1.0/`. It contains 31 fire
-archives, including data for 24 future cases defined under `zenodo/datasets/`.
-The archive contains current input data, comparison observations and supplied
-data-generation code. It excludes simulation outputs, runners, model
-configurations, reports, legacy inputs and caches. Metadata and restoration
-support files accompany the data.
+## Run and evaluate
 
 ```bash
-python3 tools/restore_zenodo_collection.py --case camp_fire --case-dir cases/Validation/landscape_scale/camp_fire --manifest zenodo/collection_manifest.json --archive-dir zenodo/dist/collection-2.1.0
+ELMFIRE_BIN=/path/to/elmfire PYTHON_BIN=/path/to/python cases/Validation/landscape_scale/antelope_2021/run_case.sh
+```
+
+Each runner checks and characterizes its inputs, launches ELMFIRE, evaluates
+available results and compiles its standalone report. GOFER cases launch one
+process; Camp, Thomas and Tubbs retain their documented ensemble setups.
+Configuration files select `./outputs`, and postprocessors discover the current
+run there. Logs are written to `logs/elmfire.stdout` and `logs/elmfire.stderr`.
+No runner deletes previous results automatically.
+
+GOFER comparison uses the unique latest arrival-time raster for member one,
+with numeric timestamps, verified grid coordinates and explicit conversion to
+hours since the GOES ignition hour. Primary metrics remain Jaccard overlap,
+precision, recall, F1, area ratio and co-burned arrival-time errors at declared
+times. They are descriptive; no independent PASS/FAIL limits were supplied.
+The newly added cases also characterize the CAL FIRE final mask and its
+GeoPackage layers. The supplied PNG is a preview, not quantitative evidence.
+Where no separate hourly vector-area series was supplied, growth is derived
+from the arrival-time raster and labeled accordingly.
+
+The scientific Python environment needs numpy, matplotlib and rasterio; data
+generation additionally needs the dependencies listed in its local README.
+VIIRS characterization requires GDAL's `ogr2ogr`. Standalone reports use
+LuaLaTeX, latexmk and genuine Times New Roman fonts. Input characterization,
+postprocessing and report compilation can be run without launching ELMFIRE.
+
+All 28 GOFER cases include supplementary `data/weather/ws_gust.tif` files from
+the supplied `ELMFIRE_GOFER_validation 2` directory. Their grids and hourly band
+counts match `ws.tif`; source metadata records the import checks and checksums.
+The supplied tags identify NOAA RTMA 10-m gusts converted to mph at 20 ft and
+bilinearly interpolated onto the weather grid. Current namelists retain
+`WS_FILENAME = 'ws'`: simulations and wind summaries continue to use `ws.tif`.
+Gusts are retained as supplementary data and are checked during preprocessing.
+
+## Restore data explicitly
+
+The source-directory helper checks every input, supplementary gust and observation checksum before
+copying missing files and refuses to replace differing existing files:
+
+```bash
+python3 cases/Validation/landscape_scale/antelope_2021/scripts/stage_data.py --source-dir "/path/to/ELMFIRE_GOFER_validation 2"
+python3 cases/Validation/landscape_scale/antelope_2021/scripts/stage_data.py --verify
+```
+
+The frozen Zenodo version 2.1.0 contains scientific inputs, observations and
+supplied data-generation sources for all 31 fires. Its original metadata
+predates promotion of the 24 remaining fires into runnable cases. Current case
+configurations and processing code are maintained in this repository.
+The supplementary gust rasters and updated generation scripts were added after
+version 2.1.0. That frozen archive and its manifests remain unchanged and cannot
+restore these additions. Its generation bundle also contains earlier script
+versions, so restoring it over current generation code will refuse the differing
+files. Use the updated source directory for current data restoration. Future
+archive builds include the gust files and updated generators.
+
+```bash
+python3 tools/restore_zenodo_collection.py --case antelope_2021 --case-dir cases/Validation/landscape_scale/antelope_2021 --manifest zenodo/collection_manifest.json --archive-dir zenodo/dist/collection-2.1.0
 ```
 
 A copied case can use `scripts/stage_dataset.py --bundle-dir /path/to/fire-bundles`
 or `--verify`. Use `--download` only after registering a published version DOI.
-Restoration is explicit, verifies hashes and refuses differing existing files.
-Current case configurations come from the repository, not the data archive.
-The four GOFER `stage_data.py` scripts can also restore the updated data from
-the supplied directory, using `--source-dir /path/to/ELMFIRE_GOFER_validation`.
-They verify all source files before copying missing files.
+Restoration verifies file hashes and protects differing existing files; it does
+not copy old runners, configurations or simulation products into a case.
 
 ## Generate data where source code was supplied
 
-The 28 GOFER datasets retain adapted input-generation code in
-`scripts/generate_data/`. It fetches terrain, fuel and weather data, stacks
-landscape bands, and creates ignition coordinates. It writes only data to a
-new destination and does not create runners or model configurations.
+The 28 GOFER cases retain original sources and adapted case-local entry points
+under `scripts/generate_data/`. These prepare raster inputs and ignition tables,
+or match CAL FIRE records and generate final-perimeter vectors and aligned masks.
+They write into new destinations and require upstream source data or CloudFire
+access. Regeneration from those external sources has not been verified against
+the frozen data hashes.
 
 ```bash
 python3 scripts/generate_data/prepare_inputs.py --output-dir /path/to/new-case --gofer-ignitions /path/to/GOFERC_fireIg.shp
+python3 scripts/generate_data/generate_observations.py --calfire-perimeters /path/to/California_Historic_Fire_Perimeters.geojson --gofer-perimeters /path/to/GOFERC_fireProg.shp --output-dir /path/to/new-observations
 ```
 
-See the local generator README for dependencies. External CloudFire access and
-upstream GOFER files are required; regeneration has not been verified against
-the frozen input hashes. `generate_observations.py` uses the supplied CAL FIRE
-perimeter-generation functions with explicit upstream vector paths. The four
-GOFER cases include arrival-time TIFFs, PNG previews, perimeter GeoPackages and
-aligned 30 m mask TIFFs in `data/observation/`. No generator for the GOFER
-arrival-time TIFF/PNG was supplied. No input-generation script was supplied
-for Camp, Thomas or Tubbs.
-These limitations remain recorded in the source metadata.
-
-## Run and evaluate a current case
+Add `--gusts` to `prepare_inputs.py` to generate supplementary gusts with new
+inputs; `--grib-python /path/to/python` selects the rasterio/GDAL environment
+with GRIB support. To use the current case's weather grid and UTC start time
+without regenerating other inputs, run from its root:
 
 ```bash
-ELMFIRE_BIN=/path/to/elmfire PYTHON_BIN=/path/to/python cases/Validation/landscape_scale/camp_fire/run_case.sh
+python3 scripts/generate_data/rtma_gusts.py --output-file /path/to/new-weather/ws_gust.tif
 ```
 
-The runner preprocesses the case-local data, runs ELMFIRE, evaluates available
-outputs and compiles the report. Camp, Thomas and Tubbs use their documented
-ensemble setup; GOFER cases launch one process. All seven cases write ELMFIRE
-results to `outputs/`, and postprocessors read that folder. Standard output and error logs remain in `logs/`, with temporary
-files in `logs/scratch/`. No earlier run is selected automatically. Source
-rasters and current scientific settings were not changed by the cleanup. Cases with no results report **NOT EVALUABLE**.
+The gust generator requires NOAA access, writes a new TIFF and
+`.generation.json` sidecar, and refuses existing destinations. Missing NOAA hours
+become nodata and are listed explicitly. It changes no namelist or existing wind
+file. External regeneration has not been run to reproduce the supplied hashes.
 
-Preprocessing requires the scientific Python packages listed by each script;
-VIIRS characterization also requires GDAL's `ogr2ogr`. Reports require LuaLaTeX,
-latexmk and genuine Times New Roman fonts. Reports can be compiled from retained
-input evidence and the current status without running ELMFIRE.
+No GOFER arrival-time TIFF/PNG generator was supplied. Camp, Thomas and Tubbs
+have no supplied input generator. Exact source-version, calibration-history and
+redistribution gaps remain explicit in the source metadata.
 
 GOFER source: Liu et al. (2024), doi:10.5194/essd-16-1395-2024; dataset
-doi:10.5281/zenodo.8327264. Full attribution, license evidence and unresolved
-source-version and redistribution questions are retained in the metadata.
-For case construction, follow the repository's validation-case skill.
+DOI:10.5281/zenodo.8327264. Full creator attribution and license evidence remain
+in the Zenodo metadata. Follow the repository validation-case skill for further
+case construction.

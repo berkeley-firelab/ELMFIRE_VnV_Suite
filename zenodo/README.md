@@ -39,7 +39,10 @@ python3 tools/prepare_zenodo_collection.py verify --version 2.1.0
 ```
 
 The per-fire folders under `dist/2.1.0/` are local staging inputs for the combined
-record. The browser draft has not been replaced with this new file set.
+record. The [Zenodo draft](https://zenodo.org/uploads/23574586) contains this
+version: all 37 uploaded files were verified against their local MD5 values on
+2026-10-22. The draft is saved and unpublished. See `upload-verification.json`
+for the verification inventory.
 See the [upload guide](../docs/zenodo-upload-guide.md) before publication.
 
 ## Fire archives

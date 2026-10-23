@@ -17,7 +17,8 @@ import rasterio
 from rasterio.transform import from_origin
 
 ROOT = Path(__file__).resolve().parents[2]
-CASES = ('caldor_2021', 'czu_lightning_complex_2020', 'glass_2020', 'kincade_2019')
+CASES = tuple(sorted(path.parent.parent.name for path in
+                     (ROOT / 'cases/Validation/landscape_scale').glob('*/scripts/stage_data.py')))
 TRANSFORM = from_origin(500000, 4200000, 30, 30)
 CRS = rasterio.crs.CRS.from_epsg(32610)
 
@@ -174,6 +175,38 @@ class GoferEvidenceTests(unittest.TestCase):
                 result, arrays = module.evaluate_run(run, source, paths)
                 self.assertEqual(result['status'], 'NOT EVALUABLE')
                 self.assertIsNone(arrays)
+
+    def test_growth_uses_raster_when_no_vector_area_series_was_supplied(self):
+        module = MODULES['antelope_2021']
+        run, source, paths = self.comparison()
+        source['observation'] = {}
+        result, arrays = module.evaluate_run(run, source, paths)
+        captured = []
+        def capture(figure, name):
+            line = figure.axes[0].lines[0]
+            captured.append((line.get_label(), line.get_ydata().copy()))
+            module.plt.close(figure)
+        with patch.object(module, 'save_figure', side_effect=capture):
+            module.plot_summary([result], {run['run_id']: arrays}, source, 'Synthetic comparison')
+        self.assertEqual(captured[0][0], 'GOFER arrival-time raster')
+        np.testing.assert_allclose(captured[0][1], np.array([0, 1, 1, 2, 3]) * 0.0009)
+
+    def test_new_case_uses_current_source_velocity_output_and_member_one(self):
+        module = MODULES['antelope_2021']
+        run, source, paths = self.comparison()
+        source.update(model_domain={'crs_name': 'UTM zone 10N'}, ignitions=[])
+        _, arrays = module.evaluate_run(run, source, paths)
+        raster(self.root / 'velocity_0000001_0014400.tif', [[1, 1], [1, 1]])
+        raster(self.root / 'velocity_0000002_0014400.tif', [[999, 999], [999, 999]])
+        captured = []
+        def capture(figure, name):
+            if name.startswith('fields_'):
+                captured.append(np.asarray(figure.axes[0].images[0].get_array()))
+            module.plt.close(figure)
+        with patch.object(module, 'save_figure', side_effect=capture):
+            names = module.plot_run(run, arrays, source, 'Synthetic comparison')
+        self.assertIn('fields_baseline.pdf', names)
+        np.testing.assert_array_equal(captured[0], np.ones((2, 2)))
 
     def test_empty_observation_is_not_evaluable(self):
         run, source, paths = self.comparison()

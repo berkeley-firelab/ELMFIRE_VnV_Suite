@@ -7,6 +7,9 @@ ELMFIRE tutorials use), then writes:
     <fire_id>/inputs/landscape.tif     8 bands: dem slp asp fbfm40 cc ch cbh cbd (Int16, 30 m)
     <fire_id>/inputs/adj.tif, phi.tif  spread-rate adjustment factor, initial level set (30 m)
     <fire_id>/inputs/ws wd m1 m10 m100 lh lw .tif   hourly weather/moisture stacks (600 m)
+    <fire_id>/inputs/ws_gust.tif       hourly RTMA gusts at 20 ft (mph), same grid as ws.tif,
+                                       with --gusts (see rtma_gusts.py; not read by ELMFIRE
+                                       unless the configuration points at it)
     <fire_id>/inputs/ignition_mask.tif 300 m radius disk around the ignition point
     <fire_id>/inputs/metadata.in/.out, fuel_models.csv, elmfire.data
     <fire_id>/01-run.sh                runs ELMFIRE, logs provenance, keeps GeoTIFF outputs only
@@ -26,6 +29,10 @@ crown-fire cells only, fixed random seed) until calibration.
 
 Usage (needs rasterio + pyproj; the client needs grpcio, protobuf, python-dateutil, pytz):
     python prepare_inputs.py [--fires Kincade_2019 ...] [--client-python PY] [--force]
+                             [--gusts [--grib-python PY]]
+
+CloudFire's ws.tif is the RTMA 10 m wind times 0.87, i.e. the 20-ft wind ELMFIRE expects
+(MPH_20FT_TO_KMPH_10M = 1.609 / 0.87); --gusts converts RTMA 10 m gusts the same way.
 """
 
 import argparse
@@ -350,6 +357,10 @@ def main():
     p.add_argument("--client-python", default=sys.executable,
                    help="Python with grpcio/protobuf/dateutil/pytz for the CloudFire client")
     p.add_argument("--force", action="store_true", help="rebuild fires that already have inputs")
+    p.add_argument("--gusts", action="store_true",
+                   help="also write inputs/ws_gust.tif from RTMA 10 m gusts (runs rtma_gusts.py)")
+    p.add_argument("--grib-python", default=sys.executable,
+                   help="Python whose GDAL has the GRIB driver, for --gusts (e.g. the wrfpost env)")
     p.add_argument("--config-only", action="store_true",
                    help="only rewrite elmfire.data and 01-run.sh from existing inputs")
     args = p.parse_args()
@@ -382,6 +393,10 @@ def main():
         log.to_csv(log_path, index=False)
         print(f"  ok: {entry['n_wx_times']} weather times, ignition "
               f"({entry['x_ign']}, {entry['y_ign']}) {entry['srs']}", flush=True)
+
+    if args.gusts:
+        ready = [f for f in fires.fire_id if (ROOT / f / "inputs" / "ws.tif").is_file()]
+        subprocess.run([args.grib_python, str(ROOT / "rtma_gusts.py"), "--fires", *ready], check=True)
 
 
 if __name__ == "__main__":

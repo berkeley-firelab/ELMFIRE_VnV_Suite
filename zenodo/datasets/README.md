@@ -1,24 +1,11 @@
-# Data for future validation cases
+# Dataset locations
 
-These 24 definitions retain current input data, comparison observations and
-supplied input and observation-generation scripts. They are data sets for future cases, not
-runnable validation configurations. Each is included as `<fire_id>.tar` in the
-combined `../dist/collection-2.1.0/` record. Historical results, original model
-configurations, legacy runners and source caches have been removed.
+All 31 fire datasets now have runnable cases under
+`cases/Validation/landscape_scale/`. The 24 former future-case definitions were
+promoted there with their canonical data folders and supplied generation sources;
+no duplicate payload or second copy of the scientific data is retained here.
 
-Current data restore to `data/weather/`, `data/fuels_and_topography/`, `data/misc/`
-and `data/observation/`. Supplied data-generation code restores to
-`scripts/generate_data/`. Archive and source manifests remain in the repository;
-source metadata is embedded in each archived dataset manifest.
-
-From the repository root:
-
-```bash
-python3 tools/restore_zenodo_collection.py --case antelope_2021 --case-dir /path/to/antelope_2021 --manifest zenodo/collection_manifest.json --archive-dir zenodo/dist/collection-2.1.0
-```
-
-See each generator README for external source requirements and limitations.
-Each case includes GOFER arrival-time TIFFs and PNG previews, a CAL FIRE
-final-perimeter GeoPackage, and an aligned 30 m mask TIFF. CAL FIRE generation
-source is included; the GOFER arrival-time TIFF/PNG generator was not provided.
-See the collection upload guide before publishing.
+Frozen version 2.1.0 remains available under `zenodo/dist/collection-2.1.0/`.
+Its metadata reflects the seven implemented cases at packaging time. Current
+case configurations, processing code and source audits are in the validation
+suite. The frozen upload set has not been changed by case promotion.

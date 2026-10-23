@@ -22,10 +22,13 @@ def collection_metadata(version: str, paths: list[Path]) -> dict:
     worksheets = {path.name: json.loads((ROOT / 'zenodo/metadata' / (path.name + '.json')).read_text())
                   for path in paths}
     creators = worksheets['antelope_2021']['creators'] + worksheets['camp_fire']['creators']
+    implemented = sum((definition(path.name) / 'case.yaml').is_file() for path in paths)
+    future = len(paths) - implemented
+    case_scope = (f'{implemented} datasets support implemented validation cases'
+                  + (f'; {future} contain data for future cases. ' if future else '. '))
     description = (
         'This collection contains input rasters, required input tables, fire observations and data-generation source '
-        'for 31 wildfires used in ELMFIRE validation studies. Seven datasets support '
-        'implemented validation cases; 24 contain data for future cases. Each fire has '
+        'for 31 wildfires used in ELMFIRE validation studies. ' + case_scope + 'Each fire has '
         'a separate archive containing input and observation bundles and data-generation scripts where supplied, '
         'file inventories, checksums, a README, and a Python restoration script. '
         'Historical model outputs, runners and model configurations are excluded. '
@@ -61,11 +64,14 @@ def collection_metadata(version: str, paths: list[Path]) -> dict:
 
 def readme(manifest: dict) -> str:
     rows = '\n'.join(f'  {entry["filename"]}' for entry in manifest['fires'])
+    future = sum(entry['dataset_manifest'].get('dataset_kind') == 'future_validation_case'
+                 for entry in manifest['fires'])
+    case_scope = (f'{len(manifest["fires"]) - future} datasets support implemented validation cases'
+                  + (f'; {future} support future cases.\n' if future else '.\n'))
     return (
         f'ELMFIRE validation datasets\nCollection version: {manifest["dataset_version"]}\n\n'
         'This collection contains input rasters, necessary input tables, comparison\n'
-        'observations and supplied data-generation code for 31 wildfires. Seven\n'
-        'datasets support implemented validation cases; 24 support future cases.\n'
+        'observations and supplied data-generation code for 31 wildfires.\n' + case_scope +
         'Historical model outputs, runners, model configurations, reports and caches\n'
         'are excluded. Scientific data contents are preserved.\n\n'
         'Contents\n--------\n'

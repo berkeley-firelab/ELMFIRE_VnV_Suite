@@ -25,3 +25,30 @@ geopandas, shapely, pandas, rasterio and matplotlib. Upstream source data and
 CloudFire access are external requirements. No script generating the supplied
 GOFER arrival-time TIFF or its PNG preview was present in the source folder.
 Generation from external services has not been verified against frozen hashes.
+
+Supplementary RTMA gusts
+-----------------------
+The supplied ws_gust.tif is stored in data/weather/. It is not selected by the
+current model configuration: WS_FILENAME remains 'ws'. The gust stack has the
+same hourly band order, CRS and grid as ws.tif. Its source tags identify NOAA
+RTMA 10-m gusts, converted with 0.87 * 2.23694 to mph at 20 ft and interpolated
+bilinearly. Original supplied sources are retained under source/.
+
+Add --gusts [--grib-python /path/to/python] to prepare_inputs.py to generate the
+gust stack alongside new input rasters. To generate gusts from this case's
+existing wind grid without regenerating other inputs, use:
+
+python3 scripts/generate_data/rtma_gusts.py --output-file /path/to/new-weather/ws_gust.tif
+
+The standalone entry point reads the weather start from data/source_manifest.json;
+--weather-template and --weather-start-utc can explicitly select another grid and
+first-band time. It refuses existing TIFF/sidecar destinations, keeps temporary
+GRIB files outside the inputs, and writes a .generation.json provenance sidecar.
+Missing source hours become nodata (-9999) and are listed in that sidecar. It
+requires numpy, rasterio/GDAL with the GRIB driver and external NOAA access.
+Generation has not been run against NOAA to verify the supplied file hashes.
+
+The frozen Zenodo version 2.1.0 predates these gust additions and updated
+generators. It cannot restore them. Use stage_data.py with the updated supplied
+directory for current data; the archive_manifest.json pins the current data and
+generation code. A future archive build will include these additions.

@@ -283,7 +283,7 @@ def verify_upload_set(case: Path, directory: Path, check_sources: bool = False) 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('build', 'verify', 'metadata', 'register'))
-    parser.add_argument('--case', default='all', help='individual fire/case ID, gofer (24 future cases), or all')
+    parser.add_argument('--case', default='all', help='individual fire/case ID, gofer (all GOFER cases), or all')
     parser.add_argument('--version', default='2.1.0')
     parser.add_argument('--output', type=Path, help='defaults to zenodo/dist/<version>')
     parser.add_argument('--record-id')
@@ -296,7 +296,8 @@ def main() -> None:
     cases = sorted(p for p in CASE_ROOT.iterdir() if (p / 'case.yaml').is_file())
     gofer = sorted(p.parent.parent for p in DATASET_ROOT.glob('*/data/archive_manifest.json'))
     if args.case == 'gofer':
-        cases = gofer
+        cases = [case for case in cases + gofer
+                 if json.loads((case / 'data/archive_manifest.json').read_text()).get('fire_id')]
     else:
         cases += gofer
         if args.case != 'all':

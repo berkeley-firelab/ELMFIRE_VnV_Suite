@@ -190,6 +190,10 @@ def main():
     parser.add_argument("--gofer-ignitions", required=True, type=Path,
                         help="upstream GOFERC_fireIg.shp, including its shapefile components")
     parser.add_argument("--client-python", default=sys.executable)
+    parser.add_argument("--gusts", action="store_true",
+                        help="also generate supplementary data/weather/ws_gust.tif")
+    parser.add_argument("--grib-python", default=sys.executable,
+                        help="Python with rasterio/GDAL GRIB support for --gusts")
     args = parser.parse_args()
     GOFER_IGNITIONS = args.gofer_ignitions.expanduser().resolve()
     if not GOFER_IGNITIONS.is_file():
@@ -227,6 +231,13 @@ def main():
             shutil.copyfile(path, stage / "data" / folder / path.name)
         shutil.copyfile(inputs / "ignitions.csv", stage / "data/misc/ignitions.csv")
         shutil.copyfile(source_table, stage / "data/misc/fuel_models.csv")
+        if args.gusts:
+            # Keep ws.tif as the model wind. Gusts are a separate, optional stack.
+            first_time = pd.Timestamp(row.t_ign_utc).floor("h").isoformat()
+            subprocess.run([args.grib_python, str(ROOT / "rtma_gusts.py"),
+                            "--weather-template", str(stage / "data/weather/ws.tif"),
+                            "--weather-start-utc", first_time,
+                            "--output-file", str(stage / "data/weather/ws_gust.tif")], check=True)
         stage.rename(output)
     print(f"Prepared input rasters and ignition table in {output}")
 

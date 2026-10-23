@@ -121,7 +121,9 @@ def sha256(path: Path) -> str:
 def check_inputs(source: dict, inputs: Path, observation: Path, weather: Path) -> list[str]:
     """Return a list of integrity problems; empty when the inputs are usable."""
     errors = []
-    for record in source["model_inputs"]["files"]:
+    provided_files = (source["model_inputs"]["files"]
+                      + source.get("supplementary_weather", {}).get("files", []))
+    for record in provided_files:
         path = CASE_DIR / record["path"]
         if not path.is_file():
             errors.append(f"missing provided input: {record['name']}")
@@ -154,6 +156,14 @@ def check_inputs(source: dict, inputs: Path, observation: Path, weather: Path) -
             n_bands = src.count if n_bands is None else n_bands
             if src.count != n_bands:
                 errors.append(f"{key} band count differs from the other weather rasters")
+    # Gusts are checksum-pinned supplementary data, not part of WEATHER or the
+    # wind statistics. Require their native grid and hourly order to match ws.
+    if source.get("supplementary_weather", {}).get("files"):
+        with rasterio.open(weather / "ws.tif") as wind, rasterio.open(weather / "ws_gust.tif") as gust:
+            if (gust.crs != wind.crs or gust.transform != wind.transform
+                    or gust.width != wind.width or gust.height != wind.height
+                    or gust.count != wind.count):
+                errors.append("supplementary ws_gust grid or band count differs from ws")
     if n_bands != source["weather"]["band_count"]:
         errors.append("weather band count differs from the source record")
     return errors

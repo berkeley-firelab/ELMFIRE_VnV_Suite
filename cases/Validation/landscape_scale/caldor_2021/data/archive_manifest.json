@@ -138,13 +138,22 @@
       "sha256": "bfc257527333ebdffda60e08c40f2a5d3d930bebbfae38accb19dc17fd15e733",
       "source_relative_path": "Caldor_2021/observations/Caldor_2021_toa.tif",
       "processing": "copied unchanged from the user-supplied updated directory"
+    },
+    {
+      "path": "data/weather/ws_gust.tif",
+      "size": 40842054,
+      "sha256": "6b0c9a981efe598bc0330cd8b422e5f4ce517c8fc4dcb66c3cb1dcbef8af9c90",
+      "role": "inputs",
+      "source_relative_path": "Caldor_2021/inputs/ws_gust.tif",
+      "processing": "copied unchanged from user-supplied ELMFIRE_GOFER_validation 2",
+      "used_by_current_simulation": false
     }
   ],
   "generation_files": [
     {
       "path": "scripts/generate_data/README.txt",
-      "size": 1791,
-      "sha256": "2ee931f0f245b8c86efb7dbefe19079782db3ffe3a0ce71154e5b2f6182a99c7"
+      "size": 3394,
+      "sha256": "484f41e676a11c5ce97cda252a3920f7aa76f12fb16aa5419de6baa852b59b3e"
     },
     {
       "path": "scripts/generate_data/fires.csv",
@@ -163,8 +172,13 @@
     },
     {
       "path": "scripts/generate_data/prepare_inputs.py",
-      "size": 11078,
-      "sha256": "820365bdda8beebf082b3ef304d85a31f13317237d2faad07ceee113adde7757"
+      "size": 11872,
+      "sha256": "71ce2e3df4c5afcc3bca8d3762580ff61ab76b6d7bdecf917e6aa54df2f20693"
+    },
+    {
+      "path": "scripts/generate_data/rtma_gusts.py",
+      "size": 9759,
+      "sha256": "d451aa4633da495e6571cd24463ad36bab6974a6862c9a3816481fc471ea0b06"
     },
     {
       "path": "scripts/generate_data/source/exploratory.py",
@@ -178,8 +192,13 @@
     },
     {
       "path": "scripts/generate_data/source/prepare_inputs.py",
-      "size": 16402,
-      "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c"
+      "size": 17423,
+      "sha256": "d6cda9ee410a239161ea216cdf090dc00153c4fb5fc3c9fd719b509e6dbf6c96"
+    },
+    {
+      "path": "scripts/generate_data/source/rtma_gusts.py",
+      "size": 7499,
+      "sha256": "e27a383239f441b8785234e7785490287ea3769a21fe660068fbe2d9717ae347"
     },
     {
       "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign.py",
@@ -219,11 +238,6 @@
   },
   "generation_sources": [
     {
-      "source_relative_path": "prepare_inputs.py",
-      "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c",
-      "size": 16402
-    },
-    {
       "source_relative_path": "make_fires.py",
       "sha256": "a6f8dd87475483086a939c308770b10d19790456a0d6ece569ff0d3b020cfb94",
       "size": 3167
@@ -232,6 +246,37 @@
       "source_relative_path": "exploratory.py",
       "sha256": "3ce3f69eb0bab864adbaab85d1032934c9bcdcc89c8e41cf6ef6f354b7ab851e",
       "size": 21531
+    },
+    {
+      "source_relative_path": "prepare_inputs.py",
+      "sha256": "d6cda9ee410a239161ea216cdf090dc00153c4fb5fc3c9fd719b509e6dbf6c96",
+      "size": 17423,
+      "source_directory": "ELMFIRE_GOFER_validation 2"
+    },
+    {
+      "source_relative_path": "rtma_gusts.py",
+      "sha256": "e27a383239f441b8785234e7785490287ea3769a21fe660068fbe2d9717ae347",
+      "size": 7499,
+      "source_directory": "ELMFIRE_GOFER_validation 2"
+    }
+  ],
+  "generation_source_history": [
+    {
+      "source_directory": "ELMFIRE_GOFER_validation",
+      "files": [
+        {
+          "source_relative_path": "prepare_inputs.py",
+          "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c",
+          "size": 16402
+        }
+      ]
+    }
+  ],
+  "source_updates": [
+    {
+      "name": "ELMFIRE_GOFER_validation 2",
+      "received_date": "2026-10-22",
+      "scope": "supplementary ws_gust.tif and updated gust/input generation sources; existing data and wind selection unchanged"
     }
   ]
 }

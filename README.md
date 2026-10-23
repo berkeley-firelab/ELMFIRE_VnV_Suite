@@ -124,8 +124,8 @@ rasters, necessary fuel-model and ignition tables, comparison observations,
 and supplied data-generation code. It excludes simulation results, runners,
 model configurations, reports, caches and superseded inputs.
 
-The seven current cases remain under `cases/Validation/landscape_scale/`;
-definitions for 24 future cases are under `zenodo/datasets/`. Current case
+All 31 cases are implemented under `cases/Validation/landscape_scale/`;
+the 24 former future-case definitions have been promoted into that suite. Current case
 configurations and evaluation workflows remain in the repository. Restore the
 data into a clone before running a case. Generation scripts, where supplied,
 require external source files and service access. CAL FIRE final-perimeter

@@ -62,6 +62,17 @@ class ValidationInputLayoutTests(unittest.TestCase):
                           'model_domain': {'crs': 'EPSG:32610'}, 'weather': {'band_count': 1}}
                 module.CASE_DIR = root
                 self.assertEqual(module.check_inputs(source, fuels, observation, weather), [])
+                # Supplementary gusts must share the wind grid and hourly order;
+                # they are checked without adding them to model wind statistics.
+                gust = weather / 'ws_gust.tif'
+                raster(gust, 1)
+                source['supplementary_weather'] = {'files': [
+                    {'name': 'ws_gust.tif', 'path': 'data/weather/ws_gust.tif'}]}
+                self.assertEqual(module.check_inputs(source, fuels, observation, weather), [])
+                with rasterio.open(gust, 'r+') as dataset:
+                    dataset.transform = from_origin(500030, 4200000, 30, 30)
+                errors = module.check_inputs(source, fuels, observation, weather)
+                self.assertTrue(any('ws_gust grid' in error for error in errors))
                 (weather / 'm10.tif').unlink()
                 errors = module.check_inputs(source, fuels, observation, weather)
                 self.assertTrue(any('m10.tif' in error and 'missing' in error for error in errors))
@@ -107,7 +118,7 @@ class ValidationInputLayoutTests(unittest.TestCase):
                     self.assertNotIn('data/archive_payload/inputs/', relative)
                     if relative.startswith('data/weather/'):
                         self.assertIn(Path(relative).name.split('.tif')[0],
-                                      {'ws', 'wd', 'm1', 'm10', 'm100', 'm1f', 'm10f', 'm100f', 'lh', 'lw'})
+                                      {'ws', 'ws_gust', 'wd', 'm1', 'm10', 'm100', 'm1f', 'm10f', 'm100f', 'lh', 'lw'})
 
 
 if __name__ == '__main__':
