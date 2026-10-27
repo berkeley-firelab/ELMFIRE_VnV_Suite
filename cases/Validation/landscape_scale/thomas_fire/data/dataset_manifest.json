@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "case_id": "thomas_fire",
-  "dataset_version": "2.1.0",
-  "source_revision": "9b2f5614fac60e1877221399db05a9bd73a86c52",
+  "dataset_version": "2.2.0",
+  "source_revision": "bddc2cef6107f4be8c0c2b4ef08a1d547efe339e",
   "source_state": "working tree snapshot; file hashes are authoritative",
   "archive_scope": "input data, observations and data-generation source only",
   "source_metadata": {
@@ -88,8 +88,8 @@
       "role": "inputs",
       "filename": "inputs.tar.gz",
       "required": true,
-      "size": 21788504,
-      "sha256": "99371fec9c02886025f0ae8a1130db0f8437a721839752f8e198d84294c8715c",
+      "size": 21783925,
+      "sha256": "8ab722640c358ed69c3fa415d06c9e072a2547aaf2b23159b2cb1a8b224aabe3",
       "url": null,
       "files": [
         {

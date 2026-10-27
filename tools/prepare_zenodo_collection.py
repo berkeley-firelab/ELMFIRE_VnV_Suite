@@ -36,7 +36,11 @@ def collection_metadata(version: str, paths: list[Path]) -> dict:
         '28 fires contain GOFER-derived arrival-time TIFFs and PNG previews, plus '
         'CAL FIRE final-perimeter GeoPackages and aligned 30 m mask TIFFs. '
         'The GeoPackages retain CAL FIRE records and the final GOFER perimeter. '
-        'Input preparation and CAL FIRE perimeter-generation sources are included.\n\n'
+        'Input preparation and CAL FIRE perimeter-generation sources are included. '
+        'All 28 GOFER fires also include supplementary ws_gust.tif rasters and updated '
+        'case-local gust-generation scripts. NOAA RTMA 10-m gusts were converted to '
+        'mph at 20 ft and bilinearly interpolated onto each weather grid. Regular '
+        'wind rasters are retained; gust selection is controlled by the model configuration.\n\n'
         'Chris Lautenberger and Daniel San Martin are credited for the 28 GOFER-related '
         'fire datasets. Dwi M. J. Purnomo, Maria Theodori, and Kasra Shamsaei are credited '
         'for Camp, Thomas, and Tubbs.\n\n' + GOFER_CREDIT + '\n\n'
@@ -82,6 +86,12 @@ def readme(manifest: dict) -> str:
         '28 GOFER fires, and VIIRS data for Camp, Thomas and Tubbs. They restore\n'
         'to data/observation/. Generation code\n'
         'restores to scripts/generate_data/.\n'
+        'All 28 GOFER fires include supplementary data/weather/ws_gust.tif and updated\n'
+        'rtma_gusts.py and prepare_inputs.py generators. Regular ws.tif is retained.\n'
+        'Gusts are NOAA RTMA 10-m values converted to mph at 20 ft, bilinearly\n'
+        'interpolated onto the existing hourly weather grid. Generation requires\n'
+        'NOAA access and rasterio/GDAL with GRIB support; --gusts enables it during\n'
+        'input preparation. Source scripts and provenance are included.\n'
         'collection_manifest.json records each archive and its file inventory.\n'
         'metadata-worksheet.json records attribution, license and permission gaps.\n'
         'checksums.sha256 verifies the other files in this record.\n\n'
@@ -206,7 +216,7 @@ def register(output: Path, record_id: str, doi: str) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('build', 'verify', 'register'))
-    parser.add_argument('--version', default='2.1.0')
+    parser.add_argument('--version', default='2.2.0')
     parser.add_argument('--source', type=Path)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--record-id')

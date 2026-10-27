@@ -3,7 +3,7 @@
   "case_id": "beckwourth_complex_2021",
   "resource_type": "Dataset",
   "title": "ELMFIRE validation inputs and observations for beckwourth complex 2021",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "creators": [
     {
       "name": "Chris Lautenberger",

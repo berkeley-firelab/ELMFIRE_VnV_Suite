@@ -152,8 +152,8 @@
   "generation_files": [
     {
       "path": "scripts/generate_data/README.txt",
-      "size": 3394,
-      "sha256": "484f41e676a11c5ce97cda252a3920f7aa76f12fb16aa5419de6baa852b59b3e"
+      "size": 3398,
+      "sha256": "c912d095af4668b608b39cbeff24baaef14cb23bfc13913720b7284a5aa1f232"
     },
     {
       "path": "scripts/generate_data/fires.csv",
@@ -177,8 +177,8 @@
     },
     {
       "path": "scripts/generate_data/rtma_gusts.py",
-      "size": 9759,
-      "sha256": "d451aa4633da495e6571cd24463ad36bab6974a6862c9a3816481fc471ea0b06"
+      "size": 9949,
+      "sha256": "dbcb0529bc2c1fb4d8c4fb0ca2f4492064f4af1c9269a5d5f52d848e8660c05a"
     },
     {
       "path": "scripts/generate_data/source/exploratory.py",

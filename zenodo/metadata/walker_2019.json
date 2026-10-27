@@ -3,7 +3,7 @@
   "case_id": "walker_2019",
   "resource_type": "Dataset",
   "title": "ELMFIRE validation inputs and observations for walker 2019",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "creators": [
     {
       "name": "Chris Lautenberger",

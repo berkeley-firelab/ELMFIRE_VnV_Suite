@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "case_id": "tubbs_fire",
-  "dataset_version": "2.1.0",
-  "source_revision": "9b2f5614fac60e1877221399db05a9bd73a86c52",
+  "dataset_version": "2.2.0",
+  "source_revision": "bddc2cef6107f4be8c0c2b4ef08a1d547efe339e",
   "source_state": "working tree snapshot; file hashes are authoritative",
   "archive_scope": "input data, observations and data-generation source only",
   "source_metadata": {
@@ -99,8 +99,8 @@
       "role": "inputs",
       "filename": "inputs.tar.gz",
       "required": true,
-      "size": 4507845,
-      "sha256": "38f891634d8a6f97f159e9d970bddd4915a275fd613bf1fe1d179981dd40654f",
+      "size": 4507279,
+      "sha256": "ac805896603c00f6f488b4c7cf401502154d431cfabb42f6e515576e4d67e2b6",
       "url": null,
       "files": [
         {

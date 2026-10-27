@@ -3,7 +3,7 @@
   "case_id": "camp_fire",
   "resource_type": "Dataset",
   "title": "ELMFIRE validation inputs and observations for camp fire",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "creators": [
     {
       "name": "Dwi M. J. Purnomo",

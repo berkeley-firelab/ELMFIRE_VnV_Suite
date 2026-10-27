@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "case_id": "czu_lightning_complex_2020",
-  "dataset_version": "2.1.0",
-  "source_revision": "9b2f5614fac60e1877221399db05a9bd73a86c52",
+  "dataset_version": "2.2.0",
+  "source_revision": "bddc2cef6107f4be8c0c2b4ef08a1d547efe339e",
   "source_state": "working tree snapshot; file hashes are authoritative",
   "archive_scope": "input data, observations and data-generation source only",
   "source_metadata": {
@@ -508,7 +508,43 @@
       "input_scripts": "scripts/generate_data/prepare_inputs.py",
       "observation_scripts": "scripts/generate_data/generate_observations.py",
       "supplied_sources": "scripts/generate_data/source",
-      "limitations": "CAL FIRE final-perimeter generation is supplied in exploratory.py; GOFER arrival-time TIFF/PNG generation code is absent. Upstream CAL FIRE/GOFER files and CloudFire service access are external requirements."
+      "limitations": "CAL FIRE final-perimeter generation is supplied in exploratory.py; GOFER arrival-time TIFF/PNG generation code is absent. Upstream CAL FIRE/GOFER files and CloudFire service access are external requirements.",
+      "gust_scripts": "scripts/generate_data/rtma_gusts.py",
+      "gust_usage": "prepare_inputs.py --gusts or standalone rtma_gusts.py --output-file NEW_FILE; existing files and model configuration are preserved",
+      "frozen_archive_note": "Zenodo 2.2.0 includes supplementary gust rasters and updated generation scripts; 2.1.0 predates them."
+    },
+    "supplementary_weather": {
+      "source_directory": "ELMFIRE_GOFER_validation 2",
+      "received_date": "2026-10-22",
+      "files": [
+        {
+          "path": "data/weather/ws_gust.tif",
+          "size": 3740272,
+          "sha256": "7e2919d20bf4863580ca2f488382b05d1f58edc7513c67ae8d42826f537dba6a",
+          "source_relative_path": "CZU_Lightning_Complex_2020/inputs/ws_gust.tif",
+          "processing": "copied unchanged from user-supplied ELMFIRE_GOFER_validation 2",
+          "used_by_current_simulation": false,
+          "name": "ws_gust.tif"
+        }
+      ],
+      "role": "supplementary; not selected by current ELMFIRE namelist",
+      "source": "NOAA RTMA 2.5 km GUST at 10 m, as identified by supplied raster tags and source script",
+      "units": "mph at 20 ft",
+      "conversion": "0.87 * 2.23694 * GUST[m/s at 10 m]",
+      "resampling": "bilinear onto the ws.tif grid",
+      "first_time_utc": "2020-08-17T00:00:00Z",
+      "interval_s": 3600,
+      "band_count": 126,
+      "time_basis": "band order and first UTC hour from supplied inputs_log.csv; per-band timestamps were not supplied in the TIFF",
+      "import_checks": {
+        "grid_and_band_count_match_ws": true,
+        "missing_cells": 0,
+        "negative_cells": 0,
+        "minimum_mph": 0.0,
+        "maximum_mph": 37.99088668823242,
+        "mean_mph": 12.712615758913863
+      },
+      "regeneration_verified": false
     }
   },
   "zenodo": {
@@ -521,8 +557,8 @@
       "role": "inputs",
       "filename": "inputs.tar.gz",
       "required": true,
-      "size": 30330424,
-      "sha256": "01fb3f0f2870c69dbc0e1e8347c1b2c03c99348bb4a898ebbc50fd11474cc173",
+      "size": 34063918,
+      "sha256": "69322e744de611df800b8ae10b96c632e82cc68a8803aae2e94d8e1689bb98b5",
       "url": null,
       "files": [
         {
@@ -559,6 +595,11 @@
           "path": "data/weather/ws.tif",
           "size": 3757869,
           "sha256": "a5e839bcca109ed798cfab99419743dbe7b03984871a8ffa2310f6851b785c90"
+        },
+        {
+          "path": "data/weather/ws_gust.tif",
+          "size": 3740272,
+          "sha256": "7e2919d20bf4863580ca2f488382b05d1f58edc7513c67ae8d42826f537dba6a"
         },
         {
           "path": "data/fuels_and_topography/adj.tif",
@@ -626,14 +667,14 @@
       "role": "generation",
       "filename": "generation.tar.gz",
       "required": true,
-      "size": 26000,
-      "sha256": "a4f01395746798a81167b67b9612e8f6eb10cbf30696aecfcba4a598444c6430",
+      "size": 32678,
+      "sha256": "6df984ea9aba8bdc2d4fc86b40029a541d4252b11c8e83daf978f28b7ebd1c20",
       "url": null,
       "files": [
         {
           "path": "scripts/generate_data/README.txt",
-          "size": 1791,
-          "sha256": "2ee931f0f245b8c86efb7dbefe19079782db3ffe3a0ce71154e5b2f6182a99c7"
+          "size": 3398,
+          "sha256": "c912d095af4668b608b39cbeff24baaef14cb23bfc13913720b7284a5aa1f232"
         },
         {
           "path": "scripts/generate_data/fires.csv",
@@ -652,8 +693,13 @@
         },
         {
           "path": "scripts/generate_data/prepare_inputs.py",
-          "size": 11078,
-          "sha256": "820365bdda8beebf082b3ef304d85a31f13317237d2faad07ceee113adde7757"
+          "size": 11872,
+          "sha256": "71ce2e3df4c5afcc3bca8d3762580ff61ab76b6d7bdecf917e6aa54df2f20693"
+        },
+        {
+          "path": "scripts/generate_data/rtma_gusts.py",
+          "size": 9949,
+          "sha256": "dbcb0529bc2c1fb4d8c4fb0ca2f4492064f4af1c9269a5d5f52d848e8660c05a"
         },
         {
           "path": "scripts/generate_data/source/exploratory.py",
@@ -667,8 +713,13 @@
         },
         {
           "path": "scripts/generate_data/source/prepare_inputs.py",
-          "size": 16402,
-          "sha256": "02428b42cc3ea1f92b61afd7a1293fb004b1d2e670100e32460b33a40dfadc2c"
+          "size": 17423,
+          "sha256": "d6cda9ee410a239161ea216cdf090dc00153c4fb5fc3c9fd719b509e6dbf6c96"
+        },
+        {
+          "path": "scripts/generate_data/source/rtma_gusts.py",
+          "size": 7499,
+          "sha256": "e27a383239f441b8785234e7785490287ea3769a21fe660068fbe2d9717ae347"
         },
         {
           "path": "scripts/generate_data/tools/cloudfire/fuel_wx_ign.py",

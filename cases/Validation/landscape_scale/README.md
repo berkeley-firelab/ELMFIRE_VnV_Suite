@@ -132,19 +132,15 @@ python3 cases/Validation/landscape_scale/antelope_2021/scripts/stage_data.py --s
 python3 cases/Validation/landscape_scale/antelope_2021/scripts/stage_data.py --verify
 ```
 
-The frozen Zenodo version 2.1.0 contains scientific inputs, observations and
-supplied data-generation sources for all 31 fires. Its original metadata
-predates promotion of the 24 remaining fires into runnable cases. Current case
-configurations and processing code are maintained in this repository.
-The supplementary gust rasters and updated generation scripts were added after
-version 2.1.0. That frozen archive and its manifests remain unchanged and cannot
-restore these additions. Its generation bundle also contains earlier script
-versions, so restoring it over current generation code will refuse the differing
-files. Use the updated source directory for current data restoration. Future
-archive builds include the gust files and updated generators.
+Zenodo version 2.2.0 contains scientific inputs, observations and supplied
+data-generation sources for all 31 fires, including supplementary gust rasters
+and updated generators for the 28 GOFER cases. Version 2.1.0 predates the gust
+additions. Current configurations and processing workflows remain in this
+repository. Restoration refuses differing existing files; use an empty target
+when comparing archive versions.
 
 ```bash
-python3 tools/restore_zenodo_collection.py --case antelope_2021 --case-dir cases/Validation/landscape_scale/antelope_2021 --manifest zenodo/collection_manifest.json --archive-dir zenodo/dist/collection-2.1.0
+python3 tools/restore_zenodo_collection.py --case antelope_2021 --case-dir cases/Validation/landscape_scale/antelope_2021 --manifest zenodo/collection_manifest.json --archive-dir zenodo/dist/collection-2.2.0
 ```
 
 A copied case can use `scripts/stage_dataset.py --bundle-dir /path/to/fire-bundles`

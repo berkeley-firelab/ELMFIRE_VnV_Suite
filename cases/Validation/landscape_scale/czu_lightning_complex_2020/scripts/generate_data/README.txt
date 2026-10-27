@@ -48,7 +48,7 @@ Missing source hours become nodata (-9999) and are listed in that sidecar. It
 requires numpy, rasterio/GDAL with the GRIB driver and external NOAA access.
 Generation has not been run against NOAA to verify the supplied file hashes.
 
-The frozen Zenodo version 2.1.0 predates these gust additions and updated
-generators. It cannot restore them. Use stage_data.py with the updated supplied
-directory for current data; the archive_manifest.json pins the current data and
-generation code. A future archive build will include these additions.
+Zenodo version 2.2.0 includes the supplementary gust rasters and these updated
+generators. Version 2.1.0 predates them. Current archive manifests pin both data
+and generation code. After archive-only restoration, the standalone gust
+generator reads weather timing from dataset_manifest.json source metadata.

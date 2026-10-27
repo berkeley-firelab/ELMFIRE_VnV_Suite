@@ -210,7 +210,7 @@
     "limitations": "CAL FIRE final-perimeter generation is supplied in exploratory.py; GOFER arrival-time TIFF/PNG generation code is absent. Upstream CAL FIRE/GOFER files and CloudFire service access are external requirements.",
     "gust_scripts": "scripts/generate_data/rtma_gusts.py",
     "gust_usage": "prepare_inputs.py --gusts or standalone rtma_gusts.py --output-file NEW_FILE; existing files and model configuration are preserved",
-    "frozen_archive_note": "Zenodo 2.1.0 predates the supplementary gust raster and updated generation scripts; its manifest remains unchanged."
+    "frozen_archive_note": "Zenodo 2.2.0 includes supplementary gust rasters and updated generation scripts; 2.1.0 predates them."
   },
   "fire_name": "Beckwourth Complex",
   "fire_year": 2021,

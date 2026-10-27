@@ -1,7 +1,7 @@
 # Uploading the ELMFIRE validation data collection
 
 Prepare one Zenodo Dataset record for all 31 fires. The current local upload is
-`zenodo/dist/collection-2.1.0/`, containing 31 fire archives and six support files.
+`zenodo/dist/collection-2.2.0/`, containing 31 fire archives and six support files.
 It contains input rasters, necessary input tables, comparison observations and
 data-generation source where supplied. It excludes model results, runners,
 model configurations, reports and caches.
@@ -9,14 +9,14 @@ model configurations, reports and caches.
 ## Prepare and verify
 
 ```bash
-python3 tools/prepare_zenodo.py build --version 2.1.0
-python3 tools/prepare_zenodo.py verify --version 2.1.0 --check-sources
-python3 tools/prepare_zenodo_collection.py build --version 2.1.0
-python3 tools/prepare_zenodo_collection.py verify --version 2.1.0
+python3 tools/prepare_zenodo.py build --version 2.2.0
+python3 tools/prepare_zenodo.py verify --version 2.2.0 --check-sources
+python3 tools/prepare_zenodo_collection.py build --version 2.2.0
+python3 tools/prepare_zenodo_collection.py verify --version 2.2.0
 ```
 
 Build commands refuse existing output folders. Use a new version or output
-folder for subsequent builds. The per-fire staging folders in `zenodo/dist/2.1.0/`
+folder for subsequent builds. The per-fire staging folders in `zenodo/dist/2.2.0/`
 are not separate deposits. Per-fire archives include `inputs.tar.gz`,
 `observations.tar.gz`, `generation.tar.gz` where available, and metadata and
 restoration files. Source attribution and limitations are retained in metadata;
@@ -29,7 +29,7 @@ case configurations are maintained only in the repository.
 2. Set the type to Dataset and use `zenodo/collection-metadata.json` for its
    title, version, date, description, creators, license and related identifiers.
 3. Replace the old upload files with the complete 37-file set from
-   `zenodo/dist/collection-2.1.0/`. Do not mix files from different versions.
+   `zenodo/dist/collection-2.2.0/`. Do not mix files from different versions.
 4. Verify every upload completes, save the draft and preview it. Stop before
    publication for review.
 
@@ -42,11 +42,10 @@ https://zenodo.org/records/14642378. The exact GOFER version used in the supplie
 rasters is unverified. Permission evidence for other source products remains
 incomplete and must be reviewed before publication.
 
-The [existing draft](https://zenodo.org/uploads/23574586) was updated to version
-2.1.0 on 2026-10-22. All 37 file checksums match the local upload set. The
-35 outdated files were replaced; the two identical restoration helpers were
-retained. The draft is saved and unpublished. Verification is recorded in
-`zenodo/upload-verification.json`.
+The [existing draft](https://zenodo.org/uploads/23574586) contains version 2.2.0
+with supplementary gust rasters and updated generation scripts. All 37 uploaded
+files match the local MD5 values, verified on 2026-10-23. The draft is saved and
+unpublished. See `zenodo/upload-verification.json` for the verification inventory.
 
 ## Register and restore
 
@@ -62,7 +61,7 @@ registered archive into a fresh directory using `--download`.
 For local restoration:
 
 ```bash
-python3 tools/restore_zenodo_collection.py --case camp_fire --case-dir /path/to/restored-data --manifest zenodo/collection_manifest.json --archive-dir zenodo/dist/collection-2.1.0
+python3 tools/restore_zenodo_collection.py --case camp_fire --case-dir /path/to/restored-data --manifest zenodo/collection_manifest.json --archive-dir zenodo/dist/collection-2.2.0
 ```
 
 The standalone `stage_collection.py` accepts the same options. Both Python
@@ -79,3 +78,11 @@ entry point are included for the 28 GOFER fires. These require the upstream
 CAL FIRE and GOFER vectors. The supplied directory does not document CAL FIRE
 license terms. No generator for the supplied GOFER arrival-time TIFFs or PNGs
 was provided. Camp, Thomas and Tubbs have no supplied input generator.
+
+## Supplementary gusts
+
+Version 2.2.0 adds `data/weather/ws_gust.tif` to all 28 GOFER cases and includes
+the adapted `rtma_gusts.py`, updated `prepare_inputs.py`, and original source
+scripts. The regular wind rasters are retained. Gust regeneration requires NOAA
+access and rasterio/GDAL GRIB support. Its generated output has not been
+verified against the supplied raster hashes.

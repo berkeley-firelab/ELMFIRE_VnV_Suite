@@ -3,7 +3,7 @@
   "case_id": "w_5_cold_springs_2020",
   "resource_type": "Dataset",
   "title": "ELMFIRE validation inputs and observations for w 5 cold springs 2020",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "creators": [
     {
       "name": "Chris Lautenberger",

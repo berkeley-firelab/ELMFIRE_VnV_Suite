@@ -199,7 +199,11 @@ def main():
     args = parser.parse_args()
     first_time = args.weather_start_utc
     if first_time is None:
-        source = json.loads((CASE_DIR / "data/source_manifest.json").read_text())
+        source_path = CASE_DIR / "data/source_manifest.json"
+        if source_path.is_file():
+            source = json.loads(source_path.read_text())
+        else:
+            source = json.loads((CASE_DIR / "data/dataset_manifest.json").read_text())["source_metadata"]
         first_time = source["weather"]["first_time_utc"]
     try:
         result = generate(args.weather_template, first_time, args.output_file, args.workers)

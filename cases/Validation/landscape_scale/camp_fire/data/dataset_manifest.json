@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "case_id": "camp_fire",
-  "dataset_version": "2.1.0",
-  "source_revision": "9b2f5614fac60e1877221399db05a9bd73a86c52",
+  "dataset_version": "2.2.0",
+  "source_revision": "bddc2cef6107f4be8c0c2b4ef08a1d547efe339e",
   "source_state": "working tree snapshot; file hashes are authoritative",
   "archive_scope": "input data, observations and data-generation source only",
   "source_metadata": {
@@ -93,8 +93,8 @@
       "role": "inputs",
       "filename": "inputs.tar.gz",
       "required": true,
-      "size": 10729002,
-      "sha256": "1bad1370b5276c1c9406ae5b0172160169d29fae35e21f138236f14c019f14fa",
+      "size": 10728935,
+      "sha256": "55d35835f477534d7cafe651d9fc86f7d82eea0909fbc58bcc24b4ffc6fcbd17",
       "url": null,
       "files": [
         {

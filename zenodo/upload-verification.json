@@ -1,12 +1,13 @@
 {
   "draft_url": "https://zenodo.org/uploads/23574586",
   "record_id": "23574586",
-  "dataset_version": "2.1.0",
+  "dataset_version": "2.2.0",
   "status": "all files uploaded and checksum-verified; unpublished draft",
-  "checked_at_utc": "2026-10-22T23:23:05.510492+00:00",
+  "checked_on": "2026-10-23",
+  "checked_timezone": "America/Los_Angeles",
   "file_count": 37,
-  "total_bytes": 7047370067,
-  "verification": "Zenodo MD5 values displayed in the upload table match the local files; local collection SHA-256 verification also passed.",
+  "total_bytes": 8496803757,
+  "verification": "All 37 Zenodo MD5 values match the verified local version 2.2.0 files; each upload shows 100%. Local per-fire and collection SHA-256 verification passed.",
   "replaced_files": 35,
   "unchanged_identical_files": [
     "stage_collection.py",
@@ -15,171 +16,171 @@
   "files": [
     {
       "filename": "README.txt",
-      "size": 3469,
-      "md5": "837fd9ec92790377a8f6a4ec4afcb802",
-      "zenodo_md5": "837fd9ec92790377a8f6a4ec4afcb802"
+      "size": 3875,
+      "md5": "fb1c564fd403746c3a62659975526e85",
+      "zenodo_md5": "fb1c564fd403746c3a62659975526e85"
     },
     {
       "filename": "antelope_2021.tar",
-      "size": 201082880,
-      "md5": "00bf86802fb2a43a9a0eefa8b85f23d0",
-      "zenodo_md5": "00bf86802fb2a43a9a0eefa8b85f23d0"
+      "size": 246753280,
+      "md5": "c077726925fff70b8055cc350c840dd2",
+      "zenodo_md5": "c077726925fff70b8055cc350c840dd2"
     },
     {
       "filename": "august_complex_2020.tar",
-      "size": 1228687360,
-      "md5": "2ce7656a4dbf5776ac5a17d77e656080",
-      "zenodo_md5": "2ce7656a4dbf5776ac5a17d77e656080"
+      "size": 1476096000,
+      "md5": "1ab93c05b61909f437bd2b47a0721e43",
+      "zenodo_md5": "1ab93c05b61909f437bd2b47a0721e43"
     },
     {
       "filename": "beckwourth_complex_2021.tar",
-      "size": 155688960,
-      "md5": "3035595c5ac436bfc288998d5038fce0",
-      "zenodo_md5": "3035595c5ac436bfc288998d5038fce0"
+      "size": 191201280,
+      "md5": "f2e7d8675820220721156719f496fcab",
+      "zenodo_md5": "f2e7d8675820220721156719f496fcab"
     },
     {
       "filename": "bobcat_2020.tar",
-      "size": 91791360,
-      "md5": "e8f51efd9329c4bd9807f6b8b7f40b0e",
-      "zenodo_md5": "e8f51efd9329c4bd9807f6b8b7f40b0e"
+      "size": 111206400,
+      "md5": "efc8b00c289c7d94cd1916d9aec918f3",
+      "zenodo_md5": "efc8b00c289c7d94cd1916d9aec918f3"
     },
     {
       "filename": "caldor_2021.tar",
-      "size": 196280320,
-      "md5": "8b3aaaee3281749b8235686c8f382a15",
-      "zenodo_md5": "8b3aaaee3281749b8235686c8f382a15"
+      "size": 237066240,
+      "md5": "6f56fe810d5d559960966e012d7f182d",
+      "zenodo_md5": "6f56fe810d5d559960966e012d7f182d"
     },
     {
       "filename": "camp_fire.tar",
       "size": 10844160,
-      "md5": "5ce1544998ef9de6c15470ad793df404",
-      "zenodo_md5": "5ce1544998ef9de6c15470ad793df404"
+      "md5": "1c4a1fc1507f6de999c272e0c7cab262",
+      "zenodo_md5": "1c4a1fc1507f6de999c272e0c7cab262"
     },
     {
       "filename": "checksums.sha256",
       "size": 3096,
-      "md5": "9c4d467935121bb1501f425efb0ccfdc",
-      "zenodo_md5": "9c4d467935121bb1501f425efb0ccfdc"
+      "md5": "8613e6d41dfe86b3129270f97fabcd06",
+      "zenodo_md5": "8613e6d41dfe86b3129270f97fabcd06"
     },
     {
       "filename": "collection_manifest.json",
-      "size": 538030,
-      "md5": "a789ac9f48a19c79ee618fe29eb49cc9",
-      "zenodo_md5": "a789ac9f48a19c79ee618fe29eb49cc9"
+      "size": 867681,
+      "md5": "23da3321d5cdc7660897d9602a817ca7",
+      "zenodo_md5": "23da3321d5cdc7660897d9602a817ca7"
     },
     {
       "filename": "creek_2020.tar",
-      "size": 756664320,
-      "md5": "9b152486182ec5b10972a307e076143b",
-      "zenodo_md5": "9b152486182ec5b10972a307e076143b"
+      "size": 893562880,
+      "md5": "f7661d968dba48375ed4480de9c060b4",
+      "zenodo_md5": "f7661d968dba48375ed4480de9c060b4"
     },
     {
       "filename": "czu_lightning_complex_2020.tar",
-      "size": 30832640,
-      "md5": "e91520591458022bebe8fbb627d14175",
-      "zenodo_md5": "e91520591458022bebe8fbb627d14175"
+      "size": 34570240,
+      "md5": "9370c0c6735290aa26278b1c3a0fbd8e",
+      "zenodo_md5": "9370c0c6735290aa26278b1c3a0fbd8e"
     },
     {
       "filename": "dixie_2021.tar",
-      "size": 1152010240,
-      "md5": "af9743439bce741ea6718a7f551506f1",
-      "zenodo_md5": "af9743439bce741ea6718a7f551506f1"
+      "size": 1414973440,
+      "md5": "bf5d0472c2b29ef8ec6fbbde29b5610b",
+      "zenodo_md5": "bf5d0472c2b29ef8ec6fbbde29b5610b"
     },
     {
       "filename": "dolan_2020.tar",
-      "size": 146063360,
-      "md5": "3134c4e354776b843bceb3c9a98ce0c7",
-      "zenodo_md5": "3134c4e354776b843bceb3c9a98ce0c7"
+      "size": 175759360,
+      "md5": "fdd0bfd17825079245acd86eb5b4d056",
+      "zenodo_md5": "fdd0bfd17825079245acd86eb5b4d056"
     },
     {
       "filename": "glass_2020.tar",
-      "size": 35246080,
-      "md5": "ce7089a11b95c939148c185238f8f2d4",
-      "zenodo_md5": "ce7089a11b95c939148c185238f8f2d4"
+      "size": 41256960,
+      "md5": "e6bd44dcf0c81f71265e68e56caaae5c",
+      "zenodo_md5": "e6bd44dcf0c81f71265e68e56caaae5c"
     },
     {
       "filename": "july_complex_2020.tar",
-      "size": 65013760,
-      "md5": "7c2eebce3eaa86deaaf8d643bd5d5f3e",
-      "zenodo_md5": "7c2eebce3eaa86deaaf8d643bd5d5f3e"
+      "size": 77117440,
+      "md5": "ae279e77b2733ea1eef40e52355b6f71",
+      "zenodo_md5": "ae279e77b2733ea1eef40e52355b6f71"
     },
     {
       "filename": "kincade_2019.tar",
-      "size": 29644800,
-      "md5": "b8ec8c4756d2b231a923cffd8b353ccc",
-      "zenodo_md5": "b8ec8c4756d2b231a923cffd8b353ccc"
+      "size": 34058240,
+      "md5": "7751590589b1ccd56da76463b1258f69",
+      "zenodo_md5": "7751590589b1ccd56da76463b1258f69"
     },
     {
       "filename": "knp_complex_2021.tar",
-      "size": 120842240,
-      "md5": "d78c308ff745fc2b85d889085e806a4a",
-      "zenodo_md5": "d78c308ff745fc2b85d889085e806a4a"
+      "size": 146001920,
+      "md5": "1f47df14a607f70fc075554bd89cfdb4",
+      "zenodo_md5": "1f47df14a607f70fc075554bd89cfdb4"
     },
     {
       "filename": "lnu_lightning_complex_2020.tar",
-      "size": 252825600,
-      "md5": "2743dc1efddc1698179dfc301fdc16f7",
-      "zenodo_md5": "2743dc1efddc1698179dfc301fdc16f7"
+      "size": 289996800,
+      "md5": "82fadae44d409d6152abbe403f27f667",
+      "zenodo_md5": "82fadae44d409d6152abbe403f27f667"
     },
     {
       "filename": "mccash_2021.tar",
-      "size": 208967680,
-      "md5": "1d56a8370757600f27a7cab86869751f",
-      "zenodo_md5": "1d56a8370757600f27a7cab86869751f"
+      "size": 255877120,
+      "md5": "f31c39ec855872afceea9e5a516dd956",
+      "zenodo_md5": "f31c39ec855872afceea9e5a516dd956"
     },
     {
       "filename": "mcfarland_2021.tar",
-      "size": 125020160,
-      "md5": "00e51ecdfe088aa063cf369c15b2b7e8",
-      "zenodo_md5": "00e51ecdfe088aa063cf369c15b2b7e8"
+      "size": 151869440,
+      "md5": "2f56ca074db9f9ddf0757679fdf07096",
+      "zenodo_md5": "2f56ca074db9f9ddf0757679fdf07096"
     },
     {
       "filename": "metadata-worksheet.json",
-      "size": 6144,
-      "md5": "0994742a484a928a91ba4ac3d9d83ee5",
-      "zenodo_md5": "0994742a484a928a91ba4ac3d9d83ee5"
+      "size": 6417,
+      "md5": "41c82f2a2db592a0d1cc81eea3a6458a",
+      "zenodo_md5": "41c82f2a2db592a0d1cc81eea3a6458a"
     },
     {
       "filename": "monument_2021.tar",
-      "size": 280094720,
-      "md5": "18fd43f8b795141a78aa614c04616ccd",
-      "zenodo_md5": "18fd43f8b795141a78aa614c04616ccd"
+      "size": 342722560,
+      "md5": "4fb6a03f679d691f4a9e9dcb5c16d6eb",
+      "zenodo_md5": "4fb6a03f679d691f4a9e9dcb5c16d6eb"
     },
     {
       "filename": "north_complex_2020.tar",
-      "size": 386027520,
-      "md5": "681e6a10b786eb1b8ac984f32d606234",
-      "zenodo_md5": "681e6a10b786eb1b8ac984f32d606234"
+      "size": 468961280,
+      "md5": "ef6a2d2072cb3fe17549814150ac1274",
+      "zenodo_md5": "ef6a2d2072cb3fe17549814150ac1274"
     },
     {
       "filename": "red_salmon_complex_2020.tar",
-      "size": 302960640,
-      "md5": "b55dd885a55f5dcc36deb8d595c77c47",
-      "zenodo_md5": "b55dd885a55f5dcc36deb8d595c77c47"
+      "size": 371660800,
+      "md5": "7a7827663694ab3354daf0f2385cd812",
+      "zenodo_md5": "7a7827663694ab3354daf0f2385cd812"
     },
     {
       "filename": "river_complex_2021.tar",
-      "size": 392550400,
-      "md5": "085358db97900603b8accd3a19443525",
-      "zenodo_md5": "085358db97900603b8accd3a19443525"
+      "size": 477204480,
+      "md5": "9e2dc7bb3107a18bb00b359eecfc3d0a",
+      "zenodo_md5": "9e2dc7bb3107a18bb00b359eecfc3d0a"
     },
     {
       "filename": "scu_lightning_complex_2020.tar",
-      "size": 146892800,
-      "md5": "d0ea995ff16c0f8a09e3a76743523143",
-      "zenodo_md5": "d0ea995ff16c0f8a09e3a76743523143"
+      "size": 175667200,
+      "md5": "d4a5d38e38ad7de1a528351aab3ed1fe",
+      "zenodo_md5": "d4a5d38e38ad7de1a528351aab3ed1fe"
     },
     {
       "filename": "slater_and_devil_2020.tar",
-      "size": 101775360,
-      "md5": "d779702a8142510f12f2d32c28c3a03f",
-      "zenodo_md5": "d779702a8142510f12f2d32c28c3a03f"
+      "size": 120176640,
+      "md5": "fdc4a9cc3a9d3178c53d8bacab424b7d",
+      "zenodo_md5": "fdc4a9cc3a9d3178c53d8bacab424b7d"
     },
     {
       "filename": "sqf_complex_2020.tar",
-      "size": 312842240,
-      "md5": "fe4c4d1f590de2cbe8381786941869fe",
-      "zenodo_md5": "fe4c4d1f590de2cbe8381786941869fe"
+      "size": 378071040,
+      "md5": "cbce440d9cf3aa6ba6a449d80e63a36a",
+      "zenodo_md5": "cbce440d9cf3aa6ba6a449d80e63a36a"
     },
     {
       "filename": "stage_collection.py",
@@ -195,47 +196,77 @@
     },
     {
       "filename": "tamarack_2021.tar",
-      "size": 84090880,
-      "md5": "c91ad5db864c348d28770ca5a3b26d40",
-      "zenodo_md5": "c91ad5db864c348d28770ca5a3b26d40"
+      "size": 101611520,
+      "md5": "40b5b12358703e78475bee3b63eef2c5",
+      "zenodo_md5": "40b5b12358703e78475bee3b63eef2c5"
     },
     {
       "filename": "thomas_fire.tar",
-      "size": 22067200,
-      "md5": "4022b9d98f48d372c4743fb74e1150a1",
-      "zenodo_md5": "4022b9d98f48d372c4743fb74e1150a1"
+      "size": 22056960,
+      "md5": "f3324b0e726f20bb70f37c93bb995fbf",
+      "zenodo_md5": "f3324b0e726f20bb70f37c93bb995fbf"
     },
     {
       "filename": "tubbs_fire.tar",
       "size": 4608000,
-      "md5": "12e01f1dccd1572ed1589aff21541102",
-      "zenodo_md5": "12e01f1dccd1572ed1589aff21541102"
+      "md5": "07b1c522fbd3687498292f4daada4823",
+      "zenodo_md5": "07b1c522fbd3687498292f4daada4823"
     },
     {
       "filename": "w_5_cold_springs_2020.tar",
-      "size": 51814400,
-      "md5": "07db4b290be0c87a0a9aded484d8ea1c",
-      "zenodo_md5": "07db4b290be0c87a0a9aded484d8ea1c"
+      "size": 61992960,
+      "md5": "cfd9be551a56a487cc4f61ea45f28346",
+      "zenodo_md5": "cfd9be551a56a487cc4f61ea45f28346"
     },
     {
       "filename": "walker_2019.tar",
-      "size": 31180800,
-      "md5": "cfb7e69f176d81daa9a76af7132e29c4",
-      "zenodo_md5": "cfb7e69f176d81daa9a76af7132e29c4"
+      "size": 36485120,
+      "md5": "7e1bd0aa86f32dff4c0e4a95bd09c213",
+      "zenodo_md5": "7e1bd0aa86f32dff4c0e4a95bd09c213"
     },
     {
       "filename": "windy_2021.tar",
-      "size": 103516160,
-      "md5": "c8ebe1949d0f4fcaaf75f2521398b459",
-      "zenodo_md5": "c8ebe1949d0f4fcaaf75f2521398b459"
+      "size": 125429760,
+      "md5": "f92c87cba0131cd0393f432e254370bf",
+      "zenodo_md5": "f92c87cba0131cd0393f432e254370bf"
     },
     {
       "filename": "zogg_2020.tar",
-      "size": 18882560,
-      "md5": "d139ce439aaf94bf385c90737ba9ee39",
-      "zenodo_md5": "d139ce439aaf94bf385c90737ba9ee39"
+      "size": 21053440,
+      "md5": "c60f2f8ff312e859bc4029393353184f",
+      "zenodo_md5": "c60f2f8ff312e859bc4029393353184f"
     }
   ],
+  "gust_cases_verified": [
+    "antelope_2021",
+    "august_complex_2020",
+    "beckwourth_complex_2021",
+    "bobcat_2020",
+    "caldor_2021",
+    "creek_2020",
+    "czu_lightning_complex_2020",
+    "dixie_2021",
+    "dolan_2020",
+    "glass_2020",
+    "july_complex_2020",
+    "kincade_2019",
+    "knp_complex_2021",
+    "lnu_lightning_complex_2020",
+    "mccash_2021",
+    "mcfarland_2021",
+    "monument_2021",
+    "north_complex_2020",
+    "red_salmon_complex_2020",
+    "river_complex_2021",
+    "scu_lightning_complex_2020",
+    "slater_and_devil_2020",
+    "sqf_complex_2020",
+    "tamarack_2021",
+    "w_5_cold_springs_2020",
+    "walker_2019",
+    "windy_2021",
+    "zogg_2020"
+  ],
   "draft_saved": true,
-  "ui_confirmation": "Record successfully saved.; Version 2.1.0; 37 files; 7.05 GB; Draft"
+  "ui_confirmation": "Record successfully saved.; Version 2.2.0; 37 files; unpublished draft"
 }

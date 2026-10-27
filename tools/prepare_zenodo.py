@@ -284,7 +284,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('build', 'verify', 'metadata', 'register'))
     parser.add_argument('--case', default='all', help='individual fire/case ID, gofer (all GOFER cases), or all')
-    parser.add_argument('--version', default='2.1.0')
+    parser.add_argument('--version', default='2.2.0')
     parser.add_argument('--output', type=Path, help='defaults to zenodo/dist/<version>')
     parser.add_argument('--record-id')
     parser.add_argument('--doi')
