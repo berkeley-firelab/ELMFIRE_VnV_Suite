@@ -39,10 +39,10 @@ def font_probe(output: Path) -> tuple[bool, str]:
 \input{report_style.tex}
 \newcommand{\CheckFace}[1]{\directlua{texio.write_nl("REPORTFONT:#1:" .. font.getfont(font.current()).fullname)}}
 \begin{document}
-\CheckFace{regular}Times New Roman regular.\par
-{\bfseries\CheckFace{bold}Times New Roman bold.\par}
-{\itshape\CheckFace{italic}Times New Roman italic.\par}
-{\bfseries\itshape\CheckFace{bolditalic}Times New Roman bold italic.\par}
+\CheckFace{regular}TeX Gyre Termes regular.\par
+{\bfseries\CheckFace{bold}TeX Gyre Termes bold.\par}
+{\itshape\CheckFace{italic}TeX Gyre Termes italic.\par}
+{\bfseries\itshape\CheckFace{bolditalic}TeX Gyre Termes bold italic.\par}
 \end{document}
 ''')
     result = subprocess.run(['latexmk', '-r', str(ROOT / 'common/latexmkrc'),
@@ -58,11 +58,11 @@ def font_probe(output: Path) -> tuple[bool, str]:
         r'REPORTFONT:(regular|bold|italic|bolditalic):([^\r\n\[]+)', tex_log)}
     if set(faces) != {'regular', 'bold', 'italic', 'bolditalic'}:
         return False, f'Could not verify all four font faces; inspect {output / "build.log.txt"}'
-    if any('timesnewroman' not in re.sub(r'\s+', '', name).lower() for name in faces.values()):
+    if any('texgyretermes' not in re.sub(r'\s+', '', name).lower() for name in faces.values()):
         return False, f'Unexpected font substitution: {faces}'
     if len(set(faces.values())) != 4:
         return False, f'Font faces are not distinct: {faces}'
-    return True, 'Times New Roman regular, bold, italic and bold italic compiled successfully.'
+    return True, 'TeX Gyre Termes regular, bold, italic and bold italic compiled successfully.'
 
 
 def main() -> None:
@@ -101,8 +101,8 @@ def main() -> None:
             print('[OK] ' + message)
         else:
             errors.append(message)
-            errors.append('Use genuine Times New Roman files for all four faces. '
-                          'Set ELMFIRE_REPORT_FONT_DIR if they are outside the system font directories. '
+            errors.append('Install the TeX Live tex-gyre package (Ubuntu/Debian: fonts-texgyre) '
+                          'and check kpsewhich texgyretermes-regular.otf. '
                           'Use a non-hidden relative ELMFIRE_TEX_CACHE such as tex-cache if the log reports a cache failure.')
     if errors:
         for error in errors:

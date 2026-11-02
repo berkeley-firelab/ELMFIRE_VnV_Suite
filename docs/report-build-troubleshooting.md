@@ -3,7 +3,7 @@
 Run the environment check before rebuilding a report on either the workstation
 or Savio. It checks the selected Python interpreter, report tools, every TeX
 package referenced by current reports, cache access, and actual compilation of
-genuine Times New Roman regular, bold, italic, and bold italic.
+TeX Gyre Termes regular, bold, italic, and bold italic.
 
 ```bash
 # Activate the Python environment used for this suite first.
@@ -36,7 +36,7 @@ LuaLaTeX needs to write its font cache. In the installed TeX Live 2024, the TeX
 file-access policy also rejects hidden or absolute cache paths even when the
 operating system permits writing them. Every current report and the case
 template now has a local `.latexmkrc` that places the cache in the relative
-`tex-cache/` directory, chooses LuaLaTeX, and configures an optional font directory.
+`tex-cache/` directory, chooses LuaLaTeX, and uses the TeX-distributed font files.
 Those files are copies of `common/latexmkrc`; keep them synchronized.
 
 Run `latexmk` from the report directory so it loads that configuration:
@@ -55,27 +55,44 @@ If compiling by calling `lualatex` directly, `.latexmkrc` is not read; prefer
 `latexmk`, or explicitly export `TEXMFCACHE=tex-cache` after creating that
 directory in the report directory.
 
-## Times New Roman cannot be found
+## TeX Gyre Termes cannot be found
 
-The report style requires genuine Times New Roman in four faces. A successful
-`fc-match` alone does not prove that LuaLaTeX can load the font: fontconfig can
-return a substitute. The report check compiles the actual style and inspects
-the resolved font names for all four faces.
+Reports use [TeX Gyre Termes](https://ctan.org/pkg/tex-gyre), a free Times-like
+font based on Nimbus Roman. The shared style explicitly selects its regular,
+bold, italic, and bold italic OpenType files. This avoids system font-name
+lookup and the need to copy proprietary fonts to a cluster.
 
-On macOS these files are commonly installed under
-`/System/Library/Fonts/Supplemental/`. If the fonts are in a separate directory,
-point the build at that directory:
+Check that the active TeX installation can find all four faces:
 
 ```bash
-export ELMFIRE_REPORT_FONT_DIR="/absolute/path/to/times-new-roman-fonts"
+for face in regular bold italic bolditalic; do
+  kpsewhich "texgyretermes-${face}.otf"
+done
+```
+
+If files are missing, install `tex-gyre` in a user-managed TeX Live installation:
+
+```bash
+tlmgr install tex-gyre
+```
+
+For a site-managed installation, load a TeX module that includes the fonts or
+ask the administrator to install them. On Ubuntu/Debian, the
+[`fonts-texgyre` package](https://packages.ubuntu.com/jammy/all/fonts-texgyre/filelist)
+provides these OpenType files. Do not mix tools from different TeX installations.
+
+The former `ELMFIRE_REPORT_FONT_DIR` variable is no longer used. It can be unset:
+
+```bash
+unset ELMFIRE_REPORT_FONT_DIR
 make report-check PYTHON_BIN=python
 ```
 
-The directory must contain the regular, bold, italic, and bold italic font
-files. Obtain the genuine files through your institution or an installation you
-are entitled to use. They are not bundled or committed in this repository.
-`ELMFIRE_REPORT_FONT_DIR` adds an OpenType lookup path; it does not substitute
-another font family. A font-only correction does not require running ELMFIRE.
+A font-only correction does not require running ELMFIRE. After changing fonts,
+rebuild the standalone case PDFs before the aggregate reports; `make reports`
+only assembles existing case PDFs and metrics. Run `latexmk -g -lualatex
+-interaction=nonstopmode -halt-on-error case_report.tex` from each case's
+`report/` directory to rebuild from existing report inputs.
 
 ## Required tools or TeX packages are missing
 
@@ -88,14 +105,12 @@ On an Ubuntu or Debian host where you manage system packages:
 
 ```bash
 sudo apt-get update
-sudo apt-get install latexmk texlive-luatex texlive-latex-extra texlive-science fontconfig
+sudo apt-get install latexmk texlive-luatex texlive-latex-extra texlive-science fonts-texgyre fontconfig
 ```
 
-These packages provide the report tools and TeX dependencies. Times New Roman
-is an additional dependency. The repository Dockerfiles include the TeX package
-set above; supply genuine Times New Roman files separately, for example through
-a read-only font volume and `ELMFIRE_REPORT_FONT_DIR`. The Ubuntu package
-catalog describes the [science collection](https://packages.ubuntu.com/jammy/texlive-science).
+These packages provide the report tools, TeX dependencies, and free report fonts.
+Both repository Dockerfiles include `fonts-texgyre`, so a separate font volume
+is not needed.
 
 With a TeX Live installation managed by `tlmgr`, install the specific missing
 packages reported by the check using that installation's package manager. On
@@ -119,9 +134,9 @@ make report-check PYTHON_BIN="$CONDA_PREFIX/bin/python"
 If the TeX tools are missing and no suitable module exists, use a user-managed
 TeX Live installation or request the tools from the cluster administrators.
 System package installation commands requiring `sudo` are not a Savio workflow.
-If Times New Roman is missing, put the four genuine faces in your own font
-directory and export `ELMFIRE_REPORT_FONT_DIR` before building. Ensure that
-directory and the report working directory are visible on the build node.
+If the font probe fails, check all four `texgyretermes-*.otf` files as described
+above. The TeX installation and report working directory must be visible on the
+build node.
 
 After the check succeeds:
 

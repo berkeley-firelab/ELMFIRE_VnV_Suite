@@ -29,10 +29,10 @@ class ReportEnvironmentTests(unittest.TestCase):
 
     def test_font_probe_rejects_substitutions_and_missing_faces(self):
         for faces, expected in (
-            (['Times New Roman', 'Times New Roman Bold', 'Times New Roman Italic', 'Times New Roman Bold Italic'], True),
+            (['TeXGyreTermes-Regular', 'TeXGyreTermes-Bold', 'TeXGyreTermes-Italic', 'TeXGyreTermes-BoldItalic'], True),
             (['Liberation Serif'] * 4, False),
-            (['Times New Roman'] * 4, False),
-            (['Times New Roman'], False),
+            (['TeXGyreTermes-Regular'] * 4, False),
+            (['TeXGyreTermes-Regular'], False),
         ):
             with self.subTest(faces=faces), tempfile.TemporaryDirectory() as tmp:
                 output = Path(tmp)

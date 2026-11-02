@@ -111,7 +111,7 @@ from the arrival-time raster and labeled accordingly.
 The scientific Python environment needs numpy, matplotlib and rasterio; data
 generation additionally needs the dependencies listed in its local README.
 VIIRS characterization requires GDAL's `ogr2ogr`. Standalone reports use
-LuaLaTeX, latexmk and genuine Times New Roman fonts. Input characterization,
+LuaLaTeX, latexmk and TeX Gyre Termes fonts. Input characterization,
 postprocessing and report compilation can be run without launching ELMFIRE.
 
 All 28 GOFER cases include supplementary `data/weather/ws_gust.tif` files from

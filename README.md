@@ -98,19 +98,21 @@ make report-check PYTHON_BIN=python
 ```
 
 Reports require `latexmk`, LuaLaTeX, the TeX packages used by the reports, and
-**genuine Times New Roman in regular, bold, italic, and bold italic faces**.
-Fonts are not bundled with this repository. If they are installed separately:
+**TeX Gyre Termes**, a free Times-like font supplied by TeX Live's `tex-gyre`
+package. The style selects its four font files directly; no Microsoft fonts or
+system font registration are required. On Ubuntu/Debian, install
+`fonts-texgyre` alongside the TeX tools.
 
 ```bash
-export ELMFIRE_REPORT_FONT_DIR=/absolute/path/to/times-new-roman-fonts
-export ELMFIRE_TEX_CACHE=tex-cache
+kpsewhich texgyretermes-regular.otf
 make report-check PYTHON_BIN=python
 ```
 
-The cache path must be relative and non-hidden. A successful `fc-match` can
-return a substitute font; the report check compiles and checks all four actual
-faces. See [report build troubleshooting](docs/report-build-troubleshooting.md)
-for installation instructions and the diagnostic logs.
+The report check compiles and checks all four font faces. The default font cache
+is `tex-cache/`; an override through `ELMFIRE_TEX_CACHE` must be relative and
+non-hidden. The former `ELMFIRE_REPORT_FONT_DIR` setting is no longer used.
+See [report build troubleshooting](docs/report-build-troubleshooting.md) for
+installation instructions and the diagnostic logs.
 
 ## Validation data and case folders
 
@@ -258,8 +260,7 @@ python tools/run_all.py --suite validation --slurm
 Use `--suite verification` for verification jobs. Each case receives a generated
 `run_case_slurm.sh` wrapper and a job name such as `elmfire-antelope_2021`.
 Scheduler logs use `slurm-<job-name>-<job-id>.stdout` and `.stderr` in the case
-directory. Export any font settings before submission as well, and ensure the
-TeX tools and fonts are accessible on the compute nodes.
+directory. Ensure the TeX tools and TeX Gyre fonts are accessible on the compute nodes.
 
 ## Rebuild reports from existing results
 
@@ -293,7 +294,7 @@ under `main_report/generated/`. Scientific decisions come from the case metrics:
 missing evidence remains `NOT EVALUABLE`, and validation without justified
 acceptance thresholds may be `CHARACTERIZED`.
 
-Reports use the common Times New Roman style in `main_report/report_style.tex`,
+Reports use the common TeX Gyre Termes style in `main_report/report_style.tex`,
 with local copies for standalone compilation. Keep those copies synchronized.
 See [report troubleshooting](docs/report-build-troubleshooting.md) for font,
 cache, package, missing-figure, and stale-report issues.
@@ -380,7 +381,7 @@ adds report style and structure checks. `make test-all` runs both. See the
 The [Google Cloud configuration folder](gcp_config/) contains Docker, Cloud Build,
 Batch, and Cloud Run templates. Adapt the project, accounts, storage, build
 context, and template paths before use; the checked-in configuration contains
-site-specific values. Supply report fonts separately. `tools/run_all.py` supports
+site-specific values. The Dockerfiles install the free TeX Gyre fonts. `tools/run_all.py` supports
 cloud task sharding and optional result uploads through `RESULTS_BUCKET`;
 those uploads also require the Google Cloud Storage Python package and access
 to the destination bucket.

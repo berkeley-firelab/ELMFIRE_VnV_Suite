@@ -23,13 +23,8 @@ $ENV{'TEXMFCACHE'} = $report_cache;
 $ENV{'TEXMFVAR'} = File::Spec->catdir($report_cache, 'texmf-var');
 $ENV{'VARTEXFONTS'} = File::Spec->catdir($report_cache, 'fonts');
 
-# Optional directory containing genuine Times New Roman font files. This adds
-# a lookup path; the report style still requires the original font family.
-if ($ENV{'ELMFIRE_REPORT_FONT_DIR'}) {
-    my $font_dir = File::Spec->rel2abs($ENV{'ELMFIRE_REPORT_FONT_DIR'});
-    die "[ERROR] ELMFIRE_REPORT_FONT_DIR is not a directory: $font_dir\n" unless -d $font_dir;
-    $ENV{'OSFONTDIR'} = $font_dir . '//' . ($ENV{'OSFONTDIR'} ? ':' . $ENV{'OSFONTDIR'} : '');
-}
+# TeX Gyre Termes is loaded by filename from the TeX distribution.
+# ELMFIRE_REPORT_FONT_DIR is no longer needed.
 
 $pdf_mode = 4;  # LuaLaTeX, including when latexmk is invoked without -lualatex.
 $silent = 1;
